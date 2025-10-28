@@ -13,12 +13,12 @@
     <div class="relative backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-md w-full mx-auto transform transition-all animate-modal-enter">
 
         {# Close Button #}
-        <button type="button"
+        <a href="{{ path('app_logout') }}"
                 class="absolute top-6 right-6 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 p-2 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 rounded-xl">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
             </svg>
-        </button>
+        </a>
 
         {# Modal Content #}
         <div class="px-10 py-12">
@@ -97,13 +97,6 @@
                     <span class="relative z-10">Verifizieren</span>
                     <div class="absolute inset-0 bg-gradient-to-r from-slate-700 to-slate-800 dark:from-gray-100 dark:to-gray-200 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-200"></div>
                 </button>
-
-                {# Alternative Options #}
-                <div class="mt-6 text-center space-y-2">
-                    <a href="#" class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 font-light">
-                        Probleme mit dem Code?
-                    </a>
-                </div>
 
             </form>
         </div>

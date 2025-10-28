@@ -88,6 +88,6 @@ class SettingsController extends AbstractController
         }
 
         // Code verified: keep the secret (already set) and send user to dashboard/home
-        return $this->redirectToRoute('app_settings');
+        return $this->redirectToRoute('app_dashboard');
     }
 }

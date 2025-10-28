@@ -12,11 +12,14 @@ class TestController extends AbstractController
     #[Route(path: '/', name: 'app_dashboard')]
     public function test(Security $security): \Symfony\Component\HttpFoundation\Response
     {
-        // Prüfen, ob der Nutzer 2FA abgeschlossen hat
-        if (!$this->isGranted('IS_AUTHENTICATED_2FA_IN_PROGRESS')) {
-
-            return $this->redirectToRoute('app_register_google_auth');
-        }
+//        //prüfe ob user google token nicht null ist
+//        $user = $security->getUser();
+//        $googleAuthenticatorToken = $user->getGoogleAuthenticatorSecret();
+//
+//        // Prüfen, ob der Nutzer 2FA abgeschlossen hat
+//        if ($googleAuthenticatorToken === null) {
+//            return $this->redirectToRoute('app_register_google_auth');
+//        }
 
         return $this->render('empty.html.twig');
     }

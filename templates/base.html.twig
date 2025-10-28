@@ -38,8 +38,14 @@
 <div class="flex h-screen">
 
 
-    {# Menü nur anzeigen, wenn Benutzer voll authentifiziert ist und Google Auth aktiv ist #}
-    {% if is_granted('IS_AUTHENTICATED_FULLY') and app.user and app.user.googleAuthenticatorSecret %}
+    {# Menü nur anzeigen, wenn Benutzer den Google-Code bereits verifiziert hat #}
+    {% set current_route = app.request.attributes.get('_route') %}
+    {% set hide_on_routes = ['app_register_google_auth', 'app_2fa_manual', 'app_2fa_manual_check'] %}
+    {% if is_granted('IS_AUTHENTICATED_FULLY')
+        and app.user
+        and app.user.googleAuthenticatorSecret
+        and not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS')
+        and current_route not in hide_on_routes %}
         {% include 'navigation/navigation.html.twig' %}
     {% endif %}
 
