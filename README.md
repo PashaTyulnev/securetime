@@ -1,4 +1,4 @@
-1. Login/Logout funktioniert
-2. Google Authentication
-   https://symfony.com/bundles/SchebTwoFactorBundle/current/providers/google.html
-3. 
+# Basis-App mit User-Authentifizierung + Google Authenticator
+
+1. Enthält User Entity mit email, password, roles und googleAuthenticatorSecret.
+2. Implementiert User-Authentifizierung mit Passwort und Google Authenticator.
