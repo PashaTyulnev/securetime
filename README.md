@@ -2,3 +2,5 @@
 
 1. Enthält User Entity mit email, password, roles und googleAuthenticatorSecret.
 2. Implementiert User-Authentifizierung mit Passwort und Google Authenticator.
+3. Navbar erstellt
+4. Eingeloggter User wird angezeigt

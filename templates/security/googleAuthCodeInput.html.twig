@@ -3,112 +3,235 @@
 {% block title %}DWD - Zwei-Faktor-Authentifizierung{% endblock %}
 
 {% block body %}
-    {# Backdrop #}
-    <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-90 transition-opacity flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8 z-50">
+    {# Backdrop mit Blur-Effekt #}
+    <div class="fixed inset-0 bg-gradient-to-br from-gray-100/90 to-gray-200/90 dark:from-gray-900/95 dark:to-black/95 backdrop-blur-md transition-opacity flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8 z-50">
 
-        {# Modal Container #}
-        <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-sm w-full mx-auto transform transition-all">
+        {# Subtle background pattern #}
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.02"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
 
-            {# Close Button #}
-            <button type="button" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition duration-150 ease-in-out">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
+    {# Modal Container mit Glassmorphism #}
+    <div class="relative backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-md w-full mx-auto transform transition-all animate-modal-enter">
 
-            {# Modal Content #}
-            <div class="px-8 py-10">
-                {# Icon #}
-                <div class="text-center mb-6">
-                    <div class="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
-                        <svg class="h-10 w-10 text-slate-900 dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                    </div>
+        {# Close Button #}
+        <button type="button"
+                class="absolute top-6 right-6 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 p-2 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 rounded-xl">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        {# Modal Content #}
+        <div class="px-10 py-12">
+            {# Icon mit Animation #}
+            <div class="text-center mb-8 animate-bounce-in">
+                <div class="mx-auto h-20 w-20 flex items-center justify-center rounded-3xl bg-gradient-to-br from-slate-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 shadow-inner">
+                    <svg class="h-11 w-11 text-slate-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
                 </div>
+            </div>
 
-                {# Title & Description #}
-                <div class="text-center mb-8">
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                        Zwei-Faktor-Authentifizierung
-                    </h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Bitte geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein
-                    </p>
-                </div>
+            {# Title & Description #}
+            <div class="text-center mb-10">
+                <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-3">
+                    Zwei-Faktor-Authentifizierung
+                </h2>
+                <p class="text-sm font-light text-gray-500 dark:text-gray-400 leading-relaxed">
+                    Bitte geben Sie den 6-stelligen Code<br>aus Ihrer Authenticator-App ein
+                </p>
+            </div>
 
-                {# Error Message #}
-                {# Error Message #}
-                {% if authenticationError %}
-                    <div class="mb-6 rounded-xl bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-red-400 dark:text-red-500" viewBox="0 0 20 20" fill="currentColor">
+            {# Error Message #}
+            {% if authenticationError %}
+                <div class="mb-8 animate-shake rounded-2xl bg-red-50/80 dark:bg-red-900/20 p-4 border border-red-200/50 dark:border-red-800/50 backdrop-blur-sm">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-10 h-10 bg-red-100 dark:bg-red-800/30 rounded-xl flex items-center justify-center">
+                                <svg class="h-5 w-5 text-red-500 dark:text-red-400" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                 </svg>
                             </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-red-800 dark:text-red-200">
-                                    Ungültiger Code. Bitte versuchen Sie es erneut.
-                                </p>
-                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-light text-red-700 dark:text-red-300">
+                                Ungültiger Code. Bitte versuchen Sie es erneut.
+                            </p>
                         </div>
                     </div>
-                {% endif %}
+                </div>
+            {% endif %}
 
-                {# Form #}
-                <form method="post" action="{{ path('2fa_login_check') }}">
+            {# Form #}
+            <form method="post" action="{{ form_action|default(path('2fa_login_check')) }}">
 
-                    {# 6-Digit Input Field #}
-                    <div class="mb-6">
-                        <input
-                            type="text"
-                            name="_auth_code"
-                            id="auth_code"
-                            maxlength="6"
-                            pattern="[0-9]{6}"
-                            inputmode="numeric"
-                            autocomplete="one-time-code"
-                            class="appearance-none relative block w-full px-4 py-4 border border-gray-300 dark:border-gray-600 rounded-xl text-center text-2xl font-mono tracking-widest text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent transition duration-150 ease-in-out"
-                            placeholder="000000"
-                            required
-                            autofocus
-                        >
+                {# 6-Digit Input Field mit modernem Design #}
+                <div class="mb-8 relative">
+                    <div class="flex justify-center space-x-3">
+                        {# 6 einzelne Input-Felder für bessere UX #}
+                        {% for i in 0..5 %}
+                            <input
+                                type="text"
+                                name="_auth_digit_{{ i }}"
+                                id="auth_digit_{{ i }}"
+                                maxlength="1"
+                                pattern="[0-9]"
+                                inputmode="numeric"
+                                class="auth-digit w-14 h-16 text-center text-2xl font-light bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800 transition-all duration-200 backdrop-blur-sm"
+                                placeholder="·"
+                                {% if i == 0 %}autofocus{% endif %}
+                                required
+                            >
+                        {% endfor %}
                     </div>
+                    {# Hidden field für den kombinierten Code #}
+                    <input type="hidden" name="_auth_code" id="auth_code">
+                </div>
 
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                    {# Submit Button #}
-                    <button
-                        type="submit"
-                        class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-slate-900 dark:bg-slate-100 dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 dark:focus:ring-offset-gray-800 transition duration-150 ease-in-out"
-                    >
-                        Verifizieren
-                    </button>
+                {# Submit Button mit Gradient #}
+                <button
+                    type="submit"
+                    class="w-full relative bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-gray-100 text-white dark:text-gray-900 font-medium py-4 px-6 rounded-2xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-slate-500/20 dark:focus:ring-white/20"
+                >
+                    <span class="relative z-10">Verifizieren</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-slate-700 to-slate-800 dark:from-gray-100 dark:to-gray-200 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-200"></div>
+                </button>
 
-                </form>
-            </div>
+                {# Alternative Options #}
+                <div class="mt-6 text-center space-y-2">
+                    <a href="#" class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 font-light">
+                        Probleme mit dem Code?
+                    </a>
+                </div>
+
+            </form>
         </div>
+
+        {# Bottom Decoration #}
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-gray-700 to-transparent"></div>
+    </div>
     </div>
 
+    {# CSS für Animationen #}
+    <style>
+        @keyframes modal-enter {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes bounce-in {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-2px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(2px);
+            }
+        }
+
+        .animate-modal-enter {
+            animation: modal-enter 0.4s ease-out;
+        }
+
+        .animate-bounce-in {
+            animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .animate-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* Focus effect for digit inputs */
+        .auth-digit:focus {
+            transform: scale(1.05);
+        }
+
+        /* Loading state for button */
+        button[type="submit"]:active {
+            transform: scale(0.98);
+        }
+    </style>
+
     <script>
-
-        // Auto-focus und Formatierung für den Code-Eingabefeld
         document.addEventListener('DOMContentLoaded', function() {
-            const codeInput = document.getElementById('auth_code');
+            const digitInputs = document.querySelectorAll('.auth-digit');
+            const hiddenInput = document.getElementById('auth_code');
 
-            // Nur Zahlen erlauben
-            codeInput.addEventListener('input', function(e) {
-                e.target.value = e.target.value.replace(/[^0-9]/g, '');
-            });
+            // Funktion zum Kombinieren der Ziffern
+            function combineDigits() {
+                let code = '';
+                digitInputs.forEach(input => {
+                    code += input.value;
+                });
+                hiddenInput.value = code;
 
-            // Auto-submit nach 6 Ziffern
-            codeInput.addEventListener('input', function(e) {
-                if (e.target.value.length === 6) {
+                // Auto-submit wenn alle 6 Ziffern eingegeben wurden
+                if (code.length === 6 && /^\d{6}$/.test(code)) {
                     setTimeout(() => {
-                        e.target.form.submit();
-                    }, 500);
+                        document.querySelector('form').submit();
+                    }, 300);
                 }
+            }
+
+            digitInputs.forEach((input, index) => {
+                // Nur Zahlen erlauben
+                input.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
+                    // Zum nächsten Feld springen
+                    if (e.target.value && index < digitInputs.length - 1) {
+                        digitInputs[index + 1].focus();
+                    }
+
+                    combineDigits();
+                });
+
+                // Backspace handling
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        digitInputs[index - 1].focus();
+                    }
+                });
+
+                // Paste handling
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
+                    if (pastedData.length === 6) {
+                        pastedData.split('').forEach((digit, i) => {
+                            if (digitInputs[i]) {
+                                digitInputs[i].value = digit;
+                            }
+                        });
+                        combineDigits();
+                    }
+                });
             });
         });
     </script>

@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="p-8 max-w-2xl mx-auto">
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-8">
+
+            <div class="flex items-center space-x-4 mb-6">
+                {{ ux_icon('lucide:shield-plus', { class: 'w-8 h-8 text-blue-600 dark:text-blue-500' }) }}
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Zwei-Faktor-Authentifizierung einrichten</h2>
+            </div>
+
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+                Verwenden Sie die App **Google Authenticator**, um den folgenden QR-Code zu scannen und die Zwei-Faktor-Authentifizierung (2FA) für Ihr Konto zu aktivieren.
+            </p>
+
+            <div class="flex flex-col items-center p-6 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 mb-8">
+                <p class="text-gray-700 dark:text-gray-200 font-semibold mb-4">Schritt 1: Scannen Sie diesen Code</p>
+
+                <img src="{{ qrCodeDataUri }}" alt="QR Code für Google Authenticator"
+                     class="w-48 h-48 border-4 border-white dark:border-gray-800 shadow-md rounded-lg p-1">
+            </div>
+
+            <div class="mb-8">
+                <p class="text-gray-700 dark:text-gray-200 font-semibold mb-3">Schritt 2: Oder geben Sie diesen Code manuell ein</p>
+
+                <code class="block w-full text-center py-3 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 font-mono text-lg rounded-lg border border-blue-200 dark:border-blue-700 select-all">
+                    {{ app.user.googleAuthenticatorSecret }}
+                </code>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">Dieser Code ist Ihr geheimer Schlüssel. Speichern Sie ihn sicher.</p>
+            </div>
+
+            {# Button zur 2FA-PIN-Seite #}
+            <div class="text-center">
+                <a href="{{ path('app_2fa_manual') }}"
+                   class="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition">
+                    Zur PIN-Eingabe
+                </a>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

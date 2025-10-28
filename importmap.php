@@ -22,4 +22,19 @@ return [
     '@symfony/stimulus-bundle' => [
         'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
     ],
+    'flowbite/plugin' => [
+        'version' => '3.1.2',
+    ],
+    'mini-svg-data-uri' => [
+        'version' => '1.4.4',
+    ],
+    'tailwindcss/plugin' => [
+        'version' => '4.0.4',
+    ],
+    'tailwindcss/defaultTheme' => [
+        'version' => '4.0.4',
+    ],
+    'tailwindcss/colors' => [
+        'version' => '4.0.4',
+    ],
 ];

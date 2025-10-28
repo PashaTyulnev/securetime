@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
-body {
-    background-color: skyblue;
+@custom-variant dark (&:where(.dark, .dark *));
+html {
+    color-scheme: light;
 }

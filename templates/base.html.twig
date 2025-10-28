@@ -1,17 +1,65 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="de" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objektsicherheit - Dashboard</title>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<script>
+    // **WICHTIG:** Verwende den Schlüssel 'theme' konsistent
+    const savedTheme = localStorage.getItem('theme');
+
+    // Ermittle den gewünschten Dark-Mode-Zustand
+    let isDarkMode = false;
+
+    if (savedTheme === 'dark') {
+        isDarkMode = true;
+    } else if (savedTheme === 'light') {
+        isDarkMode = false;
+    } else {
+        // KEINE GESPEICHERTE PRÄFERENZ: Verwende die System-Präferenz als Fallback
+        isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // Speichere den Startwert, um ihn beim nächsten Laden nicht erneut abfragen zu müssen
+        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    }
+
+    if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+</script>
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+<div class="flex h-screen">
+
+
+    {# Menü nur anzeigen, wenn Benutzer voll authentifiziert ist und Google Auth aktiv ist #}
+    {% if is_granted('IS_AUTHENTICATED_FULLY') and app.user and app.user.googleAuthenticatorSecret %}
+        {% include 'navigation/navigation.html.twig' %}
+    {% endif %}
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto">
+
+        {% block body %}
+
+            <div class="p-8">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <h2 class="text-lg font-semibold mb-4">Willkommen im Dashboard</h2>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Hier sehen Sie eine Übersicht über alle wichtigen Informationen Ihrer Objektsicherheitsfirma.
+                    </p>
+                </div>
+            </div>
+
         {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    </main>
+</div>
+</body>
 </html>
