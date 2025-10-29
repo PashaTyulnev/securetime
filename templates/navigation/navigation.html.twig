@@ -1,7 +1,7 @@
 {# 1. Definiere die aktuelle Route (Best Practice) #}
 {% set current_route = app.request.attributes.get('_route') %}
 
-{# 2. Definiere die Klassen-Sets mit eleganterem Stil #}
+{# 2. Definiere die Klassen-Sets mit elegantem Stil #}
 {% set default_classes = 'group flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 relative overflow-hidden' %}
 {% set active_classes = 'group flex items-center space-x-3 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-slate-100 to-gray-100 dark:from-gray-700/50 dark:to-gray-700/30 text-slate-900 dark:text-white font-medium shadow-sm' %}
 
@@ -26,19 +26,8 @@
     {# Navigation mit elegantem Scrollbereich #}
     <nav class="flex-1 overflow-y-auto px-5 pb-5 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent">
         <ul class="space-y-2">
-            {# Dashboard #}
-            {% set target_route = 'app_dashboard' %}
-            <li>
-                <a href="{{ path(target_route) }}" class="{% if current_route == target_route %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %}">
-                    <span class="relative z-10 flex items-center space-x-3">
-                        {{ ux_icon('lucide:layout-dashboard', { class: 'w-5 h-5 transition-colors duration-200' }) }}
-                        <span>Dashboard</span>
-                    </span>
-                    {% if current_route == target_route %}
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-slate-600 to-slate-800 dark:from-white dark:to-gray-300 rounded-r-full"></div>
-                    {% endif %}
-                </a>
-            </li>
+
+            {% include 'navigation/navigationElement.html.twig' with {'route' : 'app_dashboard', 'icon' : 'lucide:layout-dashboard', 'title' : 'Dashboard'} %}
 
             {# Einsatzplanung #}
             <li>
@@ -75,15 +64,9 @@
                 </a>
             </li>
 
-            {# Mitarbeiter #}
-            <li>
-                <a href="#" class="{{ default_classes }}">
-                    <span class="relative z-10 flex items-center space-x-3">
-                        {{ ux_icon('lucide:users', { class: 'w-5 h-5 transition-colors duration-200' }) }}
-                        <span>Mitarbeiter</span>
-                    </span>
-                </a>
-            </li>
+            {% include 'navigation/navigationElement.html.twig' with {'route' : 'app_employees', 'icon' : 'lucide:users', 'title' : 'Mitarbeiter'} %}
+
+{#            {% include 'navigation/navigationElement.html.twig' with {'route' : 'app_employees', 'icon' : 'lucide:clock', 'title' : 'Zeiterfassung'} %}#}
 
             {# Zeiterfassung #}
             <li>
@@ -212,33 +195,6 @@
         position: relative;
     }
 
-    nav a::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 1rem;
-        background: linear-gradient(45deg, transparent, rgba(100, 116, 139, 0.05), transparent);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
 
-    nav a:hover::before {
-        opacity: 1;
-    }
 
-    /* Active state animation */
-    @keyframes slideIn {
-        from {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-
-    nav a.active > div:first-child {
-        animation: slideIn 0.3s ease-out;
-    }
 </style>

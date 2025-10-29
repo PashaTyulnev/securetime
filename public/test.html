@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sicherheitsdienstleistungen – SicherZeit</title>
+    <style>
+        /* APPLE STYLE ROOTS & RESET */
+        :root {
+            --text-color: #1d1d1f; /* Fast Schwarz */
+            --subtle-color: #6e6e73; /* Dunkles Grau */
+            --light-color: #f5f5f7; /* Apple's helles Hintergrundgrau */
+            --accent: #007AA3; /* Ein tieferes, seriöses Blau-Grau */
+            --background-start: #fbfbfd; /* Sehr helles, fast weißes Hintergrund-Start */
+            --card-bg: #ffffff;
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.02); /* Sehr weicher, fast unsichtbarer Schatten */
+            --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        body {
+            font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+            color: var(--text-color);
+            background: var(--background-start);
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* GLOBALE LAYOUTS */
+        section {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 8rem 3rem;
+            text-align: center;
+        }
+
+        /* TYPOGRAFIE */
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 span {
+            font-weight: 400;
+            color: var(--subtle-color);
+        }
+
+        p.subtitle {
+            font-size: 1.25rem;
+            color: var(--subtle-color);
+            margin-bottom: 5rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            /* Extra-Pepp: Etwas fetter im Subtitle */
+            font-weight: 500;
+        }
+
+        /* GRID ANPASSUNG FÜR 5 ELEMENTE */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2.5rem;
+            text-align: left;
+        }
+
+        /* SERVICE ITEM (KACHEL) */
+        .service {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 0;
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* HOVER EFFEKT */
+        .service:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* BILD-CONTAINER: GRÖSSER & ECKIG MIT ABGERUNDETEN ECKEN */
+        .image-container {
+            width: 100%;
+            height: 150px;
+            overflow: hidden;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            margin-bottom: 1.5rem;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: grayscale(100%) brightness(1.1);
+            transition: filter 0.4s ease;
+            opacity: 0.9;
+        }
+
+        .service:hover .image-container img {
+            filter: grayscale(0%) brightness(1);
+        }
+
+        /* TEXT-INHALT INNERHALB DER KACHEL */
+        .content {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            text-align: left;
+        }
+
+        /* TEXT STYLING */
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text-color);
+        }
+
+        p {
+            font-size: 0.9rem;
+            color: var(--subtle-color);
+            line-height: 1.5;
+            margin: 0;
+            /* Peppiger: Etwas fetter für bessere Lesbarkeit in der kleinen Größe */
+            font-weight: 500;
+        }
+
+        /* ANIMATION BEIBEHALTEN */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .service {
+            opacity: 0;
+            animation: fadeUp 0.9s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
+
+        /* DELAYS */
+        .service:nth-child(1) { animation-delay: 0.05s; }
+        .service:nth-child(2) { animation-delay: 0.10s; }
+        .service:nth-child(3) { animation-delay: 0.15s; }
+        .service:nth-child(4) { animation-delay: 0.20s; }
+        .service:nth-child(5) { animation-delay: 0.25s; }
+        .service:nth-child(6) { animation-delay: 0.30s; }
+        .service:nth-child(7) { animation-delay: 0.35s; }
+        .service:nth-child(8) { animation-delay: 0.40s; }
+        .service:nth-child(9) { animation-delay: 0.45s; }
+        .service:nth-child(10) { animation-delay: 0.50s; }
+
+        /* RESPONSIVE ANPASSUNGEN */
+        @media (max-width: 1350px) {
+            .grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        @media (max-width: 1000px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 650px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        @media (max-width: 450px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .image-container {
+                height: 120px;
+            }
+            .content {
+                padding: 1rem;
+            }
+            h3 { font-size: 1.1rem; }
+            p { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+<section>
+    <h1>Sicherheit – <span>neu definiert.</span></h1>
+    <p class="subtitle">Ihre Sicherheit, unsere Expertise. Wir liefern Technologie und Präsenz, damit Sie sich auf das Wesentliche konzentrieren können.</p>
+
+    <div class="grid">
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20modern%20building%20security%20camera,%20minimalist,%20monochrome" alt="Objektschutz">
+            </div>
+            <div class="content">
+                <h3>Objektschutz</h3>
+                <p>Volle Kontrolle. Intelligente Analyse und diskrete Überwachung sichern Ihre Gebäude 24/7. **Ruhe garantiert.**</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20factory%20worker%20security%20check,%20industrial,%20monochrome" alt="Werkschutz">
+            </div>
+            <div class="content">
+                <h3>Werkschutz</h3>
+                <p>Produktion ohne Risiko. Wir sichern Logistik und steuern Zugänge. **Ihr Betrieb, reibungslos.**</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20construction%20site%20night%20security,%20urban,%20monochrome" alt="Baubewachung">
+            </div>
+            <div class="content">
+                <h3>Baubewachung</h3>
+                <p>Keine Verluste. Aktive Prävention schützt Materialien und Termine. **Sicher durch die Nacht.**</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20event%20entrance%20security,%20exclusive,%20monochrome" alt="Einlasskontrollen">
+            </div>
+            <div class="content">
+                <h3>Einlasskontrollen</h3>
+                <p>Souverän auftreten. Freundliches, geschultes Personal für einen sicheren und angenehmen Einlass. **Fokus auf das Event.**</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20corporate%20reception%20desk,%20professional%20guard,%20monochrome" alt="Pforten- & Informationsdienst">
+            </div>
+            <div class="content">
+                <h3>Pforten- & Informationsdienst</h3>
+                <p>Die Visitenkarte. Höchste Servicequalität mit geschultem Sicherheitsbewusstsein. **Der perfekte Empfang.**</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20shopping%20mall%20security%20guard,%20discreet,%20monochrome" alt="Ladendetektive">
+            </div>
+            <div class="content">
+                <h3>Ladendetektive</h3>
+                <p>Gewinne sichern. Unauffällige Präsenz minimiert Diebstahl. **Effizient und diskret.**</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20security%20strategy%20meeting,%20blueprints,%20monochrome" alt="Sicherheitskonzepte & Beratung">
+            </div>
+            <div class="content">
+                <h3>Sicherheitskonzepte & Beratung</h3>
+                <p>Strategie als Schutz. Maßgeschneiderte Analysen. **Wir schützen Ihre Zukunft.**</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20elegant%20bodyguard%20silhouette,%20luxury,%20monochrome" alt="Personenschutz">
+            </div>
+            <div class="content">
+                <h3>Personenschutz</h3>
+                <p>Diskreter Vorsprung. Absolute Professionalität, minimale Präsenz. **Konzentrieren Sie sich auf das Wesentliche.**</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20fire%20extinguisher%20emergency%20exit,%20safety,%20monochrome">
+            </div>
+            <div class="content">
+                <h3>Brand- & Evakuierungshelfer</h3>
+                <p>Sofortige Reaktion. Geschult für den Ernstfall, sichern wir schnelle Evakuierungen. **Sicherheit, wenn es zählt.**</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="image-container">
+                <img src="https://image.pollinations.ai/prompt/blurred%20technical%20security%20system%20installation,%20modern,%20monochrome" alt="Service & Technik">
+            </div>
+            <div class="content">
+                <h3>Service & Technik</h3>
+                <p>Immer einsatzbereit. 24/7-Support und modernste Installation. **Ihr Schutz, immer aktuell.**</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

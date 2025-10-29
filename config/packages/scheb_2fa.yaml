@@ -1,6 +1,6 @@
 scheb_two_factor:
     google:
-        enabled: true
+        enabled: false
         server_name: "WachZeit"      # Server name used in QR code
         issuer: "WachZeit"        # Issuer name used in QR code
         digits: 6

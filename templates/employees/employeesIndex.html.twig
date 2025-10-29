@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}WachZeit - Mitarbeiterverwaltung{% endblock %}
+
+{% block body %}
+    <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
+
+        {# Sidebar wird in der realen Implementierung eingebunden #}
+
+        {# Hauptinhalt #}
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm">
+            <div class="container mx-auto px-6 py-8">
+
+                {# Header mit Titel und Button #}
+                <div class="mb-8">
+                    <div class="flex justify-between items-center">
+                        <h1 class="text-3xl font-light text-gray-900 dark:text-white tracking-tight">Mitarbeiterverwaltung</h1>
+                        <button id="showFormButton" class="flex items-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-slate-700 to-slate-900 dark:from-white dark:to-gray-200 text-white dark:text-slate-900 hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+                            {{ ux_icon('lucide:user-plus', { class: 'w-5 h-5' }) }}
+                            <span>Neuer Mitarbeiter</span>
+                        </button>
+                    </div>
+                </div>
+
+                {% include 'employees/newEmployeeModal.html.twig' %}
+
+                {# Mitarbeiterliste #}
+                {% include 'employees/employeeList.html.twig' %}
+
+            </div>
+        </main>
+    </div>
+
+    {# Modal Animation Styles #}
+    <style>
+        @keyframes modal-enter {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes bounce-in {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-modal-enter {
+            animation: modal-enter 0.4s ease-out;
+        }
+
+        .animate-bounce-in {
+            animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+    </style>
+
+    {# JavaScript für Modal-Funktionalität #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('employeeFormModal');
+            const showFormButton = document.getElementById('showFormButton');
+            const closeFormButton = document.getElementById('closeFormButton');
+            const cancelButton = document.getElementById('cancelButton');
+
+            // Modal öffnen
+            showFormButton.addEventListener('click', function() {
+                modal.style.display = 'flex';
+                document.body.classList.add('overflow-hidden');
+            });
+
+            // Modal schließen
+            function closeModal() {
+                modal.style.display = 'none';
+                document.body.classList.remove('overflow-hidden');
+            }
+
+            closeFormButton.addEventListener('click', closeModal);
+            cancelButton.addEventListener('click', closeModal);
+
+            // Schließen bei Klick außerhalb des Modals
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+{% endblock %}
