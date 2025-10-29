@@ -3,9 +3,7 @@
 {% block title %}WachZeit - Mitarbeiterverwaltung{% endblock %}
 
 {% block body %}
-    <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
-
-        {# Sidebar wird in der realen Implementierung eingebunden #}
+    <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden" data-controller="employee">
 
         {# Hauptinhalt #}
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm">
@@ -14,18 +12,22 @@
                 {# Header mit Titel und Button #}
                 <div class="mb-8">
                     <div class="flex justify-between items-center">
-                        <h1 class="text-3xl font-light text-gray-900 dark:text-white tracking-tight">Mitarbeiterverwaltung</h1>
-                        <button id="showFormButton" class="flex items-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-slate-700 to-slate-900 dark:from-white dark:to-gray-200 text-white dark:text-slate-900 hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+                        <h1 class="text-3xl font-light text-gray-900 dark:text-white tracking-tight">
+                            Mitarbeiterverwaltung</h1>
+                        <button id="showFormButton"
+                                class="flex items-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-slate-700 to-slate-900 dark:from-white dark:to-gray-200 text-white dark:text-slate-900 hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
                             {{ ux_icon('lucide:user-plus', { class: 'w-5 h-5' }) }}
                             <span>Neuer Mitarbeiter</span>
                         </button>
                     </div>
                 </div>
 
-                {% include 'employees/newEmployeeModal.html.twig' %}
+{#                {% include 'employees/newEmployeeModal.html.twig' %}#}
 
                 {# Mitarbeiterliste #}
-                {% include 'employees/employeeList.html.twig' %}
+                <div data-employee-target="employeeList">
+
+                </div>
 
             </div>
         </main>
@@ -72,14 +74,14 @@
 
     {# JavaScript für Modal-Funktionalität #}
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('employeeFormModal');
             const showFormButton = document.getElementById('showFormButton');
             const closeFormButton = document.getElementById('closeFormButton');
             const cancelButton = document.getElementById('cancelButton');
 
             // Modal öffnen
-            showFormButton.addEventListener('click', function() {
+            showFormButton.addEventListener('click', function () {
                 modal.style.display = 'flex';
                 document.body.classList.add('overflow-hidden');
             });
@@ -94,7 +96,7 @@
             cancelButton.addEventListener('click', closeModal);
 
             // Schließen bei Klick außerhalb des Modals
-            modal.addEventListener('click', function(e) {
+            modal.addEventListener('click', function (e) {
                 if (e.target === modal) {
                     closeModal();
                 }

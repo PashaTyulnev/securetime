@@ -18,7 +18,7 @@ class EmployeesController extends AbstractController
     #[Route(path: '/employees', name: 'app_employees')]
     public function test(Security $security): Response
     {
-        return $this->render('employees/employeesIndex.html.twig');
+        return $this->render('employee/employeeIndex.html.twig');
     }
 
 }

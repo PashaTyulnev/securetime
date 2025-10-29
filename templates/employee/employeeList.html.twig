@@ -1,0 +1,117 @@
+<div
+    class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+    {# Suchfilter-Bereich #}
+    <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
+        <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">Mitarbeiterliste</h2>
+            <div class="relative">
+                <input type="text" placeholder="Suchen..."
+                       class="w-64 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800/80 transition-all duration-200">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    {{ ux_icon('lucide:search', { class: 'h-5 w-5 text-gray-400 dark:text-gray-500' }) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Tabelle #}
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50/80 dark:bg-gray-800/80">
+            <tr>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Name
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Benutzername
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    E-Mail
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Telefon
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Geb.-Datum
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Status
+                </th>
+                <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Aktionen
+                </th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+            {# Beispiel-Mitarbeiter 1 #}
+
+            {% for employee in employees %}
+                <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-200">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center space-x-4">
+                            <div
+                                class="h-10 w-10 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 rounded-full flex items-center justify-center shadow-inner">
+                                <span class="text-sm font-medium text-gray-600 dark:text-gray-300">JS</span>
+                            </div>
+                            <div>
+                                <div
+                                    class="text-sm font-medium text-gray-900 dark:text-white">{{ employee.firstName }} {{ employee.lastName }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.user.position }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.user.username }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                        jan.schmidt@wachzeit.de
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.phone }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.birthDate.date | date('d.m.Y') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if employee.user.active %}
+                            <span
+                                class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">Aktiv</span>
+                        {% else %}
+                            <span
+                                class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">Inaktiv</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex justify-end space-x-2">
+                            <button
+                                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}
+                            </button>
+                            <button
+                                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                                {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
+    {# Pagination #}
+    <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+            Zeige <span class="font-medium">1</span> bis <span class="font-medium">{{ employees | length }}</span> von <span
+                class="font-medium">{{ employees | length }}</span> Einträgen
+        </div>
+        <div class="flex space-x-2">
+            <button
+                class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                disabled>
+                {{ ux_icon('lucide:chevron-left', { class: 'h-4 w-4' }) }}
+            </button>
+            <button
+                class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                disabled>
+                {{ ux_icon('lucide:chevron-right', { class: 'h-4 w-4' }) }}
+            </button>
+        </div>
+    </div>
+</div>
