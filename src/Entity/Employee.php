@@ -5,8 +5,10 @@ namespace App\Entity;
 use App\Repository\EmployeeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
+#[UniqueEntity(fields: ['number'], message: 'Diese Personalnummer ist bereits vergeben.')]
 class Employee
 {
     #[ORM\Id]
@@ -28,6 +30,12 @@ class Employee
 
     #[ORM\OneToOne(mappedBy: 'employee', cascade: ['persist', 'remove'])]
     private ?User $user = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $number = null;
+
+    #[ORM\ManyToOne(inversedBy: 'employees')]
+    private ?Department $department = null;
 
 
 
@@ -102,6 +110,30 @@ class Employee
         }
 
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getNumber(): ?string
+    {
+        return $this->number;
+    }
+
+    public function setNumber(?string $number): static
+    {
+        $this->number = $number;
+
+        return $this;
+    }
+
+    public function getDepartment(): ?Department
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?Department $department): static
+    {
+        $this->department = $department;
 
         return $this;
     }

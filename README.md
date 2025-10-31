@@ -12,3 +12,5 @@ Die Data API wird nur JSON Daten liefern oder erstellen.
 Die Component API wird HTML Komponenten liefern.
 
 ## Erstellung vom Mitarbeitern
+1. Es wird ein User/Mitarbeiter erstellt ohne Passwort
+2. Passworterstellung wird per Email-Link angestoßen

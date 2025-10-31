@@ -22,9 +22,6 @@ return [
     '@symfony/stimulus-bundle' => [
         'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
     ],
-    'flowbite/plugin' => [
-        'version' => '3.1.2',
-    ],
     'mini-svg-data-uri' => [
         'version' => '1.4.4',
     ],
@@ -36,5 +33,18 @@ return [
     ],
     'tailwindcss/colors' => [
         'version' => '4.0.4',
+    ],
+    'flowbite' => [
+        'version' => '3.1.2',
+    ],
+    '@popperjs/core' => [
+        'version' => '2.11.8',
+    ],
+    'flowbite-datepicker' => [
+        'version' => '1.3.2',
+    ],
+    'flowbite/dist/flowbite.min.css' => [
+        'version' => '3.1.2',
+        'type' => 'css',
     ],
 ];

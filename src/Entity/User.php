@@ -6,10 +6,13 @@ use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(fields: ['username'], message: 'Dieser Benutzername ist bereits vergeben.')]
+#[UniqueEntity(fields: ['email'], message: 'Diese E-Mail-Adresse ist bereits registriert.')]
 class User implements TwoFactorInterface, UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -26,7 +29,7 @@ class User implements TwoFactorInterface, UserInterface, PasswordAuthenticatedUs
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column(type: 'json')]
@@ -137,53 +140,6 @@ class User implements TwoFactorInterface, UserInterface, PasswordAuthenticatedUs
         $this->googleAuthenticatorSecret = $googleAuthenticatorSecret;
     }
 
-    public function getFirstName(): ?string
-    {
-        return $this->firstName;
-    }
-
-    public function setFirstName(string $firstName): static
-    {
-        $this->firstName = $firstName;
-
-        return $this;
-    }
-
-    public function getLastName(): ?string
-    {
-        return $this->lastName;
-    }
-
-    public function setLastName(string $lastName): static
-    {
-        $this->lastName = $lastName;
-
-        return $this;
-    }
-
-    public function getBirthDate(): ?\DateTime
-    {
-        return $this->birthDate;
-    }
-
-    public function setBirthDate(?\DateTime $birthDate): static
-    {
-        $this->birthDate = $birthDate;
-
-        return $this;
-    }
-
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function setPhone(?string $phone): static
-    {
-        $this->phone = $phone;
-
-        return $this;
-    }
 
     public function getEmployee(): ?Employee
     {

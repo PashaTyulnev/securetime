@@ -35,6 +35,7 @@ readonly class EmployeeProvider
             'birthDate' => $employee->getBirthDate(),
             'phone' => $employee->getPhone(),
             'user' => $this->formatUserToArray($employee->getUser()),
+            'number' => $employee->getNumber(),
         ];
     }
 

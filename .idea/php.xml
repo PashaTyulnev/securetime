@@ -98,6 +98,11 @@
       <path value="$PROJECT_DIR$/vendor/dasprid/enum" />
       <path value="$PROJECT_DIR$/vendor/bacon/bacon-qr-code" />
       <path value="$PROJECT_DIR$/vendor/symfony/ux-icons" />
+      <path value="$PROJECT_DIR$/vendor/gehrisandro/tailwind-merge-php" />
+      <path value="$PROJECT_DIR$/vendor/tales-from-a-dev/flowbite-bundle" />
+      <path value="$PROJECT_DIR$/vendor/tales-from-a-dev/twig-tailwind-extra" />
+      <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/vendor/symfony/validator" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />

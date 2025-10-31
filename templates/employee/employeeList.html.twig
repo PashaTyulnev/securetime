@@ -26,6 +26,9 @@
                     Benutzername
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Nummer
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     E-Mail
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -43,15 +46,16 @@
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
-            {# Beispiel-Mitarbeiter 1 #}
 
             {% for employee in employees %}
                 <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-200">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center space-x-4">
+                       <div class="flex items-center space-x-4">
                             <div
                                 class="h-10 w-10 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 rounded-full flex items-center justify-center shadow-inner">
-                                <span class="text-sm font-medium text-gray-600 dark:text-gray-300">JS</span>
+                                <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                                    {{ (employee.firstName|default('')|slice(0,1) ~ employee.lastName|default('')|slice(0,1))|upper }}
+                                </span>
                             </div>
                             <div>
                                 <div
@@ -61,8 +65,10 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.user.username }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.number }}</td>
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                        jan.schmidt@wachzeit.de
+                        {{ employee.user.email }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.phone }}
                     </td>
@@ -78,14 +84,16 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end space-x-2">
+                            {% if is_granted("ROLE_ADMIN") %}
                             <button
                                 class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                                 {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}
                             </button>
-                            <button
+                            <button data-action="click->employee#deleteEmployee" data-employee-id-param="{{ employee.id }}"
                                 class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                                 {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
                             </button>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>
