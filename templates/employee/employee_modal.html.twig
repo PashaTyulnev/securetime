@@ -81,7 +81,7 @@
                         'systemName': 'birthDate',
                         'placeholder': '25.06.1990',
                         'required': 'required',
-                        'devValue': definedEmployee.birthDate.date is defined ? definedEmployee.birthDate.date|date('Y-m-d') : '1990-09-09'
+                        'devValue': definedEmployee.birthDate is defined ? definedEmployee.birthDate|date('Y-m-d') : '1990-09-09'
                     } %}
 
                     {% include 'elements/input.html.twig' with {
