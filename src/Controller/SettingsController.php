@@ -20,7 +20,7 @@ class SettingsController extends AbstractController
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
 
-        return $this->render('settings/settingsIndex.html.twig', [
+        return $this->render('settings/settings_index.html.twig', [
 
         ]);
     }
@@ -54,7 +54,7 @@ class SettingsController extends AbstractController
         $result = $builder->build();
         $qrCodeDataUri = $result->getDataUri();
 
-        return $this->render('settings/googleAuthentication/googleAuthRegistration.html.twig', [
+        return $this->render('settings/googleAuthentication/google_auth_registration.html.twig', [
             'qrCodeDataUri' => $qrCodeDataUri,
         ]);
     }
@@ -63,7 +63,7 @@ class SettingsController extends AbstractController
     public function twoFaManualGet(): Response
     {
         // Render the same input used by scheb's default 2FA form
-        return $this->render('security/googleAuthCodeInput.html.twig', [
+        return $this->render('security/google_auth_code_input.html.twig', [
             'authenticationError' => false,
             'form_action' => $this->generateUrl('app_2fa_manual_check'),
         ]);
@@ -81,7 +81,7 @@ class SettingsController extends AbstractController
         $isValid = $googleAuthenticator->checkCode($user, (string) $code);
 
         if (!$isValid) {
-            return $this->render('security/googleAuthCodeInput.html.twig', [
+            return $this->render('security/google_auth_code_input.html.twig', [
                 'authenticationError' => true,
                 'form_action' => $this->generateUrl('app_2fa_manual_check'),
             ]);

@@ -20,10 +20,8 @@ class EmployeesController extends AbstractController
     public function test(Security $security): Response
     {
 
-        $departments = $this->departmentRepository->findAllSortedByPosition();
+        return $this->render('employee/employee_index.html.twig', [
 
-        return $this->render('employee/employeeIndex.html.twig', [
-            'departments' => $departments,
         ]);
     }
 

@@ -50,7 +50,7 @@
             {% for employee in employees %}
                 <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-200">
                     <td class="px-6 py-4 whitespace-nowrap">
-                       <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-4">
                             <div
                                 class="h-10 w-10 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 rounded-full flex items-center justify-center shadow-inner">
                                 <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -60,7 +60,7 @@
                             <div>
                                 <div
                                     class="text-sm font-medium text-gray-900 dark:text-white">{{ employee.firstName }} {{ employee.lastName }}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.user.position }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.department.shortTitle }}</div>
                             </div>
                         </div>
                     </td>
@@ -72,7 +72,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.phone }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.birthDate.date | date('d.m.Y') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.birthDate | date('d.m.Y')}}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         {% if employee.user.active %}
                             <span
@@ -85,14 +85,16 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end space-x-2">
                             {% if is_granted("ROLE_ADMIN") %}
-                            <button
-                                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-                                {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}
-                            </button>
-                            <button data-action="click->employee#deleteEmployee" data-employee-id-param="{{ employee.id }}"
-                                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
-                                {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
-                            </button>
+                                <button data-action="click->employee#openEmployeeEditModal"
+                                        data-employee-id-param="{{ employee.id }}"
+                                        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                    {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}
+                                </button>
+                                <button data-action="click->employee#deleteEmployee"
+                                        data-employee-id-param="{{ employee.id }}"
+                                        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                                    {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
+                                </button>
                             {% endif %}
                         </div>
                     </td>
@@ -106,7 +108,8 @@
     {# Pagination #}
     <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
         <div class="text-sm text-gray-600 dark:text-gray-400">
-            Zeige <span class="font-medium">1</span> bis <span class="font-medium">{{ employees | length }}</span> von <span
+            Zeige <span class="font-medium">1</span> bis <span class="font-medium">{{ employees | length }}</span> von
+            <span
                 class="font-medium">{{ employees | length }}</span> Einträgen
         </div>
         <div class="flex space-x-2">

@@ -5,11 +5,14 @@ namespace App\Provider;
 use App\Entity\Employee;
 use App\Entity\User;
 use App\Repository\EmployeeRepository;
+use Exception;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 readonly class EmployeeProvider
 {
 
-    public function __construct(public EmployeeRepository $employeeRepository)
+    public function __construct(public EmployeeRepository $employeeRepository, private SerializerInterface $serializer)
     {
     }
 
@@ -28,41 +31,20 @@ readonly class EmployeeProvider
 
     private function formatEmployeeToArray(Employee $employee): array
     {
-        return [
-            'id' => $employee->getId(),
-            'firstName' => $employee->getFirstName(),
-            'lastName' => $employee->getLastName(),
-            'birthDate' => $employee->getBirthDate(),
-            'phone' => $employee->getPhone(),
-            'user' => $this->formatUserToArray($employee->getUser()),
-            'number' => $employee->getNumber(),
-        ];
+        return $this->serializer->normalize($employee, null, [
+            'groups' => ['employee:read']]);
+
     }
 
-    private function formatUserToArray(User $user): array
+    public function getEmployeeById(int $employeeId)
     {
-        $roles = $this->formatRolesToString($user->getRoles());
 
-        //Position basierend auf Rolle
-        return [
-            'id' => $user->getId(),
-            'username' => $user->getUsername(),
-            'email' => $user->getEmail(),
-            'position' => $roles,
-            'active' => $user->isActive(),
-        ];
-    }
+        $employee = $this->employeeRepository->find($employeeId);
 
-    private function formatRolesToString(array $getRoles): ?string
-    {
-        foreach ($getRoles as $role) {
-            if($role === 'ROLE_ADMIN') {
-                return 'Administrator';
-            } else {
-                return 'Angestellter';
-            }
+        if (!$employee) {
+            throw new \Exception('Employee not found');
         }
 
-        return null;
+        return $this->formatEmployeeToArray($employee);
     }
 }

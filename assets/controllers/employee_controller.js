@@ -1,10 +1,11 @@
 import {Controller} from '@hotwired/stimulus';
+
 import EmployeeComponentApi from "../api/EmployeeComponentApi.js";
 import EmployeeDataApi from "../api/EmployeeDataApi.js";
 
 export default class extends Controller {
 
-    static targets = ["employeeListContainer", "employeeCreationModalContainer", "errorMessageContainer", "errorMessage"]
+    static targets = ["employeeListContainer", "employeeFormModal", "employeeModalContainer", "errorMessageContainer", "errorMessage"]
 
     connect() {
         EmployeeComponentApi.getAllEmployeesList().then(html => {
@@ -12,35 +13,55 @@ export default class extends Controller {
         })
     }
 
-    createNew(event) {
+
+    openEmployeeCreationModal(event) {
+        EmployeeComponentApi.getEmployeeCreationModal().then(html => {
+            this.employeeModalContainerTarget.innerHTML = html;
+        });
+    }
+
+    openEmployeeEditModal(event) {
         event.preventDefault();
+        const employeeId = event.params.id;
 
+        EmployeeComponentApi.getEmployeeEditModal(employeeId).then(html => {
+            this.employeeModalContainerTarget.innerHTML = html;
+        });
+    }
+
+    saveNew(event) {
+        event.preventDefault();
+        this.handleSave(event, (data) => EmployeeDataApi.createNewEmployee(data));
+    }
+
+    saveEdit(event) {
+        event.preventDefault();
+        this.handleSave(event, (data) => EmployeeDataApi.updateEmployee(data));
+    }
+
+    handleSave(event, apiCall) {
         // Fehlercontainer zurücksetzen
-        this.errorMessageContainerTarget.removeAttribute('hidden');
-        this.errorMessageTarget.textContent = ''; // alten Text entfernen
+        this.errorMessageTarget.textContent = '';
+        this.errorMessageContainerTarget.classList.add('hidden');
 
-        let formData = new FormData(event.target);
-        let jsonData = Object.fromEntries(formData.entries());
+        // Formulardaten als JSON
+        const formData = new FormData(event.target);
+        const jsonData = Object.fromEntries(formData.entries());
 
-        EmployeeDataApi.createNewEmployee(jsonData)
+        // API-Aufruf (Promise)
+        apiCall(jsonData)
             .then(response => {
-                // Erfolgsfall - Status 201 "Created"
                 if (response && response.status === 'success') {
-                    // Seite neu laden
+                    // Erfolgreich -> Seite neu laden
                     window.location.reload();
                     return;
                 }
 
-                //remove class "hidden" and "opacity-0" from errorMessageContainerTarget to show the error message
-                this.errorMessageContainerTarget.classList.remove('hidden', 'opacity-0');
-
-                this.errorMessageTarget.textContent = response.message || 'Ein unbekannter Fehler ist aufgetreten';
-                this.errorMessageContainerTarget.removeAttribute('hidden');
-
+                // Fehler anzeigen
+                this.showError(response.message || 'Ein unbekannter Fehler ist aufgetreten');
             })
-            .catch(err => {
-                this.errorMessageTarget.textContent = 'Ein Netzwerkfehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-                this.errorMessageContainerTarget.removeAttribute('hidden');
+            .catch(() => {
+                this.showError('Ein Netzwerkfehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
             });
     }
 
@@ -54,24 +75,24 @@ export default class extends Controller {
             return; // Abbrechen, wenn der Benutzer auf "Abbrechen" klickt
         }
 
-        fetch(`/api/employee/delete/${employeeId}`, {
-            method: "DELETE",
-            headers: {
-                'Content-Type': 'application/json'
+        EmployeeDataApi.deleteEmployee(employeeId).then(data => {
+            if (data && data.status === 'success') {
+                window.location.reload();
+            } else {
+                alert(data.message || 'Ein unbekannter Fehler ist aufgetreten');
             }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.status === 'success') {
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Ein unbekannter Fehler ist aufgetreten');
-                }
-            })
             .catch(err => {
                 alert('Ein Netzwerkfehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
             });
     }
+
+    showError(message) {
+        this.errorMessageTarget.textContent = message;
+        this.errorMessageContainerTarget.classList.remove('hidden', 'opacity-0');
+        this.errorMessageContainerTarget.removeAttribute('hidden');
+    }
+
 
 
 }

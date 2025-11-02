@@ -27,7 +27,7 @@
     <nav class="flex-1 overflow-y-auto px-5 pb-5 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent">
         <ul class="space-y-2">
 
-            {% include 'navigation/navigationElement.html.twig' with {'route' : 'app_dashboard', 'icon' : 'lucide:layout-dashboard', 'title' : 'Dashboard'} %}
+            {% include 'navigation/navigation_element.html.twig' with {'route' : 'app_dashboard', 'icon' : 'lucide:layout-dashboard', 'title' : 'Dashboard'} %}
 
             {# Einsatzplanung #}
             <li>
@@ -64,7 +64,7 @@
                 </a>
             </li>
 
-            {% include 'navigation/navigationElement.html.twig' with {'route' : 'app_employees', 'icon' : 'lucide:users', 'title' : 'Mitarbeiter'} %}
+            {% include 'navigation/navigation_element.html.twig' with {'route' : 'app_employees', 'icon' : 'lucide:users', 'title' : 'Mitarbeiter'} %}
 
 {#            {% include 'navigation/navigationElement.html.twig' with {'route' : 'app_employees', 'icon' : 'lucide:clock', 'title' : 'Zeiterfassung'} %}#}
 

@@ -6,6 +6,7 @@ use App\Repository\EmployeeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 #[UniqueEntity(fields: ['number'], message: 'Diese Personalnummer ist bereits vergeben.')]
@@ -14,29 +15,36 @@ class Employee
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['employee:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?string $lastName = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?\DateTime $birthDate = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?string $phone = null;
 
     #[ORM\OneToOne(mappedBy: 'employee', cascade: ['persist', 'remove'])]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?User $user = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?string $number = null;
 
-    #[ORM\ManyToOne(inversedBy: 'employees')]
+    #[ORM\ManyToOne(targetEntity: Department::class, inversedBy: 'employees')]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?Department $department = null;
-
 
 
     public function getId(): ?int

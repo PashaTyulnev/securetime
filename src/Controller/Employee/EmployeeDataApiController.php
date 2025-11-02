@@ -4,6 +4,7 @@ namespace App\Controller\Employee;
 
 use App\Processor\EmployeeProcessor;
 use App\Provider\EmployeeProvider;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,5 +48,30 @@ class EmployeeDataApiController extends AbstractController
         } catch (\Exception $e) {
             return new JsonResponse(['status' => 'error', 'message' => $e->getMessage()], 400);
         }
+    }
+
+    #[Route('/update/{employeeId}', name: 'api_employee_update_by_id', methods: ['PUT'])]
+    public function updateEmployee(int $employeeId, Request $request): JsonResponse
+    {
+        $employeeData = json_decode($request->getContent(), true);
+
+        try {
+            $this->employeeProcessor->updateEmployee($employeeId,$employeeData);
+            return new JsonResponse(['status' => 'success'], 200);
+        } catch (\Exception $e) {
+            return new JsonResponse(['status' => 'error', 'message' => $e->getMessage()], 400);
+        }
+
+    }
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/{employeeId}', name: 'api_employee_get_by_id', methods: ['GET'])]
+    public function getEmployeeById(int $employeeId): JsonResponse
+    {
+        $employeeData = $this->employeeProvider->getEmployeeById($employeeId);
+
+        return new JsonResponse($employeeData);
     }
 }

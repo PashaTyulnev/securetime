@@ -1,4 +1,5 @@
 export default class EmployeeComponentApi {
+
     static getAllEmployeesList() {
 
         return fetch(`/components/employee/all`, {
@@ -9,9 +10,18 @@ export default class EmployeeComponentApi {
         }).then(response => response.text())
     }
 
-    static getNewEmployeeModal() {
+    static getEmployeeCreationModal() {
 
         return fetch(`/components/employee/new`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.text())
+    }
+
+    static getEmployeeEditModal(employeeId) {
+        return fetch(`/components/employee/edit/${employeeId}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'

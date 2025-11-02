@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
 #[UniqueEntity(fields: ['shortTitle'], message: 'Dieser Kurztitel ist bereits vergeben.')]
@@ -18,12 +19,15 @@ class Department
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?string $shortTitle = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?string $description = null;
 
     #[ORM\Column]

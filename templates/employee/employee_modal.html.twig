@@ -1,0 +1,118 @@
+{% extends 'elements/modal.html.twig' %}
+
+{% block content %}
+    {% set definedEmployee = employee is defined ? employee : {} %}
+
+    <div class="px-8 py-10">
+        <div class="text-center mb-8 animate-bounce-in">
+            <div
+                class="mx-auto h-20 w-20 flex items-center justify-center rounded-3xl bg-gradient-to-br from-slate-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 shadow-inner">
+                {{ ux_icon('lucide:user-plus', { class: 'h-11 w-11 text-slate-700 dark:text-gray-300' }) }}
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-6 text-center">
+            Mitarbeiter {% if employee is defined %}bearbeiten{% else %}hinzufügen{% endif %}
+        </h2>
+
+        {% include 'elements/modal_error.html.twig' %}
+
+        {% if employee is defined %}
+
+        <form data-action="submit->employee#saveEdit">
+            <input name="employeeId" type="hidden" value="{{ definedEmployee.id }}">
+            {% else %}
+            <form data-action="submit->employee#saveNew">
+                {% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Benutzername',
+                        'type': 'text',
+                        'systemName': 'username',
+                        'placeholder': 'aschmidt',
+                        'required': 'required',
+                        'devValue': definedEmployee.user.username|default('testuser')
+                    } %}
+
+                    {% include 'elements/select.html.twig' with {
+                        'systemName': 'department',
+                        'title': 'Abteilung',
+                        'options': departments | map(d => {
+                            'value': d.shortTitle,
+                            'label': d.title
+                        }),
+                        'defaultOption': 'Bitte wählen...',
+                        'required': 'required',
+                        'devValue': definedEmployee.department.shortTitle|default(currentDepartment|default(''))
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Personalnummer',
+                        'type': 'text',
+                        'systemName': 'number',
+                        'placeholder': '123456',
+                        'required': 'required',
+                        'devValue': definedEmployee.number|default('changeit')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Vorname',
+                        'type': 'text',
+                        'systemName': 'firstName',
+                        'placeholder': 'Alexander',
+                        'required': 'required',
+                        'devValue': definedEmployee.firstName|default('testfirstname')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Nachname',
+                        'type': 'text',
+                        'systemName': 'lastName',
+                        'placeholder': 'Schmidt',
+                        'required': 'required',
+                        'devValue': definedEmployee.lastName|default('testlastname')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Geburtsdatum',
+                        'type': 'date',
+                        'systemName': 'birthDate',
+                        'placeholder': '25.06.1990',
+                        'required': 'required',
+                        'devValue': definedEmployee.birthDate.date is defined ? definedEmployee.birthDate.date|date('Y-m-d') : '1990-09-09'
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Telefon',
+                        'type': 'text',
+                        'systemName': 'phone',
+                        'placeholder': '017685412456',
+                        'required': 'required',
+                        'devValue': definedEmployee.phone|default('017670584546test')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'E-Mail',
+                        'type': 'email',
+                        'systemName': 'email',
+                        'placeholder': 'max@gmail.com',
+                        'required': 'required',
+                        'devValue': definedEmployee.user.email|default('test@mail.de')
+                    } %}
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button type="button" data-action="click->modal#hide"
+                            class="px-6 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">
+                        Abbrechen
+                    </button>
+                    <button type="submit"
+                            class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-gray-100 text-white dark:text-gray-900 font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+                        Speichern
+                    </button>
+                </div>
+            </form>
+    </div>
+{% endblock %}

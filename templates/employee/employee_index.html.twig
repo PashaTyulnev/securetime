@@ -5,7 +5,10 @@
 {% block body %}
 
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden " data-controller="employee">
-        {% include 'employee/newEmployeeModal.html.twig' %}
+        <div data-employee-target="employeeModalContainer">
+
+        </div>
+{#        {% include 'employee/newEmployeeModal.html.twig' %}#}
         {# Hauptinhalt #}
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm">
             <div class="container mx-auto px-6 py-8">
@@ -15,7 +18,7 @@
                     <div class="flex justify-between items-center">
                         <h1 class="text-3xl font-light text-gray-900 dark:text-white tracking-tight">Mitarbeiterverwaltung</h1>
                         <!-- Modal toggle -->
-                        <button data-modal-target="employeeFormModal" data-modal-toggle="employeeFormModal"
+                        <button data-action="click->employee#openEmployeeCreationModal"
                                 class="app-button">
                             {{ ux_icon('lucide:user-plus', { class: 'w-5 h-5' }) }}
                             <span>Neuer Mitarbeiter</span>

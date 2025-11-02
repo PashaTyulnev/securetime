@@ -9,7 +9,8 @@ use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['username'], message: 'Dieser Benutzername ist bereits vergeben.')]
 #[UniqueEntity(fields: ['email'], message: 'Diese E-Mail-Adresse ist bereits registriert.')]
@@ -21,12 +22,15 @@ class User implements TwoFactorInterface, UserInterface, PasswordAuthenticatedUs
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?string $username = null;
 
     #[ORM\Column]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?bool $active = null;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(['employee:read', 'employee:write'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
