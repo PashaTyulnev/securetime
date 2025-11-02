@@ -90,11 +90,13 @@
                                         class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                                     {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}
                                 </button>
-                                <button data-action="click->employee#deleteEmployee"
-                                        data-employee-id-param="{{ employee.id }}"
-                                        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
-                                    {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
-                                </button>
+                                {% if employee.user.id != app.user.id %}
+                                    <button data-action="click->employee#deleteEmployee"
+                                            data-employee-id-param="{{ employee.id }}"
+                                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                                        {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
+                                    </button>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </td>
