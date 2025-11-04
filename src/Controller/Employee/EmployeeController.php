@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 
-class EmployeesController extends AbstractController
+class EmployeeController extends AbstractController
 {
 
     public function __construct(readonly DepartmentRepository $departmentRepository)
@@ -17,7 +17,7 @@ class EmployeesController extends AbstractController
     }
 
     #[Route(path: '/employees', name: 'app_employees')]
-    public function test(Security $security): Response
+    public function loadIndexPage(Security $security): Response
     {
 
         return $this->render('employee/employee_index.html.twig', [

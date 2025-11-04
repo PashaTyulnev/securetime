@@ -1,0 +1,265 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Objektverwaltung{% endblock %}
+
+{% block body %}
+
+    <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden" data-controller="object">
+        <div data-object-target="objectModalContainer">
+
+        </div>
+
+        {# Hauptinhalt #}
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm">
+            <div class="container mx-auto px-6 py-8">
+
+                {# Header mit Titel und Button #}
+                <div class="mb-8">
+                    <div class="flex justify-between items-center">
+                        <h1 class="text-3xl font-light text-gray-900 dark:text-white tracking-tight">Objektverwaltung</h1>
+                        <!-- Modal toggle -->
+                        <button data-action="click->object#openObjectCreationModal"
+                                class="app-button">
+                            {{ ux_icon('lucide:building-2', { class: 'w-5 h-5' }) }}
+                            <span>Neues Objekt</span>
+                        </button>
+                    </div>
+                </div>
+
+                {# Objektliste #}
+                <div data-object-target="objectListContainer">
+                    <div
+                        class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+                        {# Suchfilter-Bereich #}
+                        <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
+                            <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+                                <h2 class="text-lg font-medium text-gray-900 dark:text-white">Objektliste</h2>
+                                <div class="relative">
+                                    <input type="text" placeholder="Suchen..."
+                                           class="w-64 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800/80 transition-all duration-200">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        {{ ux_icon('lucide:search', { class: 'h-5 w-5 text-gray-400 dark:text-gray-500' }) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Tabelle #}
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50/80 dark:bg-gray-800/80">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Objekt
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Objektnummer
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Adresse
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Kategorie
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Sicherheitsstufe
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Letzte Begehung
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Aktionen
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+
+                                {# Beispiel für mehrere Objekte #}
+                                {% for object in [
+                                    {
+                                        'id': 1,
+                                        'name': 'Rechenzentrum Nord',
+                                        'number': 'OBJ-2024-001',
+                                        'address': 'Industriestr. 45, 10115 Berlin',
+                                        'category': 'Rechenzentrum',
+                                        'securityLevel': 'Hoch',
+                                        'lastInspection': '2025-10-15',
+                                        'status': 'Aktiv',
+                                        'icon': 'server'
+                                    },
+                                    {
+                                        'id': 2,
+                                        'name': 'Bürokomplex Eastside',
+                                        'number': 'OBJ-2024-002',
+                                        'address': 'Mühlenstr. 22, 10243 Berlin',
+                                        'category': 'Bürogebäude',
+                                        'securityLevel': 'Mittel',
+                                        'lastInspection': '2025-10-20',
+                                        'status': 'Aktiv',
+                                        'icon': 'building-2'
+                                    },
+                                    {
+                                        'id': 3,
+                                        'name': 'Lagerhalle Westhafen',
+                                        'number': 'OBJ-2024-003',
+                                        'address': 'Westhafen 8, 13353 Berlin',
+                                        'category': 'Lagerhalle',
+                                        'securityLevel': 'Standard',
+                                        'lastInspection': '2025-09-30',
+                                        'status': 'Wartung',
+                                        'icon': 'warehouse'
+                                    },
+                                    {
+                                        'id': 4,
+                                        'name': 'Einkaufszentrum Plaza',
+                                        'number': 'OBJ-2024-004',
+                                        'address': 'Kurfürstendamm 114, 10711 Berlin',
+                                        'category': 'Einzelhandel',
+                                        'securityLevel': 'Mittel',
+                                        'lastInspection': '2025-10-05',
+                                        'status': 'Aktiv',
+                                        'icon': 'shopping-bag'
+                                    },
+                                    {
+                                        'id': 5,
+                                        'name': 'Parkhaus Alexanderplatz',
+                                        'number': 'OBJ-2024-005',
+                                        'address': 'Alexanderstr. 5, 10178 Berlin',
+                                        'category': 'Parkhaus',
+                                        'securityLevel': 'Niedrig',
+                                        'lastInspection': '2025-10-18',
+                                        'status': 'Inaktiv',
+                                        'icon': 'car'
+                                    }
+                                ] %}
+                                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-200">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-4">
+                                                <div
+                                                    class="h-10 w-10 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-gray-600 dark:to-gray-700 rounded-full flex items-center justify-center shadow-inner">
+                                                    {{ ux_icon('lucide:' ~ object.icon, { class: 'h-5 w-5 text-slate-600 dark:text-gray-300' }) }}
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ object.name }}</div>
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ object.category }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ object.number }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ object.address }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ object.category }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                            {% if object.securityLevel == 'Hoch' %}
+                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">{{ object.securityLevel }}</span>
+                                            {% elseif object.securityLevel == 'Mittel' %}
+                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">{{ object.securityLevel }}</span>
+                                            {% else %}
+                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">{{ object.securityLevel }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ object.lastInspection | date('d.m.Y') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {% if object.status == 'Aktiv' %}
+                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">{{ object.status }}</span>
+                                            {% elseif object.status == 'Inaktiv' %}
+                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">{{ object.status }}</span>
+                                            {% else %}
+                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">{{ object.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex justify-end space-x-2">
+                                                {% if is_granted("ROLE_ADMIN") %}
+                                                    <button data-action="click->object#openObjectInfoModal"
+                                                            data-object-id-param="{{ object.id }}"
+                                                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                                        {{ ux_icon('lucide:info', { class: 'h-5 w-5' }) }}
+                                                    </button>
+                                                    <button data-action="click->object#openObjectEditModal"
+                                                            data-object-id-param="{{ object.id }}"
+                                                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                                        {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}
+                                                    </button>
+                                                    <button data-action="click->object#deleteObject"
+                                                            data-object-id-param="{{ object.id }}"
+                                                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                                                        {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {# Pagination #}
+                        <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                                Zeige <span class="font-medium">1</span> bis <span class="font-medium">5</span> von <span
+                                    class="font-medium">5</span> Einträgen
+                            </div>
+                            <div class="flex space-x-2">
+                                <button
+                                    class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                                    disabled>
+                                    {{ ux_icon('lucide:chevron-left', { class: 'h-4 w-4' }) }}
+                                </button>
+                                <button
+                                    class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                                    disabled>
+                                    {{ ux_icon('lucide:chevron-right', { class: 'h-4 w-4' }) }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {# Modal Animation Styles #}
+    <style>
+        @keyframes modal-enter {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes bounce-in {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-modal-enter {
+            animation: modal-enter 0.4s ease-out;
+        }
+
+        .animate-bounce-in {
+            animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+    </style>
+
+{% endblock %}

@@ -13,8 +13,10 @@ Die Component API wird HTML Komponenten liefern.
 
 ## Erstellung vom Mitarbeitern
 1. Es wird ein User/Mitarbeiter erstellt ohne Passwort
-2. Passworterstellung wird per Email-Link angestoßen
+2. Passworterstellung wird per E-mail-Link angestoßen
 
 ## Modals
 Im Ordner Templates/Modals gibt es ein modals.html.twig. Es muss immer Extended werden wenn man Modals erstellt.
 Des Weiteren gibt es dazu immer einen Stimulus Controller der das Modal Verhalten steuert.
+
+## Objekte

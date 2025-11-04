@@ -55,8 +55,9 @@
             </li>
 
             {# Objekte #}
+            {% set target_route = 'app_facility' %}
             <li>
-                <a href="#" class="{{ default_classes }}">
+                <a href="{{ path(target_route) }}" class="{% if current_route == target_route %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %}">
                     <span class="relative z-10 flex items-center space-x-3">
                         {{ ux_icon('lucide:building-2', { class: 'w-5 h-5 transition-colors duration-200' }) }}
                         <span>Objekte</span>

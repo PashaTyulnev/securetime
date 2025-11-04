@@ -33,7 +33,7 @@
                         'systemName': 'username',
                         'placeholder': 'aschmidt',
                         'required': 'required',
-                        'devValue': definedEmployee.user.username|default('testuser')
+                        'devValue': definedEmployee.user.username|default('')
                     } %}
 
                     {% include 'elements/select.html.twig' with {
@@ -54,7 +54,7 @@
                         'systemName': 'number',
                         'placeholder': '123456',
                         'required': 'required',
-                        'devValue': definedEmployee.number|default('changeit')
+                        'devValue': definedEmployee.number|default('')
                     } %}
 
                     {% include 'elements/input.html.twig' with {
@@ -63,7 +63,7 @@
                         'systemName': 'firstName',
                         'placeholder': 'Alexander',
                         'required': 'required',
-                        'devValue': definedEmployee.firstName|default('testfirstname')
+                        'devValue': definedEmployee.firstName|default('')
                     } %}
 
                     {% include 'elements/input.html.twig' with {
@@ -72,7 +72,7 @@
                         'systemName': 'lastName',
                         'placeholder': 'Schmidt',
                         'required': 'required',
-                        'devValue': definedEmployee.lastName|default('testlastname')
+                        'devValue': definedEmployee.lastName|default('')
                     } %}
 
                     {% include 'elements/input.html.twig' with {
@@ -81,7 +81,7 @@
                         'systemName': 'birthDate',
                         'placeholder': '25.06.1990',
                         'required': 'required',
-                        'devValue': definedEmployee.birthDate is defined ? definedEmployee.birthDate|date('Y-m-d') : '1990-09-09'
+                        'devValue': definedEmployee.birthDate is defined ? definedEmployee.birthDate|date('Y-m-d') : ''
                     } %}
 
                     {% include 'elements/input.html.twig' with {
@@ -90,7 +90,7 @@
                         'systemName': 'phone',
                         'placeholder': '017685412456',
                         'required': 'required',
-                        'devValue': definedEmployee.phone|default('017670584546test')
+                        'devValue': definedEmployee.phone|default('')
                     } %}
 
                     {% include 'elements/input.html.twig' with {
@@ -99,7 +99,7 @@
                         'systemName': 'email',
                         'placeholder': 'max@gmail.com',
                         'required': 'required',
-                        'devValue': definedEmployee.user.email|default('test@mail.de')
+                        'devValue': definedEmployee.user.email|default('')
                     } %}
                 </div>
 

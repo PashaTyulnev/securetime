@@ -19,6 +19,7 @@ class User implements TwoFactorInterface, UserInterface, PasswordAuthenticatedUs
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['employee:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
