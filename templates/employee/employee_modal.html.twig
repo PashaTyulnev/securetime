@@ -15,7 +15,7 @@
             Mitarbeiter {% if employee is defined %}bearbeiten{% else %}hinzufügen{% endif %}
         </h2>
 
-        {% include 'elements/modal_error.html.twig' %}
+        {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-employee-target'}%}
 
         {% if employee is defined %}
 

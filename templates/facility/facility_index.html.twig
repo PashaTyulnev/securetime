@@ -3,7 +3,10 @@
 {% block title %}Objektverwaltung{% endblock %}
 
 {% block body %}
-
+{#    {{ component('Alert', {#}
+{#        type: 'danger',#}
+{#        message: 'Danger Will Robinson!'#}
+{#    }) }}#}
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden" data-controller="object">
         <div data-object-target="objectModalContainer">
 
@@ -53,22 +56,13 @@
                                         Objekt
                                     </th>
                                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Objektnummer
+                                        Kürzel
                                     </th>
                                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Adresse
                                     </th>
                                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Kategorie
-                                    </th>
-                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Sicherheitsstufe
-                                    </th>
-                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Letzte Begehung
-                                    </th>
-                                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Status
+                                        Auftraggeber
                                     </th>
                                     <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Aktionen
@@ -151,25 +145,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ object.number }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ object.address }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ object.category }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                                            {% if object.securityLevel == 'Hoch' %}
-                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">{{ object.securityLevel }}</span>
-                                            {% elseif object.securityLevel == 'Mittel' %}
-                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">{{ object.securityLevel }}</span>
-                                            {% else %}
-                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">{{ object.securityLevel }}</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ object.lastInspection | date('d.m.Y') }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            {% if object.status == 'Aktiv' %}
-                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">{{ object.status }}</span>
-                                            {% elseif object.status == 'Inaktiv' %}
-                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">{{ object.status }}</span>
-                                            {% else %}
-                                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">{{ object.status }}</span>
-                                            {% endif %}
-                                        </td>
+
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div class="flex justify-end space-x-2">
                                                 {% if is_granted("ROLE_ADMIN") %}

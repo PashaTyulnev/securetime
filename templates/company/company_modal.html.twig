@@ -1,0 +1,104 @@
+{% extends 'elements/modal.html.twig' %}
+
+{% block content %}
+    {% set definedCompany = company is defined ? company : {} %}
+
+    <div class="px-8 py-10">
+        <div class="text-center mb-8 animate-bounce-in">
+            <div
+                class="mx-auto h-20 w-20 flex items-center justify-center rounded-3xl bg-gradient-to-br from-slate-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 shadow-inner">
+                {{ ux_icon('lucide:building-2', { class: 'h-11 w-11 text-slate-700 dark:text-gray-300' }) }}
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-6 text-center">
+            Firma {% if company is defined %}bearbeiten{% else %}hinzufügen{% endif %}
+        </h2>
+
+        {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-company-target'}%}
+
+        {% if company is defined %}
+        <form data-action="submit->company#saveEdit">
+            <input name="companyId" type="hidden" value="{{ definedCompany.id }}">
+            {% else %}
+            <form data-action="submit->company#saveNew">
+                {% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Firmenname',
+                        'type': 'text',
+                        'systemName': 'company',
+                        'placeholder': 'Musterfirma GmbH',
+                        'required': 'required',
+                        'devValue': definedCompany.company|default('')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Nummer',
+                        'type': 'text',
+                        'systemName': 'number',
+                        'placeholder': 'CD43/53',
+                        'required': 'required',
+                        'devValue': definedCompany.number|default('')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Logo URL',
+                        'type': 'text',
+                        'systemName': 'logo',
+                        'placeholder': 'https://example.com/logo.png',
+                        'devValue': definedCompany.logo|default('')
+                    } %}
+
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Straße',
+                        'type': 'text',
+                        'systemName': 'address[street]',
+                        'placeholder': 'Musterstraße 123',
+                        'required': 'required',
+                        'devValue': definedCompany.address.street|default('')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'PLZ',
+                        'type': 'text',
+                        'systemName': 'address[zip]',
+                        'placeholder': '01234',
+                        'required': 'required',
+                        'devValue': definedCompany.address.zip|default('')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Stadt',
+                        'type': 'text',
+                        'systemName': 'address[city]',
+                        'placeholder': 'Dresden',
+                        'required': 'required',
+                        'devValue': definedCompany.address.city|default('')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Land',
+                        'type': 'text',
+                        'systemName': 'address[country]',
+                        'placeholder': 'Deutschland',
+                        'devValue': definedCompany.address.country|default('')
+                    } %}
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button type="button" data-action="click->modal#hide"
+                            class="px-6 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">
+                        Abbrechen
+                    </button>
+                    <button type="submit"
+                            class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-gray-100 text-white dark:text-gray-900 font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+                        Speichern
+                    </button>
+                </div>
+            </form>
+    </div>
+{% endblock %}

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\FacilityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FacilityRepository::class)]
@@ -22,14 +24,26 @@ class Facility
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $street = null;
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Address $address = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $zip = null;
+    #[ORM\ManyToOne(inversedBy: 'facility')]
+    private ?Company $company = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $city = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $approach = null;
+
+    /**
+     * @var Collection<int, Contact>
+     */
+    #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'facility')]
+    private Collection $contacts;
+
+    public function __construct()
+    {
+        $this->contacts = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -72,38 +86,68 @@ class Facility
         return $this;
     }
 
-    public function getStreet(): ?string
+    public function getAddress(): ?Address
     {
-        return $this->street;
+        return $this->address;
     }
 
-    public function setStreet(string $street): static
+    public function setAddress(Address $address): static
     {
-        $this->street = $street;
+        $this->address = $address;
 
         return $this;
     }
 
-    public function getZip(): ?string
+    public function getCompany(): ?Company
     {
-        return $this->zip;
+        return $this->company;
     }
 
-    public function setZip(string $zip): static
+    public function setCompany(?Company $company): static
     {
-        $this->zip = $zip;
+        $this->company = $company;
 
         return $this;
     }
 
-    public function getCity(): ?string
+    public function getApproach(): ?string
     {
-        return $this->city;
+        return $this->approach;
     }
 
-    public function setCity(string $city): static
+    public function setApproach(?string $approach): static
     {
-        $this->city = $city;
+        $this->approach = $approach;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Contact>
+     */
+    public function getContacts(): Collection
+    {
+        return $this->contacts;
+    }
+
+    public function addContact(Contact $contact): static
+    {
+        if (!$this->contacts->contains($contact)) {
+            $this->contacts->add($contact);
+            $contact->setFacility($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContact(Contact $contact): static
+    {
+        if ($this->contacts->removeElement($contact)) {
+            // set the owning side to null (unless already changed)
+            if ($contact->getFacility() === $this) {
+                $contact->setFacility(null);
+            }
+        }
 
         return $this;
     }

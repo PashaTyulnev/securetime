@@ -40,13 +40,13 @@
                 </a>
             </li>
 
-            {# Geschützte Seite #}
-            {% set target_route = 'app_protected' %}
+
+            {% set target_route = 'app_company' %}
             <li>
                 <a href="{{ path(target_route) }}" class="{% if current_route == target_route %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %}">
                     <span class="relative z-10 flex items-center space-x-3">
                         {{ ux_icon('lucide:lock', { class: 'w-5 h-5 transition-colors duration-200' }) }}
-                        <span>Geschützte Seite</span>
+                        <span>Auftraggeber</span>
                     </span>
                     {% if current_route == target_route %}
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-slate-600 to-slate-800 dark:from-white dark:to-gray-300 rounded-r-full"></div>

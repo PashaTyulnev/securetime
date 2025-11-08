@@ -2,7 +2,7 @@ export default class EmployeeComponentApi {
 
     static getAllEmployeesList() {
 
-        return fetch(`/components/employee/all`, {
+        return fetch(`/components/employee/list`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'

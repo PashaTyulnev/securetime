@@ -17,7 +17,7 @@ class EmployeeComponentController extends AbstractController
     {
 
     }
-    #[Route(path: '/all', name: 'all_employee_list_component', methods: ['GET'])]
+    #[Route(path: '/list', name: 'all_employee_list_component', methods: ['GET'])]
     public function getEmployeeListComponent(): Response
     {
         //call function from other controller

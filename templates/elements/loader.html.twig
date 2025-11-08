@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Loader</title>
+    <style>
+        .apple-loader .spinner-ring {
+            animation: apple-loader-spin 0.8s linear infinite;
+        }
+
+        @keyframes apple-loader-spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 min-h-screen">
+
+<!-- Simple Loader -->
+<div id="page-loader" class="apple-loader fixed inset-0 bg-black/10 dark:bg-black/30 flex items-center justify-center z-50">
+    <div class="spinner-ring w-12 h-12">
+        <svg class="w-full h-full" viewBox="0 0 50 50">
+            <circle
+                cx="25"
+                cy="25"
+                r="20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="4"
+                stroke-linecap="round"
+                stroke-dasharray="80"
+                stroke-dashoffset="60"
+                class="text-blue-600 dark:text-blue-400"
+            />
+        </svg>
+    </div>
+</div>
+
+
+
+</body>
+</html>

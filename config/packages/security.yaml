@@ -13,6 +13,11 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api:
+            pattern: ^/api/
+            stateless: true
+            security: false
+            provider: app_user_provider
         main:
             two_factor:
                 auth_form_path: 2fa_login

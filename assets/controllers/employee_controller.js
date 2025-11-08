@@ -1,11 +1,12 @@
 import {Controller} from '@hotwired/stimulus';
 
-import EmployeeComponentApi from "../api/EmployeeComponentApi.js";
-import EmployeeDataApi from "../api/EmployeeDataApi.js";
+import EmployeeComponentApi from "../api/employee/EmployeeComponentApi.js";
+import EmployeeDataApi from "../api/employee/EmployeeDataApi.js";
 
 export default class extends Controller {
 
-    static targets = ["employeeListContainer", "employeeFormModal", "employeeModalContainer", "errorMessageContainer", "errorMessage"]
+    static targets = ["employeeListContainer",
+        "employeeFormModal", "employeeModalContainer", "errorMessageContainer", "errorMessage"]
 
     connect() {
         EmployeeComponentApi.getAllEmployeesList().then(html => {
