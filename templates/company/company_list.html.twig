@@ -85,12 +85,7 @@
                         <td class="px-6 py-4 align-top whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex justify-end space-x-2">
                                 {% if is_granted("ROLE_ADMIN") %}
-                                    <button data-action="click->company#openObjectInfoModal"
-                                            data-company-id-param="{{ company.id }}"
-                                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                                        {{ ux_icon('lucide:info', { class: 'h-5 w-5' }) }}
-                                    </button>
-                                    <button data-action="click->company#openObjectEditModal"
+                                    <button data-action="click->company#openEditModal"
                                             data-company-id-param="{{ company.id }}"
                                             class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                                         {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}

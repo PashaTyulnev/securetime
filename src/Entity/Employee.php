@@ -2,14 +2,30 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\EmployeeRepository;
+use App\StateProcessor\EmployeeStateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
-#[UniqueEntity(fields: ['number'], message: 'Diese Personalnummer ist bereits vergeben.')]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(processor: EmployeeStateProcessor::class),
+        new Put(processor: EmployeeStateProcessor::class),
+        new Delete(),
+    ],
+    normalizationContext: ['groups' => ['employee:read']],
+    denormalizationContext: ['groups' => ['employee:write']]
+)]
 class Employee
 {
     #[ORM\Id]
@@ -43,7 +59,7 @@ class Employee
     private ?string $number = null;
 
     #[ORM\ManyToOne(targetEntity: Department::class, inversedBy: 'employees')]
-    #[Groups(['employee:read', 'employee:write'])]
+    #[Groups(['employee:read'])]
     private ?Department $department = null;
 
 

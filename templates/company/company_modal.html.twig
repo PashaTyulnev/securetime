@@ -18,7 +18,7 @@
         {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-company-target'}%}
 
         {% if company is defined %}
-        <form data-action="submit->company#saveEdit">
+        <form data-action="submit->company#saveEdit" data-company-id-param="{{ definedCompany.id }}">
             <input name="companyId" type="hidden" value="{{ definedCompany.id }}">
             {% else %}
             <form data-action="submit->company#saveNew">
@@ -47,9 +47,9 @@
                     {% include 'elements/input.html.twig' with {
                         'title': 'Logo URL',
                         'type': 'text',
-                        'systemName': 'logo',
+                        'systemName': 'logoLink',
                         'placeholder': 'https://example.com/logo.png',
-                        'devValue': definedCompany.logo|default('')
+                        'devValue': definedCompany.logoLink|default('')
                     } %}
 
 
@@ -85,7 +85,7 @@
                         'type': 'text',
                         'systemName': 'address[country]',
                         'placeholder': 'Deutschland',
-                        'devValue': definedCompany.address.country|default('')
+                        'devValue': definedCompany.address.country|default('Deutschland')
                     } %}
                 </div>
 

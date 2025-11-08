@@ -28,4 +28,3 @@ Des Weiteren gibt es dazu immer einen Stimulus Controller der das Modal Verhalte
 1. Auftragsgeber
 1.1. Kontakte dazu 
 1.2. Adressen dazu
-2. 

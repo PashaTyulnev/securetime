@@ -14,25 +14,24 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class CompanyComponentController extends AbstractController
 {
 
-    public function __construct(readonly SerializerInterface $serializer)
+    public function __construct(readonly SerializerInterface $serializer,
+                                readonly CompanyRepository $companyRepository)
     {
     }
 
     #[Route(path: '/list', name: 'all_company_list_component', methods: ['GET'])]
-    public function getCompanyListComponent(CompanyRepository $companyRepository): Response
+    public function getCompanyListComponent(): Response
     {
 
-        $companies = $companyRepository->findAll();
+        $companies = $this->companyRepository->findAll();
 
-        // Nutze die gleiche Serialisierung wie API Platform
         $companies = $this->serializer->serialize(
             $companies,
-            'jsonld',  // oder 'json'
+            'jsonld',
             ['groups' => ['company:read']]
         );
 
         $companies = json_decode($companies, true);
-
 
         return $this->render('company/company_list.html.twig', [
             'companies' => $companies
@@ -44,6 +43,24 @@ class CompanyComponentController extends AbstractController
     {
         return $this->render('company/company_modal.html.twig', [
 
+        ]);
+    }
+
+    #[Route(path: '/edit/{companyId}', name: 'edit_company_component', methods: ['GET'])]
+    public function getEditCompanyModalComponent(int $companyId): Response
+    {
+        $company = $this->companyRepository->find($companyId);
+
+        $company = $this->serializer->serialize(
+            $company,
+            'jsonld',
+            ['groups' => ['company:read']]
+        );
+
+        $company = json_decode($company, true);
+
+        return $this->render('company/company_modal.html.twig', [
+            'company' => $company
         ]);
     }
 }

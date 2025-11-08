@@ -15,12 +15,11 @@
             Mitarbeiter {% if employee is defined %}bearbeiten{% else %}hinzufügen{% endif %}
         </h2>
 
-        {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-employee-target'}%}
+        {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-employee-target'} %}
 
         {% if employee is defined %}
 
-        <form data-action="submit->employee#saveEdit">
-            <input name="employeeId" type="hidden" value="{{ definedEmployee.id }}">
+        <form data-action="submit->employee#saveEdit" data-employee-id-param="{{ definedEmployee.id }}">
             {% else %}
             <form data-action="submit->employee#saveNew">
                 {% endif %}

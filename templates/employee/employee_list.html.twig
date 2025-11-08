@@ -1,3 +1,4 @@
+<turbo-frame id="employee-table">
 <div
     class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
     {# Suchfilter-Bereich #}
@@ -63,17 +64,17 @@
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.user.username }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.user.username|default('N/A') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.number }}</td>
 
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                        {{ employee.user.email }}
+                        {{ employee.user.email|default('N/A') }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.phone }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.birthDate | date('d.m.Y')}}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        {% if employee.user.active %}
+                        {% if employee.user and employee.user.active %}
                             <span
                                 class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">Aktiv</span>
                         {% else %}
@@ -84,13 +85,13 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end space-x-2">
                             {% if is_granted("ROLE_ADMIN") %}
-                                <button data-action="click->employee#openEmployeeEditModal"
+                                <button data-action="click->employee#openEditModal"
                                         data-employee-id-param="{{ employee.id }}"
                                         class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                                     {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}
                                 </button>
-                                {% if employee.user.id != app.user.id %}
-                                    <button data-action="click->employee#deleteEmployee"
+                                {% if employee.user and employee.user.id != app.user.id %}
+                                    <button data-action="click->employee#delete"
                                             data-employee-id-param="{{ employee.id }}"
                                             class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                                         {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
@@ -127,3 +128,4 @@
         </div>
     </div>
 </div>
+</turbo-frame>

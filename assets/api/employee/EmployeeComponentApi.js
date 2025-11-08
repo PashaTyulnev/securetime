@@ -10,7 +10,7 @@ export default class EmployeeComponentApi {
         }).then(response => response.text())
     }
 
-    static getEmployeeCreationModal() {
+    static getCreationModal() {
 
         return fetch(`/components/employee/new`, {
             method: "GET",
@@ -20,7 +20,7 @@ export default class EmployeeComponentApi {
         }).then(response => response.text())
     }
 
-    static getEmployeeEditModal(employeeId) {
+    static getEditModal(employeeId) {
         return fetch(`/components/employee/edit/${employeeId}`, {
             method: "GET",
             headers: {

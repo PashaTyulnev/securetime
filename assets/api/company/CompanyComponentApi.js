@@ -10,4 +10,13 @@ export default class CompanyComponentApi {
         }).then(response => response.text())
     }
 
+    static getEditModal(entityId) {
+        return fetch(`/components/company/edit/${entityId}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.text())
+    }
+
 }

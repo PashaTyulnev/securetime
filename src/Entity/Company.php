@@ -65,6 +65,7 @@ class Company
     private Collection $facility;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['company:read', 'company:write'])]
     private ?string $logoLink = null;
 
     public function __construct()

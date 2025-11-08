@@ -5,7 +5,7 @@
 {% block body %}
 
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden " data-controller="employee">
-        <div data-employee-target="employeeModalContainer">
+        <div data-employee-target="modalContainer">
 
         </div>
 {#        {% include 'employee/newEmployeeModal.html.twig' %}#}
@@ -18,7 +18,7 @@
                     <div class="flex justify-between items-center">
                         <h1 class="text-3xl font-light text-gray-900 dark:text-white tracking-tight">Mitarbeiterverwaltung</h1>
                         <!-- Modal toggle -->
-                        <button data-action="click->employee#openEmployeeCreationModal"
+                        <button data-action="click->employee#openCreationModal"
                                 class="app-button">
                             {{ ux_icon('lucide:user-plus', { class: 'w-5 h-5' }) }}
                             <span>Neuer Mitarbeiter</span>
@@ -26,9 +26,12 @@
                     </div>
                 </div>
 
-                {# Mitarbeiterliste #}
-                <div data-employee-target="employeeListContainer">
-                    <twig:Loader/>
+                <div>
+                    <turbo-frame id="employee-table" src="{{ path('all_employee_list_component') }}">
+                        <div class="loading">
+                            <twig:Loader/>
+                        </div>
+                    </turbo-frame>
                 </div>
             </div>
         </main>
