@@ -102,7 +102,7 @@
                                 {% endif %}
                                 {% if is_granted("ROLE_ADMIN") %}
                                     <button data-action="click->facility#delete"
-                                            data-facility-id-param="{{ facility.id }}"
+                                            data-facility-uri-param="{{ facility['@id'] }}"
                                             class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                                         {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
                                     </button>
