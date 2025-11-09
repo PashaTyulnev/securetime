@@ -1,16 +1,35 @@
 export default class Formater {
+
     static formatToJson(formData) {
-        const obj = {};
+        const jsonData = {};
+
         for (const [key, value] of formData.entries()) {
-            if (key.includes('[')) {
-                // z.B. address[street]
-                const [mainKey, subKey] = key.split(/\[|\]/).filter(Boolean);
-                obj[mainKey] = obj[mainKey] || {};
-                obj[mainKey][subKey] = value;
-            } else {
-                obj[key] = value;
+            if (value === '' || value === null || value === undefined) {
+                continue;
             }
+
+            // Ключи вида address[city] -> ['address', 'city']
+            const keys = [];
+            const regex = /([^\[\]]+)|\[([^\[\]]*)\]/g;
+            let match;
+            while ((match = regex.exec(key)) !== null) {
+                if (match[1]) {
+                    keys.push(match[1]);
+                } else if (match[2]) {
+                    keys.push(match[2]);
+                }
+            }
+
+            let current = jsonData;
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (!current[keys[i]]) {
+                    current[keys[i]] = {};
+                }
+                current = current[keys[i]];
+            }
+            current[keys[keys.length - 1]] = value;
         }
-        return obj;
+
+        return jsonData;
     }
 }

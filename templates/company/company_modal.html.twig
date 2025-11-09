@@ -18,8 +18,7 @@
         {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-company-target'}%}
 
         {% if company is defined %}
-        <form data-action="submit->company#saveEdit" data-company-id-param="{{ definedCompany.id }}">
-            <input name="companyId" type="hidden" value="{{ definedCompany.id }}">
+        <form data-action="submit->company#saveEdit" data-company-uri-param="{{ definedCompany['@id'] }}">
             {% else %}
             <form data-action="submit->company#saveNew">
                 {% endif %}

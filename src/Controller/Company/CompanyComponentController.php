@@ -3,6 +3,7 @@
 namespace App\Controller\Company;
 
 use App\Repository\CompanyRepository;
+use App\Service\CompanyService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,8 @@ class CompanyComponentController extends AbstractController
 {
 
     public function __construct(readonly SerializerInterface $serializer,
-                                readonly CompanyRepository $companyRepository)
+                                readonly CompanyService      $companyService,
+                                readonly CompanyRepository   $companyRepository)
     {
     }
 
@@ -23,16 +25,7 @@ class CompanyComponentController extends AbstractController
     public function getCompanyListComponent(): Response
     {
 
-        $companies = $this->companyRepository->findAll();
-
-        $companies = $this->serializer->serialize(
-            $companies,
-            'jsonld',
-            ['groups' => ['company:read']]
-        );
-
-        $companies = json_decode($companies, true);
-
+        $companies = $this->companyService->getAllCompanies();
         return $this->render('company/company_list.html.twig', [
             'companies' => $companies
         ]);

@@ -4,9 +4,9 @@ import Formater from "../api/helper/Formater.js";
 
 /**
  * Basis-Controller für Entity-Management (CRUD-Operationen)
- * 
+ *
  * Diese Klasse stellt gemeinsame Funktionalität für Employee, Company und andere Entities bereit.
- * 
+ *
  * Erforderliche statische Properties in abgeleiteten Klassen:
  * - entityName: String (z.B. 'employees', 'companies')
  * - componentApi: Klasse mit getCreationModal() und getEditModal(id)
@@ -54,8 +54,8 @@ export default class extends Controller {
      */
     saveEdit(event) {
         event.preventDefault();
-        const entityId = event.params.id;
-        this.handleSave(event, (data) => ApiDataHandler.updateEntity(this.getEntityName(), data, entityId));
+        const entityUri = event.params.uri;
+        this.handleSave(event, (data) => ApiDataHandler.updateEntity(this.getEntityName(), data, entityUri));
     }
 
     /**
@@ -63,7 +63,7 @@ export default class extends Controller {
      */
     delete(event) {
         event.preventDefault();
-        const entityId = event.params.id;
+        const uri = event.params.uri;
 
         // Abfrage, ob der Benutzer wirklich löschen möchte
         const confirmed = confirm(this.getDeleteConfirmMessage());
@@ -71,7 +71,7 @@ export default class extends Controller {
             return;
         }
 
-        ApiDataHandler.deleteEntity(this.getEntityName(), entityId)
+        ApiDataHandler.deleteEntity(this.getEntityName(), uri)
             .then(response => {
                 if (response.ok) {
                     window.location.reload();
@@ -112,7 +112,10 @@ export default class extends Controller {
         // API-Aufruf
         apiCall(jsonData)
             .then(response => {
-                if (!response) {
+
+                //check response is empty
+
+                if (!response || Object.keys(response).length === 0) {
                     this.showError('Keine Antwort vom Server.');
                     return;
                 }

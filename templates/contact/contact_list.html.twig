@@ -1,0 +1,173 @@
+<turbo-frame id="contacts-table">
+    <div
+        class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+        {# Suchfilter-Bereich #}
+        <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
+            <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-white"></h2>
+                <div class="relative">
+                    <input type="text" placeholder="Suchen..."
+                           class="w-64 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800/80 transition-all duration-200">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        {{ ux_icon('lucide:search', { class: 'h-5 w-5 text-gray-400 dark:text-gray-500' }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Tabelle #}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50/80 dark:bg-gray-800/80">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Kontakt
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Firma
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Objekt
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Kommunikation
+                    </th>
+                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Aktionen
+                    </th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+
+                {% for contact in contacts %}
+                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-200">
+                        <td class="px-6 py-4 align-top">
+                            <div class="flex items-center space-x-4">
+                                {% set colors = ['blue', 'green', 'purple', 'indigo', 'red', 'orange', 'yellow', 'teal'] %}
+                                {% set randomIndex = contact.id % colors|length %}
+                                {% set randomColor = colors[randomIndex] %}
+
+                                <div
+                                    class="h-10 w-10 bg-gradient-to-br from-{{ randomColor }}-200 to-{{ randomColor }}-300 dark:from-{{ randomColor }}-600 dark:to-{{ randomColor }}-700 rounded-full flex items-center justify-center shadow-inner overflow-hidden flex-shrink-0">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                                        {{ contact.firstName|slice(0, 1)|upper }}{{ contact.lastName|slice(0, 1)|upper }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ contact.firstName }} {{ contact.lastName }}</div>
+
+                                    {% if contact.jobrole is defined and contact.jobrole != "" %}
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ contact.jobrole }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4 align-top">
+                            {% if contact.company is defined and contact.company %}
+                                <div
+                                    class="text-sm font-medium text-gray-900 dark:text-white">{{ contact.company.company }}</div>
+                            {% else %}
+                                <span
+                                    class="text-sm text-gray-500 dark:text-gray-400 italic">Keine Firma angegeben</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="px-6 py-4 align-top">
+                            {% if contact.facility is defined and contact.facility %}
+                                <div
+                                    class="text-sm font-medium text-gray-900 dark:text-white">{{ contact.facility.title }}</div>
+                            {% else %}
+                                <span class="text-sm text-gray-500 dark:text-gray-400 italic">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="px-6 py-4 align-top">
+                            <div class="flex flex-col space-y-2">
+                                {% if contact.email is defined and contact.email %}
+                                    <div class="flex items-center space-x-2">
+                                        <span class="p-1 rounded-md bg-gray-100 dark:bg-gray-700">
+                                            {{ ux_icon('lucide:mail', { class: 'h-4 w-4 text-gray-600 dark:text-gray-400' }) }}
+                                        </span>
+                                        <a href="mailto:{{ contact.email }}"
+                                           class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                                            {{ contact.email }}
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% if contact.phone is defined and contact.phone %}
+                                    <div class="flex items-center space-x-2">
+                                        <span class="p-1 rounded-md bg-gray-100 dark:bg-gray-700">
+                                            {{ ux_icon('lucide:phone', { class: 'h-4 w-4 text-gray-600 dark:text-gray-400' }) }}
+                                        </span>
+                                        <a href="tel:{{ contact.phone|replace({' ': ''}) }}"
+                                           class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                                            {{ contact.phone }}
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4 align-top whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex justify-end space-x-2">
+                                {% if is_granted("ROLE_ADMIN") or is_granted("EDIT", contact) %}
+                                    <button data-action="click->contact#openEditModal"
+                                            data-contact-id-param="{{ contact.id }}"
+                                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                        {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}
+                                    </button>
+                                {% endif %}
+                                {% if is_granted("ROLE_ADMIN") %}
+                                    <button data-action="click->contact#delete"
+                                            data-contact-id-param="{{ contact.id }}"
+                                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                                        {{ ux_icon('lucide:trash-2', { class: 'h-5 w-5' }) }}
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400 italic">
+                            Keine Kontakte gefunden. Erstellen Sie einen neuen Kontakt mit dem Button oben rechts.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Pagination #}
+        <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+                {% if contacts|length > 0 %}
+                    Zeige <span class="font-medium">{{ pagination.firstItem|default(1) }}</span> bis <span
+                    class="font-medium">{{ pagination.lastItem|default(contacts|length) }}</span> von <span
+                    class="font-medium">{{ pagination.total|default(contacts|length) }}</span> Einträgen
+                {% else %}
+                    Keine Einträge gefunden
+                {% endif %}
+            </div>
+            <div class="flex space-x-2">
+                <button
+                    class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                    {% if pagination is not defined or pagination.currentPage == 1 or pagination.currentPage is not defined %}disabled{% endif %}
+                    data-action="click->contacts#loadPage"
+                    data-page-param="{{ pagination.currentPage|default(1) - 1 }}">
+                    {{ ux_icon('lucide:chevron-left', { class: 'h-4 w-4' }) }}
+                </button>
+                <button
+                    class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                    {% if pagination is not defined or pagination.currentPage == pagination.lastPage or pagination.lastPage is not defined %}disabled{% endif %}
+                    data-action="click->contacts#loadPage"
+                    data-page-param="{{ pagination.currentPage|default(1) + 1 }}">
+                    {{ ux_icon('lucide:chevron-right', { class: 'h-4 w-4' }) }}
+                </button>
+            </div>
+        </div>
+    </div>
+</turbo-frame>

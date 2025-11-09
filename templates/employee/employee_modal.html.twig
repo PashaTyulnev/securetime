@@ -19,7 +19,7 @@
 
         {% if employee is defined %}
 
-        <form data-action="submit->employee#saveEdit" data-employee-id-param="{{ definedEmployee.id }}">
+        <form data-action="submit->employee#saveEdit" data-employee-uri-param="{{ definedEmployee['@id'] }}">
             {% else %}
             <form data-action="submit->employee#saveNew">
                 {% endif %}
@@ -39,12 +39,14 @@
                         'systemName': 'department',
                         'title': 'Abteilung',
                         'options': departments | map(d => {
-                            'value': d.shortTitle,
+                            'value': d['@id'],
                             'label': d.title
                         }),
                         'defaultOption': 'Bitte wählen...',
                         'required': 'required',
-                        'devValue': definedEmployee.department.shortTitle|default(currentDepartment|default(''))
+                        'devValue': definedEmployee.department is defined and definedEmployee.department is not null
+                        ? definedEmployee.department['@id']
+                        : ''
                     } %}
 
                     {% include 'elements/input.html.twig' with {

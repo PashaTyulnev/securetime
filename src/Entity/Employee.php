@@ -9,7 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\EmployeeRepository;
-use App\StateProcessor\EmployeeStateProcessor;
+use App\Processor\EmployeeProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -19,8 +19,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(processor: EmployeeStateProcessor::class),
-        new Put(processor: EmployeeStateProcessor::class),
+        new Post(processor:EmployeeProcessor::class),
+        new Put(processor:EmployeeProcessor::class),
         new Delete(),
     ],
     normalizationContext: ['groups' => ['employee:read']],
@@ -59,7 +59,7 @@ class Employee
     private ?string $number = null;
 
     #[ORM\ManyToOne(targetEntity: Department::class, inversedBy: 'employees')]
-    #[Groups(['employee:read'])]
+    #[Groups(['employee:read','employee:write'])]
     private ?Department $department = null;
 
 

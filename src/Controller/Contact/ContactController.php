@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class ContactController extends AbstractController
 {
 
-    #[Route(path: '/contact', name: 'app_contact')]
+    #[Route(path: '/contacts', name: 'app_contacts')]
     public function loadIndexPage(Security $security): Response
     {
 

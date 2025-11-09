@@ -1,0 +1,115 @@
+{% extends 'elements/modal.html.twig' %}
+
+{% block content %}
+    {% set definedContact = contact is defined ? contact : {} %}
+
+    <div class="px-8 py-10">
+        <div class="text-center mb-8 animate-bounce-in">
+            <div
+                class="mx-auto h-20 w-20 flex items-center justify-center rounded-3xl bg-gradient-to-br from-slate-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 shadow-inner">
+                {{ ux_icon('lucide:user', { class: 'h-11 w-11 text-slate-700 dark:text-gray-300' }) }}
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-6 text-center">
+            Kontakt {% if contact is defined %}bearbeiten{% else %}hinzufügen{% endif %}
+        </h2>
+
+        {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-contact-target'} %}
+
+        {% if contact is defined %}
+        <form data-action="submit->contact#saveEdit" data-contact-uri-param="{{ definedContact['@id'] }}">
+            {% else %}
+            <form data-action="submit->contact#saveNew">
+                {% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Vorname',
+                        'type': 'text',
+                        'systemName': 'firstName',
+                        'placeholder': 'Max',
+                        'required': 'required',
+                        'devValue': definedContact.firstName|default('')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Nachname',
+                        'type': 'text',
+                        'systemName': 'lastName',
+                        'placeholder': 'Mustermann',
+                        'required': 'required',
+                        'devValue': definedContact.lastName|default('')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'E-Mail',
+                        'type': 'email',
+                        'systemName': 'email',
+                        'placeholder': 'max.mustermann@example.com',
+                        'required': 'required',
+                        'devValue': definedContact.email|default('')
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Telefon',
+                        'type': 'tel',
+                        'systemName': 'phone',
+                        'placeholder': '+49 123 456789',
+                        'devValue': definedContact.phone|default('')
+                    } %}
+
+                    {% include 'elements/select.html.twig' with {
+                        'title': 'Firma',
+                        'systemName': 'company',
+                        'placeholder': 'Bitte Firma auswählen',
+                        'required': 'false',
+                        'disableDefaultOption': true,
+                        'defaultOption': 'Bitte Firma auswählen...',
+                        'options': companies|map(c => {
+                            'value': c['@id'],
+                            'label': c.company,
+                            'selected': contact is defined and contact.company is not null and contact.company.id == c.id
+                        }),
+                        'devValue': contact is defined and contact.company is not null ? contact.company['@id'] : ''
+                    } %}
+
+                    {% include 'elements/select.html.twig' with {
+                        'title': 'Objekt',
+                        'systemName': 'facility',
+                        'placeholder': 'Bitte Objekt auswählen',
+                        'required': 'false',
+                        'disableDefaultOption': true,
+                        'defaultOption': 'Bitte Objekt auswählen...',
+                        'options': facilities|map(f => {
+                            'value': f['@id'],
+                            'label': f.title,
+                            'selected': contact is defined and contact.facility is not null and contact.facility.id == f.id
+                        }),
+                        'devValue': contact is defined and contact.facility is not null ? contact.facility['@id'] : ''
+                    } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Position',
+                        'type': 'text',
+                        'systemName': 'jobrole',
+                        'placeholder': 'Geschäftsführer',
+                        'devValue': definedContact.jobrole|default('')
+                    } %}
+
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button type="button" data-action="click->modal#hide"
+                            class="px-6 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">
+                        Abbrechen
+                    </button>
+                    <button type="submit"
+                            class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-gray-100 text-white dark:text-gray-900 font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+                        Speichern
+                    </button>
+                </div>
+            </form>
+    </div>
+{% endblock %}

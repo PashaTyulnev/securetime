@@ -17,32 +17,36 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
-#[UniqueEntity(fields: ['company'], message: 'Diese Firma ist bereits angelegt.')]
 #[ApiResource(
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(),
-        new Put(),
+        new Post(validationContext: ['groups' => ['Default', 'create']]),
+        new Put(validationContext: ['groups' => ['Default', 'update']]),
         new Delete(),
     ],
     normalizationContext: ['groups' => ['company:read']],
     denormalizationContext: ['groups' => ['company:write']]
+)]
+#[UniqueEntity(
+    fields: ['company'],
+    message: 'Diese Firma ist bereits angelegt.',
+    groups: ['create']  // Nur beim Create prüfen!
 )]
 class Company
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['company:read'])]
+    #[Groups(['company:read', 'contact:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['company:read', 'company:write'])]
+    #[Groups(['company:read', 'company:write', 'contact:read'])]
     private ?string $number = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['company:read', 'company:write'])]
+    #[Groups(['company:read', 'company:write', 'contact:read','contact:read', 'facility:read'])]
     private ?string $company = null;
 
     /**
@@ -53,7 +57,7 @@ class Company
     private Collection $contacts;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: false)]
     #[Groups(['company:read', 'company:write'])]
     #[Assert\Valid]
     private ?Address $address = null;

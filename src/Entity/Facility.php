@@ -2,36 +2,61 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\FacilityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: FacilityRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Put(),
+        new Delete(),
+    ],
+    normalizationContext: ['groups' => ['facility:read']],
+    denormalizationContext: ['groups' => ['facility:write']]
+)]
 class Facility
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['contact:read', 'facility:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['contact:read', 'facility:read','facility:write'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['contact:read', 'facility:read','facility:write'])]
     private ?string $shortTitle = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255,nullable: true)]
+    #[Groups(['contact:read', 'facility:read','facility:write'])]
     private ?string $description = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['facility:read','facility:write'])]
     private ?Address $address = null;
 
     #[ORM\ManyToOne(inversedBy: 'facility')]
+    #[Groups(['facility:read','facility:write'])]
     private ?Company $company = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['facility:read','facility:write'])]
     private ?string $approach = null;
 
     /**
