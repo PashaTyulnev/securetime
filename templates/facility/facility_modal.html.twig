@@ -86,6 +86,7 @@
 
                     {% include 'elements/input.html.twig' with {
                         'title': 'PLZ',
+                        'action': 'data-action=input->facility#fetchCityByZip',
                         'type': 'text',
                         'systemName': 'address[zip]',
                         'placeholder': '01234',
@@ -96,6 +97,7 @@
                     {% include 'elements/input.html.twig' with {
                         'title': 'Stadt',
                         'type': 'text',
+                        'target': 'data-facility-target=cityInput',
                         'systemName': 'address[[city]',
                         'placeholder': 'Dresden',
                         'required': 'required',
