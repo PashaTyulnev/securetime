@@ -20,7 +20,7 @@ class EmployeeController extends AbstractController
     public function loadIndexPage(Security $security): Response
     {
 
-        return $this->render('employee/employee_index.html.twig', [
+        return $this->render('pages/employee/employee_index.html.twig', [
 
         ]);
     }

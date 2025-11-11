@@ -19,7 +19,7 @@ class FacilityController extends AbstractController
     public function loadIndexPage(Security $security): Response
     {
 
-        return $this->render('facility/facility_index.html.twig', [
+        return $this->render('pages/facility/facility_index.html.twig', [
 
         ]);
     }

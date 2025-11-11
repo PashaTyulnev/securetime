@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div data-controller="schedule-weekly"
+         class="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-gray-950 dark:via-slate-950 dark:to-gray-900">
+        {# Animated Background Gradients #}
+        <div class="fixed inset-0 overflow-hidden pointer-events-none">
+            <div
+                class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-10 dark:opacity-20 animate-blob"></div>
+            <div
+                class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-10 dark:opacity-20 animate-blob animation-delay-2000"></div>
+            <div
+                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-10 dark:opacity-20 animate-blob animation-delay-4000"></div>
+        </div>
+
+        {# Header with Glassmorphism #}
+        <header
+            class="sticky top-0 z-50 backdrop-blur-2xl bg-white/70 dark:bg-gray-900/70 border-b border-gray-200/50 dark:border-gray-800/50">
+            <div class="max-w-[1600px] mx-auto">
+                {# Top Bar #}
+                <div class="px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-6">
+                            <h1 class="text-3xl font-extralight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+                                Dienstplaner (Personalansicht)
+                            </h1>
+                        </div>
+
+                        {# Date Navigation #}
+                        {% include "/pages/schedule/schedule_week/week_navigation.html.twig" %}
+                    </div>
+                </div>
+
+                {# Tab Navigation - Zeitraum Typ #}
+                {% include '/pages/schedule/components/range_type_navigation.html.twig' %}
+            </div>
+        </header>
+
+        {# Main Content #}
+        <main class="max-w-[1600px] mx-auto px-6 py-8">
+
+
+            {#            #}{# Filter Bar - Geändert: Fokus auf Objektauswahl #}
+            <div
+                class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl p-4 mb-8 border border-gray-200/50 dark:border-gray-800/50">
+                <div class="flex flex-wrap items-center gap-4">
+
+                    {# NEUE OBJEKT-AUSWAHL #}
+                    {% set facilities_list = [
+                        {'name': 'Main Building', 'id': 1, 'color': 'blue'},
+                        {'name': 'North Parking', 'id': 2, 'color': 'purple'},
+                        {'name': 'West Warehouse', 'id': 3, 'color': 'emerald'},
+                        {'name': 'Tech Center', 'id': 4, 'color': 'orange'}
+                    ] %}
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Objekt:</span>
+                        <select
+                            class="px-4 py-2 bg-blue-100/80 dark:bg-blue-900/40 rounded-xl border-0 text-sm font-bold text-blue-900 dark:text-blue-200 focus:ring-2 focus:ring-blue-500">
+                            <option>Alle Objekte anzeigen</option>
+                            {% for facility in facilities_list %}
+                                <option value="{{ facility.id }}"
+                                        {% if facility.id == 1 %}selected{% endif %}>{{ facility.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {# ENDE NEUE OBJEKT-AUSWAHL #}
+
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400">View:</span>
+                        <select
+                            class="px-4 py-2 bg-gray-100/80 dark:bg-gray-800/80 rounded-xl border-0 text-sm font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                            <option>Alle Mitarbeiter</option>
+                            <option>Verplant</option>
+                            <option>Mit Lücken</option>
+                        </select>
+                    </div>
+                    <div class="ml-auto flex items-center gap-2">
+                        <button
+                            class="p-2 bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 rounded-xl transition-all duration-200">
+                            {{ ux_icon('lucide:download', { class: 'h-4 w-4 text-gray-600 dark:text-gray-400' }) }}
+                        </button>
+                        <button
+                            class="p-2 bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 rounded-xl transition-all duration-200">
+                            {{ ux_icon('lucide:printer', { class: 'h-4 w-4 text-gray-600 dark:text-gray-400' }) }}
+                        </button>
+                        <button
+                            class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200">
+                            {{ ux_icon('lucide:plus', { class: 'h-4 w-4 inline mr-1' }) }}
+                            Neue Schicht
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {# Hauptinhalt #}
+            {% include 'pages/schedule/schedule_week/schedule_week_overview.html.twig' %}
+        </main>
+
+        <div class="fixed bottom-8 right-8 flex flex-col gap-3">
+            <button
+                class="group p-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-200 border border-gray-200/50 dark:border-gray-800/50">
+                {{ ux_icon('lucide:message-circle', { class: 'h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400' }) }}
+            </button>
+            <button
+                class="group p-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-200">
+                {{ ux_icon('lucide:plus', { class: 'h-6 w-6 text-white' }) }}
+            </button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+    </style>
+{% endblock %}

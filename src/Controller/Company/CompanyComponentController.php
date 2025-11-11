@@ -26,7 +26,7 @@ class CompanyComponentController extends AbstractController
     {
 
         $companies = $this->companyService->getAllCompanies();
-        return $this->render('company/company_list.html.twig', [
+        return $this->render('pages/company/company_list.html.twig', [
             'companies' => $companies
         ]);
     }
@@ -34,7 +34,7 @@ class CompanyComponentController extends AbstractController
     #[Route('/new', name: 'new_company_component', methods: ['GET'])]
     public function getNewCompanyModalComponent(): Response
     {
-        return $this->render('company/company_modal.html.twig', [
+        return $this->render('pages/company/company_modal.html.twig', [
 
         ]);
     }
@@ -52,7 +52,7 @@ class CompanyComponentController extends AbstractController
 
         $company = json_decode($company, true);
 
-        return $this->render('company/company_modal.html.twig', [
+        return $this->render('pages/company/company_modal.html.twig', [
             'company' => $company
         ]);
     }

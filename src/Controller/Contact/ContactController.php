@@ -15,7 +15,7 @@ class ContactController extends AbstractController
     public function loadIndexPage(Security $security): Response
     {
 
-        return $this->render('contact/contact_index.html.twig', [
+        return $this->render('pages/contact/contact_index.html.twig', [
 
         ]);
     }

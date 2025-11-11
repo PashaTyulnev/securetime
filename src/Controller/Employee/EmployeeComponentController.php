@@ -28,7 +28,7 @@ class EmployeeComponentController extends AbstractController
         //call function from other controller
         $allEmployees = $this->employeeService->getAllEmployees();
 
-        return $this->render('employee/employee_list.html.twig', [
+        return $this->render('pages/employee/employee_list.html.twig', [
             'employees' => $allEmployees
         ]);
     }
@@ -38,7 +38,7 @@ class EmployeeComponentController extends AbstractController
     {
         $departments = $this->departmentService->getAllDepartments();
 
-        return $this->render('employee/employee_modal.html.twig', [
+        return $this->render('pages/employee/employee_modal.html.twig', [
             'departments' => $departments
         ]);
     }
@@ -51,7 +51,7 @@ class EmployeeComponentController extends AbstractController
         //call function from other controller
         $employee = $this->employeeService->getEmployee($employeeId);
 
-        return $this->render('employee/employee_modal.html.twig', [
+        return $this->render('pages/employee/employee_modal.html.twig', [
             'departments' => $departments,
             'employee' => $employee
         ]);

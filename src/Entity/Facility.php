@@ -11,10 +11,16 @@ use ApiPlatform\Metadata\Put;
 use App\Repository\FacilityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FacilityRepository::class)]
+#[Assert\Expression(
+    expression: "!this.getDateTo() || !this.getDateFrom() || this.getDateTo() > this.getDateFrom()",
+    message: "Das Ende-Datum muss nach dem Start-Datum liegen."
+)]
 #[ApiResource(
     operations: [
         new Get(),
@@ -64,6 +70,14 @@ class Facility
      */
     #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'facility')]
     private Collection $contacts;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['facility:read','facility:write'])]
+    private ?\DateTime $dateFrom = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['facility:read','facility:write'])]
+    private ?\DateTime $dateTo = null;
 
     public function __construct()
     {
@@ -173,6 +187,30 @@ class Facility
                 $contact->setFacility(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDateFrom(): ?\DateTime
+    {
+        return $this->dateFrom;
+    }
+
+    public function setDateFrom(?\DateTime $dateFrom): static
+    {
+        $this->dateFrom = $dateFrom;
+
+        return $this;
+    }
+
+    public function getDateTo(): ?\DateTime
+    {
+        return $this->dateTo;
+    }
+
+    public function setDateTo(?\DateTime $dateTo): static
+    {
+        $this->dateTo = $dateTo;
 
         return $this;
     }

@@ -20,7 +20,7 @@ class SettingsController extends AbstractController
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
 
-        return $this->render('settings/settings_index.html.twig', [
+        return $this->render('pages/settings/settings_index.html.twig', [
 
         ]);
     }

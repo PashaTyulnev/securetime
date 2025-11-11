@@ -1,0 +1,169 @@
+{% extends 'elements/modal.html.twig' %}
+
+{% block content %}
+    {% set definedFacility = facility is defined ? facility : {} %}
+
+    <div class="px-8 py-10">
+
+
+        <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-6 text-center">
+            Objekt {% if facility is defined %}bearbeiten{% else %}hinzufügen{% endif %}
+        </h2>
+
+        {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-facility-target'} %}
+
+        {% if facility is defined %}
+        <form data-action="submit->facility#saveEdit" data-facility-uri-param="{{ definedFacility['@id'] }}">
+            {% else %}
+            <form data-action="submit->facility#saveNew">
+                {% endif %}
+
+                {# Zwei-Spalten-Layout für Desktop #}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                    {# Linke Spalte #}
+                    <div class="space-y-6">
+                        {# Grunddaten #}
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4 uppercase tracking-wider">
+                                Grunddaten
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    {% include 'elements/input.html.twig' with {
+                                        'title': 'Bezeichnung',
+                                        'type': 'text',
+                                        'systemName': 'title',
+                                        'placeholder': 'Zirkus',
+                                        'required': 'required',
+                                        'devValue': definedFacility.title|default('')
+                                    } %}
+
+                                    {% include 'elements/input.html.twig' with {
+                                        'title': 'Kürzel',
+                                        'type': 'text',
+                                        'systemName': 'shortTitle',
+                                        'placeholder': 'ZRK',
+                                        'required': 'required',
+                                        'devValue': definedFacility.shortTitle|default('')
+                                    } %}
+                                </div>
+
+                                {% include 'elements/select.html.twig' with {
+                                    'title': 'Auftraggeber',
+                                    'systemName': 'company',
+                                    'placeholder': 'Bitte Auftraggeber auswählen',
+                                    'required': 'required',
+                                    'disableDefaultOption': true,
+                                    'defaultOption': 'Bitte Auftraggeber auswählen...',
+                                    'options': companies|map(c => {
+                                        'value': c['@id'],
+                                        'label': c.company,
+                                        'selected': facility is defined and facility.company is not null and facility.company == c['@id']
+                                    }),
+                                    'devValue': facility is defined and facility.company is not null ? facility.company : ''
+                                } %}
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    {% include 'elements/input.html.twig' with {
+                                        'title': 'Datum von',
+                                        'type': 'date',
+                                        'systemName': 'dateFrom',
+                                        'placeholder': '',
+                                        'devValue': facility is defined and facility.dateFrom is defined ? facility.dateFrom|date('Y-m-d') : ''
+                                    } %}
+
+                                    {% include 'elements/input.html.twig' with {
+                                        'title': 'Datum bis',
+                                        'type': 'date',
+                                        'systemName': 'dateTo',
+                                        'placeholder': '',
+                                        'devValue': facility is defined and facility.dateTo is defined ? facility.dateTo|date('Y-m-d') : ''
+                                    } %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Rechte Spalte #}
+                    <div class="space-y-6">
+                        {# Adresse #}
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4 uppercase tracking-wider">
+                                Adresse
+                            </h3>
+                            <div class="space-y-4">
+                                {% include 'elements/input.html.twig' with {
+                                    'title': 'Straße & Hausnummer',
+                                    'type': 'text',
+                                    'systemName': 'address[street]',
+                                    'placeholder': 'Musterstraße 123',
+                                    'required': 'required',
+                                    'devValue': facility is defined and facility.address is defined ? facility.address.street|default('') : ''
+                                } %}
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    {% include 'elements/input.html.twig' with {
+                                        'title': 'PLZ',
+                                        'action': 'data-action=input->facility#fetchCityByZip',
+                                        'type': 'text',
+                                        'systemName': 'address[zip]',
+                                        'placeholder': '01234',
+                                        'required': 'required',
+                                        'devValue': facility is defined and facility.address is defined ? facility.address.zip|default('') : ''
+                                    } %}
+
+                                    {% include 'elements/input.html.twig' with {
+                                        'title': 'Stadt',
+                                        'type': 'text',
+                                        'target': 'data-facility-target=cityInput',
+                                        'systemName': 'address[city]',
+                                        'placeholder': 'Dresden',
+                                        'required': 'required',
+                                        'devValue': facility is defined and facility.address is defined ? facility.address.city|default('') : ''
+                                    } %}
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    {% include 'elements/input.html.twig' with {
+                                        'title': 'Land',
+                                        'type': 'text',
+                                        'systemName': 'address[country]',
+                                        'placeholder': 'Deutschland',
+                                        'required': 'required',
+                                        'devValue': facility is defined and facility.address is defined ? facility.address.country|default('Deutschland') : 'Deutschland'
+                                    } %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Volle Breite für Anfahrt #}
+                <div class="mt-6">
+                    <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4 uppercase tracking-wider">
+                        Zusatzinformationen
+                    </h3>
+                    {% include 'elements/textarea.html.twig' with {
+                        'title': 'Anfahrt',
+                        'systemName': 'approach',
+                        'placeholder': 'Beschreiben Sie, wie man zum Objekt gelangt...',
+                        'rows': 3,
+                        'devValue': definedFacility.approach|default('')
+                    } %}
+                </div>
+
+                {# Buttons #}
+                <div class="flex justify-end space-x-4 mt-8">
+                    <button type="button" data-action="click->modal#hide"
+                            class="px-6 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">
+                        Abbrechen
+                    </button>
+                    <button type="submit"
+                            class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-gray-100 text-white dark:text-gray-900 font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+                        Speichern
+                    </button>
+                </div>
+            </form>
+    </div>
+{% endblock %}

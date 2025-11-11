@@ -40,7 +40,7 @@ class ContactComponentController extends AbstractController
 
         $contacts = json_decode($contacts, true);
 
-        return $this->render('contact/contact_list.html.twig', [
+        return $this->render('pages/contact/contact_list.html.twig', [
             'contacts' => $contacts
         ]);
     }
@@ -53,7 +53,7 @@ class ContactComponentController extends AbstractController
         $facilities =  $this->contactService->getAllFacilities();
 
 
-        return $this->render('contact/contact_modal.html.twig', [
+        return $this->render('pages/contact/contact_modal.html.twig', [
             'companies' => $companies,
             'facilities' => $facilities
         ]);
@@ -66,7 +66,7 @@ class ContactComponentController extends AbstractController
         $companies =  $this->contactService->getAllCompanies();
         $facilities =  $this->contactService->getAllFacilities();
 
-        return $this->render('contact/contact_modal.html.twig', [
+        return $this->render('pages/contact/contact_modal.html.twig', [
             'contact' => $contact,
             'companies' => $companies,
             'facilities' => $facilities

@@ -19,7 +19,7 @@ class CompanyController extends AbstractController
     public function loadIndexPage(Security $security): Response
     {
 
-        return $this->render('company/company_index.html.twig', [
+        return $this->render('pages/company/company_index.html.twig', [
 
         ]);
     }

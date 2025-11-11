@@ -23,7 +23,7 @@ class FacilityComponentController extends AbstractController
         //call function from other controller
         $allFacilities = $this->facilityService->getAllFacilities();
 
-        return $this->render('facility/facility_list.html.twig', [
+        return $this->render('pages/facility/facility_list.html.twig', [
             'facilities' => $allFacilities
         ]);
     }
@@ -33,7 +33,7 @@ class FacilityComponentController extends AbstractController
     {
 
         $allCompanies = $this->companyService->getAllCompanies();
-        return $this->render('facility/facility_modal.html.twig', [
+        return $this->render('pages/facility/facility_modal.html.twig', [
             'companies' => $allCompanies
         ]);
     }
@@ -44,7 +44,7 @@ class FacilityComponentController extends AbstractController
         $facility = $this->facilityService->getFacilityById($facilityId);
 
         $allCompanies = $this->companyService->getAllCompanies();
-        return $this->render('facility/facility_modal.html.twig', [
+        return $this->render('pages/facility/facility_modal.html.twig', [
             'companies' => $allCompanies,
             'facility' => $facility
         ]);

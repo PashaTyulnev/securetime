@@ -1,24 +1,26 @@
+{% block modal %}
+    {# Formular-Modal zum Anlegen neuer Mitarbeiter #}
+    <div data-controller="modal" data-modal-target="modal" tabindex="-1" aria-hidden="true"
+         class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-100 hidden">
+        <div class="h-full w-full overflow-y-auto flex items-center justify-center min-h-full p-4 sm:p-6 lg:p-8">
+            <div
+                class="relative w-full max-w-5xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all animate-modal-enter my-8">
+                {# Close Button #}
+                <button data-action="click->modal#hide"
+                        class="absolute top-6 right-6 z-10 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 p-2 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 rounded-xl">
+                    {{ ux_icon('lucide:x', { class: 'h-5 w-5' }) }}
+                </button>
 
+                {# Scrollbarer Content-Bereich #}
+                <div class="max-h-[calc(100vh-8rem)] overflow-y-auto rounded-3xl">
+                    {% block content %}
+                    {% endblock %}
+                </div>
 
-  {% block modal %}
-      {# Formular-Modal zum Anlegen neuer Mitarbeiter #}
-      <div data-controller="modal" data-modal-target="modal" tabindex="-1" aria-hidden="true"
-           class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-100 flex items-center justify-center px-4 py-6 hidden ">
-          <div
-              class="relative w-4xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all animate-modal-enter">
-              {# Close Button #}
-              <button data-action="click->modal#hide"
-                      class="absolute top-6 right-6 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 p-2 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 rounded-xl">
-                  {{ ux_icon('lucide:x', { class: 'h-5 w-5' }) }}
-              </button>
-
-              {% block content %}
-
-              {% endblock %}
-              {# Bottom Decoration #}
-              <div
-                  class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-gray-700 to-transparent"></div>
-          </div>
-      </div>
-
-  {% endblock %}
+                {# Bottom Decoration #}
+                <div
+                    class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-gray-700 to-transparent rounded-b-3xl"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
