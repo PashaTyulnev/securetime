@@ -49,6 +49,20 @@
                         : ''
                     } %}
 
+                    {% include 'elements/select.html.twig' with {
+                        'systemName': 'qualification',
+                        'title': 'Qualifikation',
+                        'options': qualifications | map(q => {
+                            'value': q['@id'],
+                            'label': q.title
+                        }),
+                        'defaultOption': 'Bitte wählen...',
+                        'required': 'required',
+                        'devValue': definedEmployee.qualification is defined and definedEmployee.qualification is not null
+                        ? definedEmployee.qualification['@id']
+                        : ''
+                    } %}
+
                     {% include 'elements/input.html.twig' with {
                         'title': 'Personalnummer',
                         'type': 'text',

@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-gray-950 dark:via-slate-950 dark:to-gray-900">
+        {# Animated Background #}
+        <div class="fixed inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-10 dark:opacity-20 animate-blob"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-10 dark:opacity-20 animate-blob animation-delay-2000"></div>
+        </div>
+
+        {# Header #}
+        <header class="sticky top-0 z-50 backdrop-blur-2xl bg-white/70 dark:bg-gray-900/70 border-b border-gray-200/50 dark:border-gray-800/50">
+            <div class="max-w-[1800px] mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-6">
+                        <h1 class="text-3xl font-extralight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+                            Schicht-Vorlagen
+                        </h1>
+                        <div class="h-8 w-px bg-gray-200 dark:bg-gray-800"></div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400 font-light">Definiere Standard-Schichten für jedes Objekt</span>
+                    </div>
+
+                </div>
+            </div>
+        </header>
+
+        {# Main Content #}
+        {% include 'pages/facility_shift/facility_shift_overview.html.twig'  %}
+    </div>
+
+    <script>
+        function selectFacility(facilityId) {
+            // Hide all panels
+            document.querySelectorAll('.facility-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+
+            // Remove active state from all items
+            document.querySelectorAll('.facility-item').forEach(item => {
+                item.classList.remove('bg-white/80', 'dark:bg-gray-800/80', 'ring-2', 'ring-blue-500');
+            });
+
+            // Show selected panel
+            const selectedPanel = document.getElementById('facility-panel-' + facilityId);
+            if (selectedPanel) {
+                selectedPanel.classList.remove('hidden');
+            }
+
+            // Add active state to selected item
+            const selectedItem = document.querySelector(`[data-facility-id="${facilityId}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('bg-white/80', 'dark:bg-gray-800/80', 'ring-2', 'ring-blue-500');
+            }
+        }
+
+        // Toggle weekdays
+        document.querySelectorAll('td button').forEach(button => {
+            if (button.textContent.length <= 2) { // Weekday buttons
+                button.addEventListener('click', function() {
+                    if (this.classList.contains('bg-gray-200')) {
+                        // Activate
+                        this.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-500');
+                        this.classList.add('bg-blue-600', 'text-white');
+                    } else {
+                        // Deactivate
+                        this.classList.remove('bg-blue-600', 'bg-amber-600', 'bg-indigo-600', 'text-white');
+                        this.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-500');
+                    }
+                });
+            }
+        });
+    </script>
+
+    <style>
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+    </style>
+{% endblock %}

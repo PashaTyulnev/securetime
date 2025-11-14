@@ -7,28 +7,14 @@
             <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Mitarbeiter</span>
         </div>
 
-        {# Kopfzeilen der Tage #}
-        {% set days = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'] %}
-        {% set dates = ['11. Nov', '12. Nov', '13. Nov', '14. Nov', '15. Nov', '16. Nov', '17. Nov'] %}
-        {% for i, day in days %}
-            <div class="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-xl p-4 border-b-2 border-r border-gray-200/50 dark:border-gray-700/50 text-center {% if i == 1 %}bg-blue-50/80 dark:bg-blue-900/20{% endif %}">
-                <div class="text-sm font-semibold text-gray-900 dark:text-white {% if i == 1 %}text-blue-600 dark:text-blue-400{% endif %}">{{ day }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ dates[i] }}</div>
-                {% if i == 1 %}
-                    <div class="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-xs font-medium text-blue-600 dark:text-blue-400 mt-2">
-                        Heute
-                    </div>
-                {% endif %}
+
+        {% for day in datesRange %}
+            <div class="p-4 border-b-2 border-r border-gray-200/50 dark:border-gray-700/50 text-center backdrop-blur-xl {% if day.isToday %}bg-blue-50/80 dark:bg-blue-900/20{% else %}bg-gray-50/80 dark:bg-gray-800/80{% endif %}">
+                <div class="text-sm font-semibold {% if day.isToday %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-white{% endif %}">{{ day.name }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ day.shortName }}</div>
             </div>
         {% endfor %}
 
-        {# NEUE MITARBEITER DATEN #}
-        {% set employees = [
-            {'name': 'M. Schmidt', 'title': 'Security', 'color': 'red'},
-            {'name': 'T. Weber', 'title': 'Supervisor', 'color': 'indigo'},
-            {'name': 'A. Müller', 'title': 'Trainee', 'color': 'teal'},
-            {'name': 'S. Wagner', 'title': 'Security', 'color': 'gray'}
-        ] %}
 
         {% for employee in employees %}
             <div class="contents group">
@@ -36,12 +22,12 @@
                 {# Mitarbeiter-Spalte (Linke Spalte) #}
                 <div class="bg-white/50 dark:bg-gray-900/50 p-4 border-b border-r border-gray-200/50 dark:border-gray-700/50 sticky left-0 z-10">
                     <div class="flex items-center gap-3">
-                        <div class="p-1.5 bg-{{ employee.color }}-100 dark:bg-{{ employee.color }}-900/30 rounded-lg">
-                            {{ ux_icon('lucide:user', { class: 'h-4 w-4 text-' ~ employee.color ~ '-600 dark:text-' ~ employee.color ~ '-400' }) }}
+                        <div class="p-1.5 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+                            {{ ux_icon('lucide:user', { class: 'h-4 w-4 text-indigo-600 dark:text-indigo-400' }) }}
                         </div>
                         <div>
-                            <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ employee.name }}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.title }}</div>
+                            <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ employee.firstName|slice(0,1)|upper }}. {{ employee.lastName }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.department.title }}</div>
                         </div>
                     </div>
                 </div>
@@ -51,27 +37,26 @@
                     <div class="relative p-3 border-b border-r border-gray-200/50 dark:border-gray-700/50 min-h-[120px] hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 group/cell">
                         {# Hier würden die Schichten des aktuellen Mitarbeiters für das AUSGEWÄHLTE OBJEKT geladen #}
 
-                        {% if employee.name == 'M. Schmidt' and day == 1 %}
-                            {# Beispielschicht (Tag) #}
+
                             <div class="mb-2 p-2.5 bg-gradient-to-r from-amber-500/90 to-orange-500/90 dark:from-amber-600/90 dark:to-orange-600/90 rounded-xl text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 cursor-pointer">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs font-semibold">06:00 - 14:00</span>
                                     <div class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
                                 </div>
-                                <div class="text-xs mt-1 opacity-90">Main Building</div> {# Anzeigen des Objekts, da nicht mehr im Kontext der Zeile #}
+                                <div class="text-xs mt-1 opacity-90">Main Building</div>  Anzeigen des Objekts, da nicht mehr im Kontext der Zeile
                             </div>
-                        {% endif %}
 
-                        {% if employee.name == 'T. Weber' and day == 5 %}
-                            {# Beispielschicht (Nacht) #}
-                            <div class="mb-2 p-2.5 bg-gradient-to-r from-indigo-500/90 to-purple-500/90 dark:from-indigo-600/90 dark:to-purple-600/90 rounded-xl text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 cursor-pointer">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-semibold">22:00 - 06:00</span>
-                                    <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
-                                </div>
-                                <div class="text-xs mt-1 opacity-90">West Warehouse</div>
-                            </div>
-                        {% endif %}
+
+{#                        {% if employee.name == 'T. Weber' and day == 5 %}#}
+{#                            #}{# Beispielschicht (Nacht) #}
+{#                            <div class="mb-2 p-2.5 bg-gradient-to-r from-indigo-500/90 to-purple-500/90 dark:from-indigo-600/90 dark:to-purple-600/90 rounded-xl text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 cursor-pointer">#}
+{#                                <div class="flex items-center justify-between">#}
+{#                                    <span class="text-xs font-semibold">22:00 - 06:00</span>#}
+{#                                    <div class="w-1.5 h-1.5 bg-white rounded-full"></div>#}
+{#                                </div>#}
+{#                                <div class="text-xs mt-1 opacity-90">West Warehouse</div>#}
+{#                            </div>#}
+{#                        {% endif %}#}
 
                         <button class="absolute bottom-2 right-2 p-1.5 bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg opacity-0 group-hover/cell:opacity-100 transition-all duration-200">
                             {{ ux_icon('lucide:plus', { class: 'h-4 w-4 text-gray-600 dark:text-gray-400' }) }}

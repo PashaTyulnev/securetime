@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\EmployeeRepository;
 use App\Processor\EmployeeProcessor;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -61,6 +63,21 @@ class Employee
     #[ORM\ManyToOne(targetEntity: Department::class, inversedBy: 'employees')]
     #[Groups(['employee:read','employee:write'])]
     private ?Department $department = null;
+
+    /**
+     * @var Collection<int, Shift>
+     */
+    #[ORM\OneToMany(targetEntity: Shift::class, mappedBy: 'Employee')]
+    private Collection $shifts;
+
+    #[ORM\ManyToOne(inversedBy: 'employees')]
+    #[Groups(['employee:read', 'employee:write'])]
+    private ?Qualification $qualification = null;
+
+    public function __construct()
+    {
+        $this->shifts = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -158,6 +175,48 @@ class Employee
     public function setDepartment(?Department $department): static
     {
         $this->department = $department;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Shift>
+     */
+    public function getShifts(): Collection
+    {
+        return $this->shifts;
+    }
+
+    public function addShift(Shift $shift): static
+    {
+        if (!$this->shifts->contains($shift)) {
+            $this->shifts->add($shift);
+            $shift->setEmployee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShift(Shift $shift): static
+    {
+        if ($this->shifts->removeElement($shift)) {
+            // set the owning side to null (unless already changed)
+            if ($shift->getEmployee() === $this) {
+                $shift->setEmployee(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getQualification(): ?Qualification
+    {
+        return $this->qualification;
+    }
+
+    public function setQualification(?Qualification $qualification): static
+    {
+        $this->qualification = $qualification;
 
         return $this;
     }

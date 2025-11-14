@@ -28,18 +28,8 @@
         <ul class="space-y-2">
 
             {% include 'navigation/navigation_element.html.twig' with {'route' : 'app_dashboard', 'icon' : 'lucide:layout-dashboard', 'title' : 'Dashboard'} %}
-
-            {# Einsatzplanung #}
-            <li>
-                <a href="#" class="{{ default_classes }}">
-                    <span class="relative z-10 flex items-center space-x-3 flex-1">
-                        {{ ux_icon('lucide:calendar-check', { class: 'w-5 h-5 transition-colors duration-200' }) }}
-                        <span>Einsatzplanung</span>
-                    </span>
-                    <span class="ml-auto bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs px-2.5 py-1 rounded-full font-medium shadow-sm">3</span>
-                </a>
-            </li>
-
+            {% include 'navigation/navigation_element.html.twig' with {'route' : 'app_facility_shift', 'icon' : 'lucide:calendar-cog', 'title' : 'Objekt-Schichten'} %}
+            {% include 'navigation/navigation_element.html.twig' with {'route' : 'app_schedule', 'icon' : 'lucide:calendar-clock', 'title' : 'Einsatzplanung'} %}
 
             {% set target_route = 'app_company' %}
             <li>
@@ -65,7 +55,6 @@
                 </a>
             </li>
 
-            {% include 'navigation/navigation_element.html.twig' with {'route' : 'app_schedule', 'icon' : 'lucide:calendar-clock', 'title' : 'Dienstplan'} %}
             {% include 'navigation/navigation_element.html.twig' with {'route' : 'app_employees', 'icon' : 'lucide:users', 'title' : 'Mitarbeiter'} %}
             {% include 'navigation/navigation_element.html.twig' with {'route' : 'app_contacts', 'icon' : 'lucide:contact', 'title' : 'Kontakte'} %}
 

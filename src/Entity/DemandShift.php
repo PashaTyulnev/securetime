@@ -1,0 +1,266 @@
+<?php
+
+namespace App\Entity;
+
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Processor\EmployeeProcessor;
+use App\Repository\DemandShiftRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+#[ORM\Entity(repositoryClass: DemandShiftRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(processor:EmployeeProcessor::class),
+        new Put(processor:EmployeeProcessor::class),
+        new Delete(),
+    ],
+    normalizationContext: ['groups' => ['demandShift:read']],
+    denormalizationContext: ['groups' => ['demandShift:write']]
+)]
+class DemandShift
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['facility:read','demandShift:read'])]
+    private ?int $id = null;
+
+    #[ORM\ManyToOne(inversedBy: 'demandShifts')]
+    #[Groups(['demandShift:read','demandShift:write'])]
+    private ?Facility $facility = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?\DateTime $validFrom = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?\DateTime $validTo = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?\DateTime $timeFrom = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?\DateTime $timeTo = null;
+
+    #[ORM\Column]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?int $amountEmployees = null;
+
+    #[ORM\Column]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?bool $onMonday = null;
+
+    #[ORM\Column]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?bool $onTuesday = null;
+
+    #[ORM\Column]
+    #[Groups(['facility:read','facility:write','demandShift:read','demandShift:write'])]
+    private ?bool $onWednesday = null;
+
+    #[ORM\Column]
+    #[Groups(['facility:read','facility:write','demandShift:read','demandShift:write'])]
+    private ?bool $onThursday = null;
+
+    #[ORM\Column]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?bool $onFriday = null;
+
+    #[ORM\Column]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?bool $onSaturday = null;
+
+    #[ORM\Column]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?bool $onSunday = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    private ?string $name = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getFacility(): ?Facility
+    {
+        return $this->facility;
+    }
+
+    public function setFacility(?Facility $facility): static
+    {
+        $this->facility = $facility;
+
+        return $this;
+    }
+
+    public function getValidFrom(): ?\DateTime
+    {
+        return $this->validFrom;
+    }
+
+    public function setValidFrom(?\DateTime $validFrom): static
+    {
+        $this->validFrom = $validFrom;
+
+        return $this;
+    }
+
+    public function getValidTo(): ?\DateTime
+    {
+        return $this->validTo;
+    }
+
+    public function setValidTo(?\DateTime $validTo): static
+    {
+        $this->validTo = $validTo;
+
+        return $this;
+    }
+
+    public function getTimeFrom(): ?\DateTime
+    {
+        return $this->timeFrom;
+    }
+
+    public function setTimeFrom(\DateTime $timeFrom): static
+    {
+        $this->timeFrom = $timeFrom;
+
+        return $this;
+    }
+
+    public function getTimeTo(): ?\DateTime
+    {
+        return $this->timeTo;
+    }
+
+    public function setTimeTo(\DateTime $timeTo): static
+    {
+        $this->timeTo = $timeTo;
+
+        return $this;
+    }
+
+
+    public function getAmountEmployees(): ?int
+    {
+        return $this->amountEmployees;
+    }
+
+    public function setAmountEmployees(int $amountEmployees): static
+    {
+        $this->amountEmployees = $amountEmployees;
+
+        return $this;
+    }
+
+    public function isOnMonday(): ?bool
+    {
+        return $this->onMonday;
+    }
+
+    public function setOnMonday(bool $onMonday): static
+    {
+        $this->onMonday = $onMonday;
+
+        return $this;
+    }
+
+    public function isOnTuesday(): ?bool
+    {
+        return $this->onTuesday;
+    }
+
+    public function setOnTuesday(bool $onTuesday): static
+    {
+        $this->onTuesday = $onTuesday;
+
+        return $this;
+    }
+
+    public function isOnWednesday(): ?bool
+    {
+        return $this->onWednesday;
+    }
+
+    public function setOnWednesday(bool $onWednesday): static
+    {
+        $this->onWednesday = $onWednesday;
+
+        return $this;
+    }
+
+    public function isOnThursday(): ?bool
+    {
+        return $this->onThursday;
+    }
+
+    public function setOnThursday(bool $onThursday): static
+    {
+        $this->onThursday = $onThursday;
+
+        return $this;
+    }
+
+    public function isOnFriday(): ?bool
+    {
+        return $this->onFriday;
+    }
+
+    public function setOnFriday(bool $onFriday): static
+    {
+        $this->onFriday = $onFriday;
+
+        return $this;
+    }
+
+    public function isOnSaturday(): ?bool
+    {
+        return $this->onSaturday;
+    }
+
+    public function setOnSaturday(bool $onSaturday): static
+    {
+        $this->onSaturday = $onSaturday;
+
+        return $this;
+    }
+
+    public function isOnSunday(): ?bool
+    {
+        return $this->onSunday;
+    }
+
+    public function setOnSunday(bool $onSunday): static
+    {
+        $this->onSunday = $onSunday;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+}

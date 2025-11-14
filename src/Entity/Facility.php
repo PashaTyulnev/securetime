@@ -79,9 +79,24 @@ class Facility
     #[Groups(['facility:read','facility:write'])]
     private ?\DateTime $dateTo = null;
 
+    /**
+     * @var Collection<int, Shift>
+     */
+    #[ORM\OneToMany(targetEntity: Shift::class, mappedBy: 'facility')]
+    private Collection $shifts;
+
+    /**
+     * @var Collection<int, DemandShift>
+     */
+    #[ORM\OneToMany(targetEntity: DemandShift::class, mappedBy: 'facility')]
+    #[Groups(['facility:read'])]
+    private Collection $demandShifts;
+
     public function __construct()
     {
         $this->contacts = new ArrayCollection();
+        $this->shifts = new ArrayCollection();
+        $this->demandShifts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -211,6 +226,66 @@ class Facility
     public function setDateTo(?\DateTime $dateTo): static
     {
         $this->dateTo = $dateTo;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Shift>
+     */
+    public function getShifts(): Collection
+    {
+        return $this->shifts;
+    }
+
+    public function addShift(Shift $shift): static
+    {
+        if (!$this->shifts->contains($shift)) {
+            $this->shifts->add($shift);
+            $shift->setFacility($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShift(Shift $shift): static
+    {
+        if ($this->shifts->removeElement($shift)) {
+            // set the owning side to null (unless already changed)
+            if ($shift->getFacility() === $this) {
+                $shift->setFacility(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DemandShift>
+     */
+    public function getDemandShifts(): Collection
+    {
+        return $this->demandShifts;
+    }
+
+    public function addDemandShift(DemandShift $demandShift): static
+    {
+        if (!$this->demandShifts->contains($demandShift)) {
+            $this->demandShifts->add($demandShift);
+            $demandShift->setFacility($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemandShift(DemandShift $demandShift): static
+    {
+        if ($this->demandShifts->removeElement($demandShift)) {
+            // set the owning side to null (unless already changed)
+            if ($demandShift->getFacility() === $this) {
+                $demandShift->setFacility(null);
+            }
+        }
 
         return $this;
     }

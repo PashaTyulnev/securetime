@@ -8,7 +8,23 @@ export default class Formater {
                 continue;
             }
 
-            // Ключи вида address[city] -> ['address', 'city']
+            let processedValue = value;
+
+            // ---- Boolean Erkennung ----
+            if (value === "true") {
+                processedValue = true;
+            } else if (value === "false") {
+                processedValue = false;
+            }
+
+            // ---- Zahl Erkennung ----
+            else if (/^-?\d+$/.test(value)) {        // Integer
+                processedValue = parseInt(value, 10);
+            } else if (/^-?\d+\.\d+$/.test(value)) { // Float
+                processedValue = parseFloat(value);
+            }
+
+            // ---- Keys mit [] Struktur parsen ----
             const keys = [];
             const regex = /([^\[\]]+)|\[([^\[\]]*)\]/g;
             let match;
@@ -27,7 +43,8 @@ export default class Formater {
                 }
                 current = current[keys[i]];
             }
-            current[keys[keys.length - 1]] = value;
+
+            current[keys[keys.length - 1]] = processedValue;
         }
 
         return jsonData;

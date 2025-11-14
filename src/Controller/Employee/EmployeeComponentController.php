@@ -14,14 +14,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route(path: '/components/employee')]
 class EmployeeComponentController extends AbstractController
 {
-    public function __construct(readonly SerializerInterface $serializer,
-                                readonly DepartmentService $departmentService,
-                                readonly EmployeeService $employeeService,
+    public function __construct(readonly SerializerInterface  $serializer,
+                                readonly DepartmentService    $departmentService,
+                                readonly EmployeeService      $employeeService,
                                 readonly DepartmentRepository $departmentRepository,
-                                readonly EmployeeRepository $employeeRepository)
+                                readonly EmployeeRepository   $employeeRepository)
     {
 
     }
+
     #[Route(path: '/list', name: 'all_employee_list_component', methods: ['GET'])]
     public function getEmployeeListComponent(): Response
     {
@@ -37,9 +38,10 @@ class EmployeeComponentController extends AbstractController
     public function getNewEmployeeModalComponent(): Response
     {
         $departments = $this->departmentService->getAllDepartments();
-
+        $qualifications = $this->employeeService->getAllQualifications();
         return $this->render('pages/employee/employee_modal.html.twig', [
-            'departments' => $departments
+            'departments' => $departments,
+            'qualifications' => $qualifications
         ]);
     }
 
@@ -47,13 +49,15 @@ class EmployeeComponentController extends AbstractController
     public function getEditEmployeeModalComponent(int $employeeId): Response
     {
         $departments = $this->departmentService->getAllDepartments();
+        $qualifications = $this->employeeService->getAllQualifications();
 
         //call function from other controller
         $employee = $this->employeeService->getEmployee($employeeId);
 
         return $this->render('pages/employee/employee_modal.html.twig', [
             'departments' => $departments,
-            'employee' => $employee
+            'employee' => $employee,
+            'qualifications' => $qualifications
         ]);
     }
 }

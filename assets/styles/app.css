@@ -8,3 +8,11 @@ html {
 .app-button{
     @apply flex items-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-slate-700 to-slate-900 dark:from-white dark:to-gray-200 text-white dark:text-slate-900 hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 cursor-pointer;
 }
+
+.activeDay{
+    @apply px-2 py-1 bg-amber-600 text-white rounded text-xs font-medium;
+}
+
+.inactiveDay{
+    @apply px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-500 rounded text-xs font-medium;
+}

@@ -4,11 +4,14 @@ namespace App\Service;
 
 use App\Repository\EmployeeRepository;
 use App\Repository\FacilityRepository;
+use App\Repository\QualificationRepository;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class EmployeeService
 {
-    public function __construct(readonly EmployeeRepository $employeeRepository, readonly SerializerInterface $serializer)
+    public function __construct(readonly EmployeeRepository $employeeRepository,
+                                readonly QualificationRepository $qualificationRepository,
+                                readonly SerializerInterface $serializer)
     {
 
     }
@@ -37,5 +40,19 @@ class EmployeeService
         );
 
         return json_decode($employee, true);
+    }
+
+    public function getAllQualifications()
+    {
+        //call function from other controller
+        $allQualifications = $this->qualificationRepository->findAll();
+
+        $allQualifications = $this->serializer->serialize(
+            $allQualifications,
+            'jsonld',
+            ['groups' => ['employee:read']]
+        );
+
+        return json_decode($allQualifications, true);
     }
 }
