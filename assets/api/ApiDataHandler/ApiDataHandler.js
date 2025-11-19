@@ -10,7 +10,10 @@ export default class ApiDataHandler {
             method: "POST",
             body: JSON.stringify(data),
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             }
         });
 
@@ -33,15 +36,22 @@ export default class ApiDataHandler {
      * Aktualisiert eine Entität über die API
      * @param {string} entityType - Der Typ der Entität (z.B. 'companies', 'users', etc.)
      * @param {Object} data - Die zu aktualisierenden Daten
-     * @param {string|number} entityUri - Die ID der zu aktualisierenden Entität
+     * @param {string|number} entityUri - Die URI der zu aktualisierenden Entität
      * @returns {Promise<Object>} - Die API-Antwort
      */
     static async updateEntity(entityType, data, entityUri) {
-        const response = await fetch(entityUri, {
+        // Cache-Busting: Füge Timestamp zur URI hinzu
+        const separator = entityUri.includes('?') ? '&' : '?';
+        const urlWithCacheBust = `${entityUri}${separator}_t=${Date.now()}`;
+
+        const response = await fetch(urlWithCacheBust, {
             method: "PUT",
             body: JSON.stringify(data),
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             }
         });
 
@@ -63,14 +73,21 @@ export default class ApiDataHandler {
     /**
      * Löscht eine Entität über die API
      * @param {string} entityType - Der Typ der Entität (z.B. 'companies', 'users', etc.)
-     * @param {string|number} uri - Die ID der zu löschenden Entität
+     * @param {string|number} uri - Die URI der zu löschenden Entität
      * @returns {Promise<Response>} - Die Fetch-Response
      */
     static async deleteEntity(entityType, uri) {
-        return await fetch(uri, {
+        // Cache-Busting: Füge Timestamp zur URI hinzu
+        const separator = uri.includes('?') ? '&' : '?';
+        const urlWithCacheBust = `${uri}${separator}_t=${Date.now()}`;
+
+        return await fetch(urlWithCacheBust, {
             method: "DELETE",
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             }
         });
     }

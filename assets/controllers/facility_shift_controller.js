@@ -45,18 +45,49 @@ export default class extends BaseEntityController {
 
         let formattedData = Formater.formatToJson(formData);
 
+        //konvertiere amountEmployees zu integer
+        formattedData.amountEmployees = parseInt(formattedData.amountEmployees);
+
         // Die aktuelle Zeile speichern um sie später zu ersetzen
         let currentRow = form.closest('tr');
 
-        ApiDataHandler.createNewEntity(this.getEntityName(), formattedData).then(newShiftData => {
-            FacilityShiftComponentApi.getFacilityShiftComponent(newShiftData).then(html => {
-                currentRow.outerHTML = html;
-            });
-        }).catch(error => {
-            console.error('Fehler beim Speichern der Schicht:', error);
-            alert('Fehler beim Speichern der Schicht. Bitte versuchen Sie es erneut.');
-        });
+        // Prüfe ob es ein Update (PUT) oder Create (POST) ist
+        const shiftUri = formData.get('uri');
 
+        if (shiftUri) {
+            // UPDATE: Bestehende Schicht aktualisieren (PUT)
+            ApiDataHandler.updateEntity(this.getEntityName(), formattedData, shiftUri)
+                .then(updatedShiftData => {
+                    FacilityShiftComponentApi.getFacilityShiftComponent(updatedShiftData).then(html => {
+                        currentRow.outerHTML = html;
+                    });
+                })
+                .catch(error => {
+                    console.error('Fehler beim Aktualisieren der Schicht:', error);
+                    alert('Fehler beim Aktualisieren der Schicht. Bitte versuchen Sie es erneut.');
+                });
+        } else {
+            // CREATE: Neue Schicht erstellen (POST)
+            ApiDataHandler.createNewEntity(this.getEntityName(), formattedData)
+                .then(newShiftData => {
+                    FacilityShiftComponentApi.getFacilityShiftComponent(newShiftData).then(html => {
+                        currentRow.outerHTML = html;
+                    });
+                })
+                .catch(error => {
+                    console.error('Fehler beim Speichern der Schicht:', error);
+                    alert('Fehler beim Speichern der Schicht. Bitte versuchen Sie es erneut.');
+                });
+        }
+    }
 
+    update(event){
+        // get the form attribute from the event target
+        let formId = event.target.attributes["form"].value;
+
+        let form = document.getElementById(formId);
+
+        //trigger submit event on the form
+        form.requestSubmit();
     }
 }

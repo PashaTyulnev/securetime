@@ -10,10 +10,8 @@
     <div class="relative z-10 max-w-md w-full mx-4 mt-4">
         {# Logo und Titel mit Animation #}
         <div class="text-center mb-10 animate-fade-in">
-            <div class="mx-auto h-24 w-24 flex items-center justify-center rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 dark:from-white dark:to-gray-100 shadow-2xl transform hover:scale-105 transition-transform duration-300">
-                <svg class="h-14 w-14 text-white dark:text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+            <div class="mx-auto h-24 w-24 flex items-center justify-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                {% include "logo.svg" %}
             </div>
             <h2 class="mt-8 text-4xl font-thin text-gray-900 dark:text-white tracking-tight">
                 SecureTime

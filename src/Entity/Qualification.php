@@ -16,11 +16,11 @@ class Qualification
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['employee:read'])]
+    #[Groups(['employee:read','facility:read','demandShift:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['employee:read', 'employee:write'])]
+    #[Groups(['employee:read', 'employee:write','demandShift:read','facility:read'])]
     private ?string $title = null;
 
     #[ORM\Column]
@@ -32,9 +32,16 @@ class Qualification
     #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'qualification')]
     private Collection $employees;
 
+    /**
+     * @var Collection<int, DemandShift>
+     */
+    #[ORM\OneToMany(targetEntity: DemandShift::class, mappedBy: 'requiredQualification')]
+    private Collection $demandShifts;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
+        $this->demandShifts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,6 +97,36 @@ class Qualification
             // set the owning side to null (unless already changed)
             if ($employee->getQualification() === $this) {
                 $employee->setQualification(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DemandShift>
+     */
+    public function getDemandShifts(): Collection
+    {
+        return $this->demandShifts;
+    }
+
+    public function addDemandShift(DemandShift $demandShift): static
+    {
+        if (!$this->demandShifts->contains($demandShift)) {
+            $this->demandShifts->add($demandShift);
+            $demandShift->setRequiredQualification($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemandShift(DemandShift $demandShift): static
+    {
+        if ($this->demandShifts->removeElement($demandShift)) {
+            // set the owning side to null (unless already changed)
+            if ($demandShift->getRequiredQualification() === $this) {
+                $demandShift->setRequiredQualification(null);
             }
         }
 

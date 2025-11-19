@@ -2,6 +2,8 @@
 
 namespace App\Controller\FacilityShift;
 
+use App\Entity\Qualification;
+use App\Service\EmployeeService;
 use App\Service\FacilityService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -10,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class FacilityShiftController extends AbstractController
 {
-    public function __construct(readonly FacilityService $facilityService)
+    public function __construct(readonly FacilityService $facilityService, readonly EmployeeService $employeeService)
     {
 
     }
@@ -19,9 +21,11 @@ class FacilityShiftController extends AbstractController
     {
 
         $allFacilities = $this->facilityService->getAllFacilities();
+        $allQualifications = $this->employeeService->getAllQualifications();
 
         return $this->render('pages/facility_shift/facility_shift_index.html.twig', [
             'facilities' => $allFacilities,
+            'qualifications' => $allQualifications,
         ]);
     }
 }

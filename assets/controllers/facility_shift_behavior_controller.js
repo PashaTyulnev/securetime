@@ -2,34 +2,68 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-    static targets = ["dayCheckbox", "shiftSelect", "timeFrom", "timeTo"];
+    static targets = [
+        "dayCheckbox",
+        "shiftSelect",
+        "timeFrom",
+        "timeTo",
+        "qualificationSelect",
+        "colorSelect",
+        "colorPreview"
+    ];
 
     connect() {
-        // Prüfen ob es eine neue Schicht ist (kein demandShift.id)
+
+        window.addEventListener("pageshow", (event) => {
+            if (event.persisted) {
+                this.element.reload();
+            }
+        });
+
         const isNewShift = this.element.querySelector('input[name="id"]') === null;
 
-        // Alle Checkboxen initialisieren
+        // Tage initialisieren
         this.dayCheckboxTargets.forEach(checkbox => {
             if (isNewShift) {
-                // Bei neuen Schichten: Alle Tage auf true setzen
                 checkbox.checked = true;
                 checkbox.value = "true";
             } else {
-                // Bei bestehenden Schichten: checked-Status aus HTML übernehmen
                 checkbox.value = checkbox.checked ? "true" : "false";
             }
             this.updateDayLabel(checkbox);
         });
 
-        // Alle vorhandenen Selects initialisieren
-        this.shiftSelectTargets.forEach(select => this.updateShiftTimes(select));
+        // Farbe initialisieren
+        if (this.hasColorSelectTarget) {
+            this.updateColor(this.colorSelectTarget.value);
+        }
 
-        // Select auf den richtigen Wert setzen
+        // Select auf gespeicherten Wert setzen
         if (this.hasShiftSelectTarget) {
             const selectedOption = this.shiftSelectTarget.querySelector('option[selected]');
             if (selectedOption) {
                 this.shiftSelectTarget.value = selectedOption.value;
             }
+        }
+    }
+
+    // ---------------------
+    // Farb-Logik
+    // ---------------------
+    changeColor(event) {
+        const color = event.target.value;
+        this.updateColor(color);
+    }
+
+    updateColor(color) {
+        // Select selbst kolorieren
+        if (this.hasColorSelectTarget) {
+            this.colorSelectTarget.style.backgroundColor = color;
+        }
+
+        // Icon-Box einfärben
+        if (this.hasColorPreviewTarget) {
+            this.colorPreviewTarget.style.borderColor = color;
         }
     }
 
@@ -57,7 +91,6 @@ export default class extends Controller {
     // Schichtart Logik
     // ---------------------
     updateShiftTimes(selectEl) {
-        const row = selectEl.closest('tr');
         const timeFromInput = this.timeFromTarget
         const timeToInput = this.timeToTarget
 
@@ -85,8 +118,7 @@ export default class extends Controller {
     }
 
     shiftChanged(event) {
-        const select = event.target;
-        this.updateShiftTimes(select);
+        this.updateShiftTimes(event.target);
     }
 
     removeRow(event) {

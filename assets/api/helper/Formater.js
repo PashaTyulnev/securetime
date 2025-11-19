@@ -17,13 +17,6 @@ export default class Formater {
                 processedValue = false;
             }
 
-            // ---- Zahl Erkennung ----
-            else if (/^-?\d+$/.test(value)) {        // Integer
-                processedValue = parseInt(value, 10);
-            } else if (/^-?\d+\.\d+$/.test(value)) { // Float
-                processedValue = parseFloat(value);
-            }
-
             // ---- Keys mit [] Struktur parsen ----
             const keys = [];
             const regex = /([^\[\]]+)|\[([^\[\]]*)\]/g;

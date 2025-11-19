@@ -90,6 +90,15 @@ class DemandShift
     #[Groups(['facility:read','demandShift:read','demandShift:write'])]
     private ?string $name = null;
 
+    #[ORM\ManyToOne(inversedBy: 'demandShifts')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['demandShift:read','demandShift:write','facility:read'])]
+    private ?Qualification $requiredQualification = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['demandShift:read','demandShift:write','facility:read'])]
+    private ?string $color = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -260,6 +269,30 @@ class DemandShift
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getRequiredQualification(): ?Qualification
+    {
+        return $this->requiredQualification;
+    }
+
+    public function setRequiredQualification(?Qualification $requiredQualification): static
+    {
+        $this->requiredQualification = $requiredQualification;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): static
+    {
+        $this->color = $color;
 
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Controller\FacilityShift;
 
+use App\Service\EmployeeService;
 use App\Service\FacilityService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -13,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class FacilityShiftComponentController extends AbstractController
 {
 
-    public function __construct(readonly FacilityService $facilityService)
+    public function __construct(readonly FacilityService $facilityService, readonly EmployeeService $employeeService)
     {
 
     }
@@ -22,11 +23,12 @@ class FacilityShiftComponentController extends AbstractController
     public function loadNewFacilityShiftComponent(Request $request): Response
     {
         $facilityUri = $request->query->get('facilityUri');
-
+        $qualifications = $this->employeeService->getAllQualifications();
         return $this->render('pages/facility_shift/facility_single_shift.html.twig', [
             'facility' => [
                 '@id' => $facilityUri
-            ]
+            ],
+            'qualifications' => $qualifications
         ]);
     }
 
@@ -35,12 +37,20 @@ class FacilityShiftComponentController extends AbstractController
     {
 
         $newShiftData = json_decode($request->getContent(), true);
+        $qualifications = $this->employeeService->getAllQualifications();
 
-        return $this->render('pages/facility_shift/facility_single_shift.html.twig', [
+        $response = $this->render('pages/facility_shift/facility_single_shift.html.twig', [
             'facility' => [
                 '@id' => $newShiftData['facility']
             ],
-            'demandShift' => $newShiftData
+            'demandShift' => $newShiftData,
+            'qualifications' => $qualifications
         ]);
+
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+
+        return $response;
     }
 }
