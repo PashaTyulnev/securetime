@@ -1,0 +1,26 @@
+<div
+    class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl p-4 mb-8 border border-gray-200/50 dark:border-gray-800/50 flex flex-col gap-4 shadow-sm">
+
+    <!-- Objektauswahl -->
+    <div class="flex items-center gap-2">
+        <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Objekt</span>
+        <select
+            data-schedule-week-target="facilitySelect"
+            data-action="change->schedule-week#selectFacility"
+            class="px-4 py-2 bg-blue-100/80 dark:bg-blue-900/40 rounded-xl border-0 text-sm font-bold text-blue-900 dark:text-blue-200 focus:ring-2 focus:ring-blue-500">
+            <option class="bg-blue-100/80 dark:bg-blue-900/40">Bitte Objekt wählen...</option>
+
+            {% for facility in facilities %}
+                <option class="bg-blue-100/80 dark:bg-blue-900/40" value="{{ facility.id }}"
+                        {% if facility.id == 1 %}selected{% endif %}>{{ facility.title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Schichtenreihe -->
+    <div class="flex gap-4 overflow-x-auto">
+        <div data-schedule-week-target="demandShiftsContainer" class="flex gap-4">
+
+        </div>
+    </div>
+</div>

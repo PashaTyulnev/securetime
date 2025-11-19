@@ -27,7 +27,7 @@
                         </div>
                         <div>
                             <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ employee.firstName|slice(0,1)|upper }}. {{ employee.lastName }}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.department.title }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.qualification.title }}</div>
                         </div>
                     </div>
                 </div>
@@ -38,13 +38,13 @@
                         {# Hier würden die Schichten des aktuellen Mitarbeiters für das AUSGEWÄHLTE OBJEKT geladen #}
 
 
-                            <div class="mb-2 p-2.5 bg-gradient-to-r from-amber-500/90 to-orange-500/90 dark:from-amber-600/90 dark:to-orange-600/90 rounded-xl text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 cursor-pointer">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-semibold">06:00 - 14:00</span>
-                                    <div class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                                </div>
-                                <div class="text-xs mt-1 opacity-90">Main Building</div>  Anzeigen des Objekts, da nicht mehr im Kontext der Zeile
-                            </div>
+{#                            <div class="mb-2 p-2.5 bg-gradient-to-r from-amber-500/90 to-orange-500/90 dark:from-amber-600/90 dark:to-orange-600/90 rounded-xl text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 cursor-pointer">#}
+{#                                <div class="flex items-center justify-between">#}
+{#                                    <span class="text-xs font-semibold">06:00 - 14:00</span>#}
+{#                                    <div class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>#}
+{#                                </div>#}
+{#                                <div class="text-xs mt-1 opacity-90">Main Building</div>  Anzeigen des Objekts, da nicht mehr im Kontext der Zeile#}
+{#                            </div>#}
 
 
 {#                        {% if employee.name == 'T. Weber' and day == 5 %}#}

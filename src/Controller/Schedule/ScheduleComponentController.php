@@ -37,4 +37,16 @@ class ScheduleComponentController extends AbstractController
             'datesRange' => $datesRange,
         ]);
     }
+
+    #[Route(path: '/components/schedule/demand-shifts' , name: 'schedule_demand_shifts_component', methods: ['GET'])]
+    public function getDemandShiftsOfFacilityComponent(Request $request) : Response
+    {
+
+        $facilityId = $request->query->get('facilityId');
+        $shifts = $this->facilityService->getDemandShiftsOfFacility($facilityId);
+
+        return $this->render('/pages/schedule/components/demand_shifts.html.twig', [
+            'demandShifts' => $shifts,
+        ]);
+    }
 }

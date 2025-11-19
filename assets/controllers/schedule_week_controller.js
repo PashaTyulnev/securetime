@@ -4,22 +4,23 @@ import DateHelper from "../helper/date_helper.js";
 import ScheduleComponentApi from "../api/schedule/ScheduleComponentApi.js";
 
 export default class extends Controller {
-    static targets = ["currentWeekText", "currentDateRangeText", "currentWeekInput", "scheduleContainer"];
+    static targets = ["currentWeekText", "currentDateRangeText", "currentWeekInput", "scheduleContainer", "facilityShiftsContainer", "facilitySelect","demandShiftsContainer"];
 
     connect() {
         this.currentDate = new Date();
         this.currentWeek = DateHelper.getWeekNumber(this.currentDate);
         this.renderWeek();
+        this.checkFacilityFromUrl()
+        this.initAllScheduleElements()
     }
-
 
     buildScheduleElement() {
 
         let year = this.currentDate.getFullYear();
         let week = this.currentWeek;
 
-        ScheduleComponentApi.getWeekScheduleComponent(year,week).then(schedule => {
-            this.scheduleContainerTarget.innerHTML = schedule;
+        ScheduleComponentApi.getWeekScheduleComponent(year,week).then(demandShiftsComponent => {
+            this.scheduleContainerTarget.innerHTML = demandShiftsComponent;
         })
     }
 
@@ -62,5 +63,43 @@ export default class extends Controller {
             this.currentWeek = weekNum;
             this.renderWeek();
         }
+    }
+
+    selectFacility(event) {
+
+        //value aus dem select holen
+        const facilityId = event.target.value;
+        this.updateFacilityUrl(facilityId)
+
+        this.initAllScheduleElements()
+    }
+
+    updateFacilityUrl(facilityId) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('facility', facilityId);
+        window.history.pushState({}, '', url);
+    }
+
+    // setzt das Select auf die Facility ID aus der URL
+    checkFacilityFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const facilityId = urlParams.get('facility');
+        if (facilityId) {
+            this.facilitySelectTarget.value = facilityId;
+        }
+    }
+
+    initAllScheduleElements() {
+       this.loadDemandShifts()
+    }
+
+    loadDemandShifts() {
+        //prüfe welche facility ausgewählt ist
+        const facilityId = this.facilitySelectTarget.value;
+
+        //lade die entsprechenden Shifts
+        ScheduleComponentApi.getDemandShiftsOfFacilityComponent(facilityId).then(shifts => {
+            this.demandShiftsContainerTarget.innerHTML = shifts;
+        })
     }
 }

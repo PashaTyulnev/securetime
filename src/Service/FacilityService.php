@@ -36,4 +36,23 @@ class FacilityService
 
         return json_decode($facility, true);
     }
+
+    public function getDemandShiftsOfFacility(float|bool|int|string|null $facilityId)
+    {
+        $facility = $this->facilityRepository->find($facilityId);
+
+        if( !$facility) {
+            return [];
+        }
+
+        $demandShifts = $facility->getDemandShifts();
+
+        $demandShifts = $this->serializer->serialize(
+            $demandShifts,
+            'jsonld',
+            ['groups' => ['demandShift:read']]
+        );
+
+        return json_decode($demandShifts, true);
+    }
 }

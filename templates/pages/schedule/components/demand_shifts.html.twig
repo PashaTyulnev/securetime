@@ -1,0 +1,53 @@
+{% set colors = [
+    '#B63E3E',
+    '#C2683E',
+    '#6EA642',
+    '#3B82C4',
+    '#7B5AC1',
+    '#C16B94',
+    '#D1B94F',
+    '#35988F',
+    '#925BCF',
+    '#D1734F'
+] %}
+
+
+{% for demandShift in demandShifts %}
+    {% set colorIndex = loop.index0 % colors|length %}
+    {% set bgColor = colors[colorIndex] %}
+
+<div
+    class="rounded-3xl p-4 flex flex-col gap-2 min-w-[240px] shadow-md hover:shadow-xl transition-all duration-200"
+    style="background-color: {{ bgColor }};">
+
+    <span class="text-sm font-semibold text-gray-100">{{ demandShift.name }}</span>
+    <span class="text-xs text-gray-100 opacity-80">
+            MA: {{ demandShift.amountEmployees }} | {{ demandShift.requiredQualification.title }} |
+            {{ demandShift.timeFrom | date('H:i') }} - {{ demandShift.timeTo | date('H:i') }}
+        </span>
+
+    <div class="flex justify-between mt-2">
+        {% set days = {
+            'Mo': demandShift.onMonday,
+            'Di': demandShift.onTuesday,
+            'Mi': demandShift.onWednesday,
+            'Do': demandShift.onThursday,
+            'Fr': demandShift.onFriday,
+            'Sa': demandShift.onSaturday,
+            'So': demandShift.onSunday
+        } %}
+
+        {% for label, value in days %}
+        <div class="flex flex-col items-center">
+            <span class="text-xs font-medium text-gray-100">{{ label }}</span>
+
+            {% if value == true %}
+            {{ ux_icon('lucide:check', { class: 'h-5 w-5 text-green-300' }) }}
+            {% else %}
+            {{ ux_icon('lucide:x', { class: 'h-5 w-5 text-red-300' }) }}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}

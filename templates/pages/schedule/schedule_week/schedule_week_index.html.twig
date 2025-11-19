@@ -22,7 +22,7 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-6">
                             <h1 class="text-3xl font-extralight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-                                Dienstplaner (Personalansicht)
+                                Objektdienstplan
                             </h1>
                         </div>
 
@@ -38,8 +38,7 @@
 
         {# Main Content #}
         <main class="max-w-[1600px] mx-auto px-6 py-8">
-
-            {% include '/pages/schedule/components/facilities_employees_filter.html.twig' %}
+            {% include '/pages/schedule/components/facility_and_shift.html.twig' %}
 
             <div data-schedule-week-target="scheduleContainer">
 
