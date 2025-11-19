@@ -49,15 +49,13 @@
                     ] %}
 
 
-
-
                     <div class="p-1.5 bg-gray-100/70 dark:bg-gray-800/50 rounded-lg"
                          data-facility-shift-behavior-target="colorPreview">
                         <select
                             name="color"
                             form="shift-form-{{ demandShift.id|default('new') }}"
                             data-facility-shift-behavior-target="colorSelect"
-                            data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                            data-action="change->facility-shift-behavior#changeColor {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
                             style="background-color: {{ demandShift.color|default('#3b82f6') }};"
                             class="appearance-none w-7 h-7 rounded-lg border border-white/40
            cursor-pointer
