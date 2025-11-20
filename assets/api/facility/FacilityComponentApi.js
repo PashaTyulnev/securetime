@@ -19,4 +19,14 @@ export default class FacilityComponentApi {
         }).then(response => response.text())
     }
 
+    static getPositionComponent() {
+
+        return fetch(`/components/facility/position`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.text())
+    }
+
 }

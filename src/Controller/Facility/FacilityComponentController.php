@@ -38,6 +38,14 @@ class FacilityComponentController extends AbstractController
         ]);
     }
 
+    #[Route(path: '/position', name: 'position_component', methods: ['GET'])]
+    public function getPositionComponent(): Response
+    {
+
+        return $this->render('pages/facility/facility_position_single.html.twig', [
+        ]);
+    }
+
     #[Route(path: '/edit/{facilityId}', name: 'edit_facility_component', methods: ['GET'])]
     public function getEditFacilityModalComponent(int $facilityId): Response
     {

@@ -58,9 +58,13 @@
                                     <div class="text-sm font-medium text-gray-900 dark:text-white">{{ facility.title }}</div>
                                     {% if facility.address is defined and facility.address %}
                                         <div class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ facility.address.city }}
+                                            {{ facility.address.street }}, {{ facility.address.zip }}, {{ facility.address.city }}
                                         </div>
                                     {% endif %}
+
+                                    {% for position in facility.positions %}
+                                    <span class="bg-brand-softer border border-brand-subtle text-fg-brand-strong text-xs font-medium px-1.5 py-0.5 rounded">{{ position.title }}</span>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </td>

@@ -1,0 +1,27 @@
+<div class="mt-6" data-controller="facility-position" data-facility-target="positionsForm">
+
+    <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4 uppercase tracking-wider">
+        Positionen
+    </h3>
+
+    <div data-facility-position-target="positionsWrapper" class="flex flex-col gap-3">
+
+{#        <input type="text" name="facility" data-facility-target="facilityUriForPositions" class="flex-1 rounded-lg border border-gray-200 dark:border-gray-600 px-2 py-1 text-sm focus:outline-none">#}
+{#        #}
+        {% if definedFacility.positions is defined %}
+
+             {% for pos in definedFacility.positions %}
+                {% include 'pages/facility/facility_position_single.html.twig'  with
+                    {'shortName': pos.shortName,
+                        'facilityUri': definedFacility['@id'],
+                        'title':pos.title,
+                        'note':pos.note} %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+<button type="button" data-action="click->facility-position#addPosition"
+        class="mt-2 px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-500 transition-all">
+    + Position hinzufügen
+</button>
+</div>

@@ -41,28 +41,28 @@ class Facility
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['contact:read', 'facility:read','facility:write'])]
+    #[Groups(['contact:read', 'facility:read', 'facility:write'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['contact:read', 'facility:read','facility:write'])]
+    #[Groups(['contact:read', 'facility:read', 'facility:write'])]
     private ?string $shortTitle = null;
 
-    #[ORM\Column(length: 255,nullable: true)]
-    #[Groups(['contact:read', 'facility:read','facility:write'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['contact:read', 'facility:read', 'facility:write'])]
     private ?string $description = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['facility:read','facility:write'])]
+    #[Groups(['facility:read', 'facility:write'])]
     private ?Address $address = null;
 
     #[ORM\ManyToOne(inversedBy: 'facility')]
-    #[Groups(['facility:read','facility:write'])]
+    #[Groups(['facility:read', 'facility:write'])]
     private ?Company $company = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['facility:read','facility:write'])]
+    #[Groups(['facility:read', 'facility:write'])]
     private ?string $approach = null;
 
     /**
@@ -72,11 +72,11 @@ class Facility
     private Collection $contacts;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['facility:read','facility:write'])]
+    #[Groups(['facility:read', 'facility:write'])]
     private ?\DateTime $dateFrom = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['facility:read','facility:write'])]
+    #[Groups(['facility:read', 'facility:write'])]
     private ?\DateTime $dateTo = null;
 
     /**
@@ -92,11 +92,19 @@ class Facility
     #[Groups(['facility:read'])]
     private Collection $demandShifts;
 
+    /**
+     * @var Collection<int, FacilityPosition>
+     */
+    #[ORM\OneToMany(targetEntity: FacilityPosition::class, mappedBy: 'facility', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['facility:read'])]
+    private Collection $positions;
+
     public function __construct()
     {
         $this->contacts = new ArrayCollection();
         $this->shifts = new ArrayCollection();
         $this->demandShifts = new ArrayCollection();
+        $this->positions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -211,21 +219,32 @@ class Facility
         return $this->dateFrom;
     }
 
-    public function setDateFrom(?\DateTime $dateFrom): static
-    {
-        $this->dateFrom = $dateFrom;
-
-        return $this;
-    }
 
     public function getDateTo(): ?\DateTime
     {
         return $this->dateTo;
     }
 
+    public function setDateFrom(?\DateTime $dateFrom): static
+    {
+        // Leere Strings werden zu null
+        if ($dateFrom === '' || $dateFrom === null) {
+            $this->dateFrom = null;
+        } else {
+            $this->dateFrom = $dateFrom;
+        }
+
+        return $this;
+    }
+
     public function setDateTo(?\DateTime $dateTo): static
     {
-        $this->dateTo = $dateTo;
+        // Leere Strings werden zu null
+        if ($dateTo === '' || $dateTo === null) {
+            $this->dateTo = null;
+        } else {
+            $this->dateTo = $dateTo;
+        }
 
         return $this;
     }
@@ -284,6 +303,36 @@ class Facility
             // set the owning side to null (unless already changed)
             if ($demandShift->getFacility() === $this) {
                 $demandShift->setFacility(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FacilityPosition>
+     */
+    public function getPositions(): Collection
+    {
+        return $this->positions;
+    }
+
+    public function addPosition(FacilityPosition $position): static
+    {
+        if (!$this->positions->contains($position)) {
+            $this->positions->add($position);
+            $position->setFacility($this);
+        }
+
+        return $this;
+    }
+
+    public function removePosition(FacilityPosition $position): static
+    {
+        if ($this->positions->removeElement($position)) {
+            // set the owning side to null (unless already changed)
+            if ($position->getFacility() === $this) {
+                $position->setFacility(null);
             }
         }
 
