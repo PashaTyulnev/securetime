@@ -36,9 +36,9 @@ export default class extends Controller {
         const positions = [];
 
         rows.forEach(row => {
-            const titleInput = row.querySelector('input[name="title"]');
-            const shortNameInput = row.querySelector('input[name="shortName"]');
-            const noteInput = row.querySelector('input[name="note"]');
+            const titleInput = row.querySelector('input[name="position[title]"]');
+            const shortNameInput = row.querySelector('input[name="position[shortName]"]');
+            const noteInput = row.querySelector('input[name="position[note]"]');
 
             // Nur Positionen mit Titel hinzufügen
             if (titleInput && titleInput.value.trim()) {

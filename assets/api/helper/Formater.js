@@ -1,6 +1,8 @@
 export default class Formater {
 
     static formatToJson(formData) {
+
+        console.log("FORMATIERE JSON")
         const jsonData = {};
 
         for (const [key, value] of formData.entries()) {
@@ -15,6 +17,12 @@ export default class Formater {
                 processedValue = true;
             } else if (value === "false") {
                 processedValue = false;
+            }
+
+            // ---- Integer-Erkennung für 'id' ----
+            const isIdKey = key.split(/[\[\]]/).filter(Boolean).pop() === "id";
+            if (isIdKey) {
+                processedValue = parseInt(value, 10);
             }
 
             // ---- Keys mit [] Struktur parsen ----
@@ -37,7 +45,14 @@ export default class Formater {
                 current = current[keys[i]];
             }
 
-            current[keys[keys.length - 1]] = processedValue;
+            const lastKey = keys[keys.length - 1];
+
+            // ---- Integer-Erkennung auch für verschachtelte id-Keys ----
+            if (lastKey === "id") {
+                processedValue = parseInt(processedValue, 10);
+            }
+
+            current[lastKey] = processedValue;
         }
 
         return jsonData;

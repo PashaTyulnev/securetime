@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Provider\EmployeeProvider;
 use App\Repository\EmployeeRepository;
 use App\Processor\EmployeeProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,7 +23,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Get(),
         new GetCollection(),
         new Post(processor:EmployeeProcessor::class),
-        new Put(processor:EmployeeProcessor::class),
+        new Put(processor: EmployeeProcessor::class),
         new Delete(),
     ],
     normalizationContext: ['groups' => ['employee:read']],
@@ -52,8 +53,8 @@ class Employee
     #[Groups(['employee:read', 'employee:write'])]
     private ?string $phone = null;
 
-    #[ORM\OneToOne(mappedBy: 'employee', cascade: ['persist', 'remove'])]
-    #[Groups(['employee:read', 'employee:write'])]
+    #[ORM\OneToOne(inversedBy: 'employee', cascade: ['persist'])]
+    #[Groups(['employee:read'])]
     private ?User $user = null;
 
     #[ORM\Column(length: 255, nullable: true)]

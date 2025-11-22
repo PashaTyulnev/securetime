@@ -1,6 +1,7 @@
 <tr data-controller="facility-shift-behavior"
     class="border-b border-gray-200/30 dark:border-gray-700/30 hover:bg-white/50 dark:hover:bg-gray-800/50 transition-colors">
     <td class="px-4 py-4">
+
         <form method="post" id="shift-form-{{ demandShift.id|default('new') }}"
               data-action="submit->facility-shift#submitNewShift" class="contents">
             {% if demandShift.id|default(false) %}

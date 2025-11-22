@@ -21,6 +21,15 @@ export default class extends BaseEntityController {
         let shiftsContainer = document.getElementById('facility-shifts-container-' + facilityId)
 
         FacilityShiftComponentApi.getNewFacilityShiftComponent(facilityUri).then(html => {
+            // Eindeutige ID für diese neue Zeile generieren
+            const uniqueId = 'new_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+            // Alle Vorkommen von 'new' in IDs durch die eindeutige ID ersetzen
+            html = html.replace(/id="([^"]+)_new"/g, `id="$1_${uniqueId}"`);
+            html = html.replace(/for="([^"]+)_new"/g, `for="$1_${uniqueId}"`);
+            html = html.replace(/shift-form-new/g, `shift-form-${uniqueId}`);
+            html = html.replace(/form="shift-form-new"/g, `form="shift-form-${uniqueId}"`);
+
             shiftsContainer.insertAdjacentHTML('beforeend', html);
         });
     }

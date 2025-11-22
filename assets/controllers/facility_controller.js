@@ -21,86 +21,65 @@ export default class extends BaseEntityController {
 
     saveNew(event) {
         event.preventDefault();
-
-        // Fehlercontainer zurücksetzen
-        this.errorMessageTarget.textContent = '';
-        this.errorMessageContainerTarget.classList.add('hidden');
+        this.resetErrors();
 
         const formData = new FormData(event.target);
         const jsonData = Formater.formatToJson(formData);
 
-        // 1. Facility erstellen
         ApiDataHandler.createNewEntity(this.getEntityName(), jsonData)
-            .then(async (response) => {
-                if (!response || Object.keys(response).length === 0) {
-                    this.showError('Keine Antwort vom Server.');
-                    return;
-                }
-
-                if (response.status >= 400) {
-                    const message = response.description || 'Ein unbekannter Fehler ist aufgetreten.';
-                    this.showError(message);
-                    return;
-                }
-
-                const newFacilityUri = response['@id'];
-
-                // 2. Positionen erstellen
-                await this.createPositions(newFacilityUri);
-
-                // 3. Modal schließen und Seite neu laden
-                this.closeModal();
-                window.location.reload();
-            })
-            .catch((error) => {
-                console.error('Fehler beim Erstellen der Facility:', error);
-                this.showError('Netzwerkfehler oder Serverfehler.');
-            });
+            .then(response => this.handleSaveResponse(response))
+            .catch(error => this.handleSaveError(error, 'Erstellen'));
     }
 
     saveEdit(event) {
         event.preventDefault();
         const facilityUri = event.params.uri;
-
-        // Fehlercontainer zurücksetzen
-        this.errorMessageTarget.textContent = '';
-        this.errorMessageContainerTarget.classList.add('hidden');
+        this.resetErrors();
 
         const formData = new FormData(event.target);
         const jsonData = Formater.formatToJson(formData);
 
-        // 1. Facility aktualisieren
         ApiDataHandler.updateEntity(this.getEntityName(), jsonData, facilityUri)
-            .then(async (response) => {
-                if (!response || Object.keys(response).length === 0) {
-                    this.showError('Keine Antwort vom Server.');
-                    return;
-                }
+            .then(response => this.handleSaveResponse(response, facilityUri))
+            .catch(error => this.handleSaveError(error, 'Aktualisieren'));
+    }
 
-                if (response.status >= 400) {
-                    const message = response.description || 'Ein unbekannter Fehler ist aufgetreten.';
-                    this.showError(message);
-                    return;
-                }
+    async handleSaveResponse(response, facilityUri = null) {
+        if (!response || Object.keys(response).length === 0) {
+            this.showError('Keine Antwort vom Server.');
+            return;
+        }
 
-                // 2. Positionen aktualisieren (alte löschen, neue erstellen)
-                await this.createPositions(facilityUri);
+        if (response.status >= 400) {
+            const message = response.description || 'Ein unbekannter Fehler ist aufgetreten.';
+            this.showError(message);
+            return;
+        }
 
-                // 3. Modal schließen und Seite neu laden
-                this.closeModal();
-                window.location.reload();
-            })
-            .catch((error) => {
-                console.error('Fehler beim Aktualisieren der Facility:', error);
-                this.showError('Netzwerkfehler oder Serverfehler.');
-            });
+        // URI ermitteln (bei neuem Entity aus Response, bei Edit aus Parameter)
+        const uri = facilityUri || response['@id'];
+        console.log("Facility URI:", uri);
+
+        // Positionen erstellen/aktualisieren
+        await this.createPositions(uri);
+
+        // Abschließen
+        this.closeModal();
+        this.reloadList();
+    }
+
+    handleSaveError(error, action) {
+        console.error(`Fehler beim ${action} der Facility:`, error);
+        this.showError('Netzwerkfehler oder Serverfehler.');
+    }
+
+    resetErrors() {
+        this.errorMessageTarget.textContent = '';
+        this.errorMessageContainerTarget.classList.add('hidden');
     }
 
     async createPositions(facilityUri) {
-        const positionController = this.application.getControllerForElementAndIdentifier(
-            this.positionsFormTarget,
-            'facility-position'
-        );
+        const positionController = this.getPositionController();
 
         if (!positionController) {
             console.warn('Position Controller nicht gefunden');
@@ -110,20 +89,12 @@ export default class extends BaseEntityController {
         const positions = positionController.getPositionsData();
 
         if (positions.length === 0) {
-            return; // Keine Positionen zu erstellen
+            return;
         }
 
-        // Alle Positionen parallel erstellen
-        const positionPromises = positions.map(position => {
-            const positionData = {
-                title: position.title,
-                shortName: position.shortName,
-                note: position.note,
-                facility: facilityUri
-            };
-
-            return ApiDataHandler.createNewEntity('facility_positions', positionData);
-        });
+        const positionPromises = positions.map(position =>
+            this.createSinglePosition(position, facilityUri)
+        );
 
         try {
             await Promise.all(positionPromises);
@@ -133,20 +104,53 @@ export default class extends BaseEntityController {
         }
     }
 
+    createSinglePosition(position, facilityUri) {
+        const positionData = {
+            title: position.title,
+            shortName: position.shortName,
+            note: position.note,
+            facility: facilityUri
+        };
+
+        return ApiDataHandler.createNewEntity('facility_positions', positionData);
+    }
+
+    getPositionController() {
+        return this.application.getControllerForElementAndIdentifier(
+            this.positionsFormTarget,
+            'facility-position'
+        );
+    }
+
     closeModal() {
-        // Modal-Controller finden und hide aufrufen
-        const modalElement = this.element.closest('[data-controller*="modal"]');
-        if (modalElement) {
-            const modalController = this.application.getControllerForElementAndIdentifier(
-                modalElement,
-                'modal'
-            );
-            if (modalController && typeof modalController.hide === 'function') {
-                modalController.hide();
-            }
+        const modalElement = this.modalContainerTarget.querySelector('[data-controller="modal"]');
+
+        if (!modalElement) {
+            console.warn('Modal-Element nicht gefunden');
+            return;
+        }
+
+        const modalController = this.application.getControllerForElementAndIdentifier(
+            modalElement,
+            'modal'
+        );
+
+        if (modalController) {
+            modalController.hide();
+        } else {
+            console.warn('Modal-Controller nicht gefunden');
         }
     }
 
+    reloadList() {
+        const turboFrame = document.getElementById('facilities-table');
+
+        if (turboFrame) {
+            turboFrame.reload();
+        } else {
+            console.warn('Turbo Frame "facilities-table" nicht gefunden');
+        }
+    }
 
     async fetchCityByZip(event) {
         const input = event.target;
@@ -155,26 +159,34 @@ export default class extends BaseEntityController {
         const zip = input.value.trim();
         const cityInput = this.cityInputTarget;
 
-        if (!/^\d{5}$/.test(zip)) {
+        if (!this.isValidGermanZip(zip)) {
             cityInput.value = '';
             return;
         }
 
         try {
-            const response = await fetch(`https://api.zippopotam.us/de/${zip}`);
-
-            if (!response.ok) {
-                cityInput.value = '';
-                return;
-            }
-
-            const data = await response.json();
-            const place = data.places?.[0];
-            cityInput.value = place ? place['place name'] : '';
-
+            const cityName = await this.getCityByZip(zip);
+            cityInput.value = cityName;
         } catch (error) {
             console.error('Fehler beim Laden der Stadt:', error);
             cityInput.value = '';
         }
+    }
+
+    isValidGermanZip(zip) {
+        return /^\d{5}$/.test(zip);
+    }
+
+    async getCityByZip(zip) {
+        const response = await fetch(`https://api.zippopotam.us/de/${zip}`);
+
+        if (!response.ok) {
+            return '';
+        }
+
+        const data = await response.json();
+        const place = data.places?.[0];
+
+        return place ? place['place name'] : '';
     }
 }

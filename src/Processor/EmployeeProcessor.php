@@ -1,9 +1,9 @@
 <?php
 namespace App\Processor;
 
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Employee;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,21 +26,65 @@ readonly class EmployeeProcessor implements ProcessorInterface
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        if ($request !== null) {
-            $requestData = json_decode($request->getContent(), true);
+        if (!$request) {
+            return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+        }
 
-            if ($operation instanceof Post && $data->getUser() === null) {
-                if (!empty($requestData['username']) && !empty($requestData['email'])) {
-                    $user = new User();
-                    $user->setUsername($requestData['username']);
-                    $user->setEmail($requestData['email']);
-                    $user->setActive(true);
-                    $user->setRoles(['ROLE_EMPLOYEE']);
-                    $user->setEmployee($data);
+        $requestData = json_decode($request->getContent(), true);
+
+        // BEI PUT: Employee aus DB laden und Werte übertragen
+        if ($operation instanceof Put && !empty($uriVariables['id'])) {
+            $employee = $this->entityManager->find(Employee::class, $uriVariables['id']);
+
+            if (!$employee) {
+                throw new \RuntimeException('Employee not found');
+            }
+
+            // Übertrage alle Werte vom deserialisierten $data zum DB-Employee
+            $employee->setFirstName($data->getFirstName());
+            $employee->setLastName($data->getLastName());
+            $employee->setPhone($data->getPhone());
+            $employee->setNumber($data->getNumber());
+            $employee->setBirthDate($data->getBirthDate());
+            $employee->setDepartment($data->getDepartment());
+            $employee->setQualification($data->getQualification());
+
+            $data = $employee;
+        }
+
+        // --- HANDLE USER ---
+        if (isset($requestData['user'])) {
+            $userData = $requestData['user'];
+
+            if (!empty($userData['id'])) {
+                $user = $this->entityManager->find(User::class, $userData['id']);
+
+                if ($user) {
+                    if (isset($userData['username'])) {
+                        $user->setUsername($userData['username']);
+                    }
+                    if (isset($userData['email'])) {
+                        $user->setEmail($userData['email']);
+                    }
+                    if (isset($userData['active'])) {
+                        $user->setActive($userData['active']);
+                    }
 
                     $data->setUser($user);
-                    $this->entityManager->persist($user);
                 }
+            } else {
+                $user = new User();
+                if (isset($userData['username'])) {
+                    $user->setUsername($userData['username']);
+                }
+                if (isset($userData['email'])) {
+                    $user->setEmail($userData['email']);
+                }
+                $user->setActive($userData['active'] ?? true);
+                $user->setRoles(['ROLE_EMPLOYEE']);
+
+                $this->entityManager->persist($user);
+                $data->setUser($user);
             }
         }
 

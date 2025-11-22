@@ -1,19 +1,19 @@
 <div class="flex gap-3 items-center p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200 position-row">
     <input type="text"
            placeholder="Position Name"
-           name="title"
+           name="position[title]"
            value="{{ title|default('') }}"
            class="flex-1 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-gray-400 transition-all">
 
     <input type="text"
            placeholder="Kürzel"
-           name="shortName"
+           name="position[shortName]"
            value="{{ shortName|default('') }}"
            class="w-28 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-gray-400 transition-all">
 
     <input type="text"
            placeholder="Notiz"
-           name="note"
+           name="position[note]"
            value="{{ note|default('') }}"
            class="flex-1 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-gray-400 transition-all">
 

@@ -29,7 +29,7 @@
                     {% include 'elements/input.html.twig' with {
                         'title': 'Benutzername',
                         'type': 'text',
-                        'systemName': 'username',
+                        'systemName': 'user[username]',
                         'placeholder': 'aschmidt',
                         'required': 'required',
                         'devValue': definedEmployee.user.username|default('')
@@ -111,11 +111,23 @@
                     {% include 'elements/input.html.twig' with {
                         'title': 'E-Mail',
                         'type': 'email',
-                        'systemName': 'email',
+                        'systemName': 'user[email]',
                         'placeholder': 'max@gmail.com',
                         'required': 'required',
                         'devValue': definedEmployee.user.email|default('')
                     } %}
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': '',
+                        'type': 'hidden',
+                        'systemName': 'user[id]',
+                        'placeholder': '',
+                        'devValue': definedEmployee.user.id|default('')
+                    } %}
+
+                   
+
+                    <input name="user[active]" type="hidden" value="true">
                 </div>
 
                 <div class="flex justify-end space-x-4">

@@ -22,7 +22,6 @@ class FacilityComponentController extends AbstractController
     {
         //call function from other controller
         $allFacilities = $this->facilityService->getAllFacilities();
-
         return $this->render('pages/facility/facility_list.html.twig', [
             'facilities' => $allFacilities
         ]);
