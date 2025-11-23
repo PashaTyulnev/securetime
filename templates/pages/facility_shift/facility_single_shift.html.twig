@@ -176,6 +176,7 @@
             </div>
         </div>
 
+        {% if facility.positions | length > 0 %}
         {# Positionen - Volle Breite unten #}
         <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30">
             <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3 block">
@@ -200,5 +201,6 @@
                 {% endfor %}
             </div>
         </div>
+        {% endif %}
     </form>
 </div>
