@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Processor\EmployeeProcessor;
 use App\Repository\DemandShiftRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -98,6 +100,18 @@ class DemandShift
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['demandShift:read','demandShift:write','facility:read'])]
     private ?string $color = null;
+
+    /**
+     * @var Collection<int, FacilityPosition>
+     */
+    #[ORM\ManyToMany(targetEntity: FacilityPosition::class, inversedBy: 'demandShifts')]
+    #[Groups(['demandShift:read','demandShift:write','facility:read'])]
+    private Collection $requiredPositions;
+
+    public function __construct()
+    {
+        $this->requiredPositions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -295,5 +309,41 @@ class DemandShift
         $this->color = $color;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, FacilityPosition>
+     */
+    public function getRequiredPositions(): Collection
+    {
+        return $this->requiredPositions;
+    }
+
+    public function addRequiredPosition(FacilityPosition $requiredPosition): static
+    {
+        if (!$this->requiredPositions->contains($requiredPosition)) {
+            $this->requiredPositions->add($requiredPosition);
+            $requiredPosition->addDemandShift($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRequiredPosition(FacilityPosition $requiredPosition): static
+    {
+        if ($this->requiredPositions->removeElement($requiredPosition)) {
+            $requiredPosition->removeDemandShift($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @deprecated Use getRequiredPositions() instead
+     * @return Collection<int, FacilityPosition>
+     */
+    public function getRequiredPosition(): Collection
+    {
+        return $this->requiredPositions;
     }
 }

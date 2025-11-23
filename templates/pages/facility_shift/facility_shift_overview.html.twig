@@ -106,71 +106,43 @@
                         <div class="space-y-4">
 
                             {# Quick Templates #}
-{#                            <div#}
-{#                                class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-2xl p-4 mb-6">#}
-{#                                <div class="flex items-center justify-between">#}
-{#                                    <span#}
-{#                                        class="text-sm font-medium text-gray-700 dark:text-gray-300">Schnell-Vorlagen:</span>#}
-{#                                    <div class="flex gap-2">#}
-{#                                        <button#}
-{#                                            class="px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg text-xs font-medium hover:shadow-md transition-all duration-200">#}
-{#                                            {{ ux_icon('lucide:sunrise', { class: 'h-3.5 w-3.5 inline mr-1 text-amber-600' }) }}#}
-{#                                            24/7 Vollbesetzung#}
-{#                                        </button>#}
-{#                                        <button#}
-{#                                            class="px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg text-xs font-medium hover:shadow-md transition-all duration-200">#}
-{#                                            {{ ux_icon('lucide:sun', { class: 'h-3.5 w-3.5 inline mr-1 text-blue-600' }) }}#}
-{#                                            Nur Tagschicht#}
-{#                                        </button>#}
-{#                                        <button#}
-{#                                            class="px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg text-xs font-medium hover:shadow-md transition-all duration-200">#}
-{#                                            {{ ux_icon('lucide:moon', { class: 'h-3.5 w-3.5 inline mr-1 text-indigo-600' }) }}#}
-{#                                            Nur Nachtschicht#}
-{#                                        </button>#}
-{#                                        <button#}
-{#                                            class="px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg text-xs font-medium hover:shadow-md transition-all duration-200">#}
-{#                                            {{ ux_icon('lucide:calendar', { class: 'h-3.5 w-3.5 inline mr-1 text-purple-600' }) }}#}
-{#                                            Wochenende#}
-{#                                        </button>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </div>#}
+                            {#                            <div #}
+                            {#                                class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-2xl p-4 mb-6"> #}
+                            {#                                <div class="flex items-center justify-between"> #}
+                            {#                                    <span #}
+                            {#                                        class="text-sm font-medium text-gray-700 dark:text-gray-300">Schnell-Vorlagen:</span> #}
+                            {#                                    <div class="flex gap-2"> #}
+                            {#                                        <button #}
+                            {#                                            class="px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg text-xs font-medium hover:shadow-md transition-all duration-200"> #}
+                            {#                                            {{ ux_icon('lucide:sunrise', { class: 'h-3.5 w-3.5 inline mr-1 text-amber-600' }) }} #}
+                            {#                                            24/7 Vollbesetzung #}
+                            {#                                        </button> #}
+                            {#                                        <button #}
+                            {#                                            class="px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg text-xs font-medium hover:shadow-md transition-all duration-200"> #}
+                            {#                                            {{ ux_icon('lucide:sun', { class: 'h-3.5 w-3.5 inline mr-1 text-blue-600' }) }} #}
+                            {#                                            Nur Tagschicht #}
+                            {#                                        </button> #}
+                            {#                                        <button #}
+                            {#                                            class="px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg text-xs font-medium hover:shadow-md transition-all duration-200"> #}
+                            {#                                            {{ ux_icon('lucide:moon', { class: 'h-3.5 w-3.5 inline mr-1 text-indigo-600' }) }} #}
+                            {#                                            Nur Nachtschicht #}
+                            {#                                        </button> #}
+                            {#                                        <button #}
+                            {#                                            class="px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg text-xs font-medium hover:shadow-md transition-all duration-200"> #}
+                            {#                                            {{ ux_icon('lucide:calendar', { class: 'h-3.5 w-3.5 inline mr-1 text-purple-600' }) }} #}
+                            {#                                            Wochenende #}
+                            {#                                        </button> #}
+                            {#                                    </div> #}
+                            {#                                </div> #}
+                            {#                            </div> #}
 
                             {# Shifts Table #}
                             <div class="bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl overflow-hidden">
-                                <table class="w-full">
-                                    <thead>
-                                    <tr class="border-b border-gray-200/50 dark:border-gray-700/50">
-                                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                                            Schicht
-                                        </th>
-                                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                                            Min. Qualifikation
-                                        </th>
-                                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                                            Zeit
-                                        </th>
-                                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                                            Personal
-                                        </th>
-                                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                                            Wochentage
-                                        </th>
-                                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                                            Aktionen
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="facility-shifts-container-{{ facility.id }}">
-
-                                    {# Individual Shift Rows #}
-
+                                <div id="facility-shifts-container-{{ facility.id }}" class="space-y-3">
                                     {% for demandShift in facility.demandShifts %}
-                                        {% include 'pages/facility_shift/facility_single_shift.html.twig' with {'demandShift':demandShift}%}
+                                        {% include 'pages/facility_shift/facility_single_shift.html.twig' with {'demandShift':demandShift} %}
                                     {% endfor %}
-
-                                    </tbody>
-                                </table>
+                                </div>
                             </div>
 
                             {# Add New Shift Button #}
@@ -192,25 +164,25 @@
                     <div
                         class="p-6 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30">
                         <div class="flex items-center justify-end">
-{#                            <div class="flex items-center gap-6">#}
-{#                                <div>#}
-{#                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Wochenstunden</span>#}
-{#                                    <div class="text-2xl font-bold text-gray-900 dark:text-white">168h</div>#}
-{#                                </div>#}
-{#                                <div>#}
-{#                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Min. Personal</span>#}
-{#                                    <div class="text-2xl font-bold text-gray-900 dark:text-white">5</div>#}
-{#                                </div>#}
-{#                                <div>#}
-{#                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Geschätzte Kosten/Woche</span>#}
-{#                                    <div class="text-2xl font-bold text-gray-900 dark:text-white">€6,720</div>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                            <button#}
-{#                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors">#}
-{#                                {{ ux_icon('lucide:check', { class: 'h-4 w-4 inline mr-1' }) }}#}
-{#                                Änderungen speichern#}
-{#                            </button>#}
+                            {#                            <div class="flex items-center gap-6"> #}
+                            {#                                <div> #}
+                            {#                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Wochenstunden</span> #}
+                            {#                                    <div class="text-2xl font-bold text-gray-900 dark:text-white">168h</div> #}
+                            {#                                </div> #}
+                            {#                                <div> #}
+                            {#                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Min. Personal</span> #}
+                            {#                                    <div class="text-2xl font-bold text-gray-900 dark:text-white">5</div> #}
+                            {#                                </div> #}
+                            {#                                <div> #}
+                            {#                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Geschätzte Kosten/Woche</span> #}
+                            {#                                    <div class="text-2xl font-bold text-gray-900 dark:text-white">€6,720</div> #}
+                            {#                                </div> #}
+                            {#                            </div> #}
+                            {#                            <button #}
+                            {#                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors"> #}
+                            {#                                {{ ux_icon('lucide:check', { class: 'h-4 w-4 inline mr-1' }) }} #}
+                            {#                                Änderungen speichern #}
+                            {#                            </button> #}
                         </div>
                     </div>
                 </div>

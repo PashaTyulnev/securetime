@@ -84,7 +84,9 @@ export default class extends Controller {
                         } catch {
                             data = {};
                         }
-                        alert(data['hydra:description'] || 'Ein unbekannter Fehler ist aufgetreten');
+
+
+                        alert(data.description);
                     });
                 }
             })

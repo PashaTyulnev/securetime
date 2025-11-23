@@ -1,230 +1,204 @@
-<tr data-controller="facility-shift-behavior"
-    class="border-b border-gray-200/30 dark:border-gray-700/30 hover:bg-white/50 dark:hover:bg-gray-800/50 transition-colors">
-    <td class="px-4 py-4">
+<div data-controller="facility-shift-behavior"
+     class="border border-gray-200/30 dark:border-gray-700/30 rounded-xl bg-white/50 dark:bg-gray-800/50 hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all mb-3 overflow-hidden">
 
-        <form method="post" id="shift-form-{{ demandShift.id|default('new') }}"
-              data-action="submit->facility-shift#submitNewShift" class="contents">
-            {% if demandShift.id|default(false) %}
-                <input type="hidden" name="id" value="{{ demandShift.id }}">
-                <input type="hidden" name="uri" value="{{ demandShift['@id'] }}">
-            {% endif %}
-            <input type="hidden" name="facility" value="{{ facility['@id'] }}">
+    <form method="post" id="shift-form-{{ demandShift.id|default('new') }}"
+          data-action="submit->facility-shift#submitShift">
+        {% if demandShift.id|default(false) %}
+            <input type="hidden" name="id" value="{{ demandShift.id }}">
+            <input type="hidden" name="uri" value="{{ demandShift['@id'] }}">
+        {% endif %}
+        <input type="hidden" name="facility" value="{{ facility['@id'] }}">
 
-            <div class="flex items-center gap-2">
-                {% set shiftName = demandShift.name|default('')|lower %}
-                {% if 'früh' in shiftName %}
-                    {% set icon = 'lucide:sunrise' %}
-                    {% set color = 'text-amber-600 dark:text-amber-400' %}
-                {% elseif 'spät' in shiftName %}
-                    {% set icon = 'lucide:sunset' %}
-                    {% set color = 'text-orange-600 dark:text-orange-400' %}
-                {% elseif 'nacht' in shiftName %}
-                    {% set icon = 'lucide:moon' %}
-                    {% set color = 'text-indigo-600 dark:text-indigo-400' %}
-                {% elseif 'tag' in shiftName %}
-                    {% set icon = 'lucide:sun' %}
-                    {% set color = 'text-yellow-600 dark:text-yellow-400' %}
-                {% else %}
-                    {% set icon = 'lucide:clock' %}
-                    {% set color = 'text-gray-500 dark:text-gray-400' %}
-                {% endif %}
+        {# Hauptbereich mit Schicht-Informationen #}
+        <div class="p-4">
+            <div class="grid grid-cols-12 gap-4 items-start">
 
-                <div class="flex flex-col gap-1.5">
-                    <!-- Icon Box -->
-                    {#                    <div class="p-1.5 bg-gray-100/70 dark:bg-gray-800/50 rounded-lg"> #}
-                    {#                        {{ ux_icon(icon, { class: 'h-4 w-4 ' ~ color }) }} #}
-                    {#                    </div> #}
+                {# Schichtname mit Farbe - 3 Spalten #}
+                <div class="col-span-3">
+                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        Schicht
+                    </label>
+                    <div class="flex items-center gap-2">
+                        {% set shiftName = demandShift.name|default('')|lower %}
+                        {% set colors = [
+                            '#B63E3E', '#C2683E', '#6EA642', '#3B82C4', '#7B5AC1',
+                            '#C16B94', '#D1B94F', '#35988F', '#925BCF', '#D1734F'
+                        ] %}
 
-                    <!-- Color Select - direkt darunter -->
-                    {% set colors = [
-                        '#B63E3E',
-                        '#C2683E',
-                        '#6EA642',
-                        '#3B82C4',
-                        '#7B5AC1',
-                        '#C16B94',
-                        '#D1B94F',
-                        '#35988F',
-                        '#925BCF',
-                        '#D1734F'
-                    ] %}
-
-
-                    <div class="p-1.5 bg-gray-100/70 dark:bg-gray-800/50 rounded-lg"
-                         data-facility-shift-behavior-target="colorPreview">
-                        <select
-                            name="color"
-                            form="shift-form-{{ demandShift.id|default('new') }}"
-                            data-facility-shift-behavior-target="colorSelect"
-                            data-action="change->facility-shift-behavior#changeColor {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                            style="background-color: {{ demandShift.color|default('#3b82f6') }};"
-                            class="appearance-none w-7 h-7 rounded-lg border border-white/40
-           cursor-pointer
-           hover:shadow-md hover:scale-[1.05]
-           focus:outline-none focus:ring-2 focus:ring-white/60 focus:scale-[1.05]
-           transition-all duration-150"
-                            title="Farbe wählen"
-                        >
-
-                            {% for color in colors %}
-                            <option
-                                value="{{ color }}"
-                                {% if demandShift.color|default('#3b82f6') == color %}selected{% endif %}
-                                style="background-color: {{ color }};"
-                            >
-                            </option>
-                            {% endfor %}
-                        </select>
-
-                        <!-- Custom arrow -->
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">
-                            {{ ux_icon('lucide:chevron-down', {
-                                class: 'w-3 h-3 text-white drop-shadow'
-                            }) }}
+                        <div class="p-1.5 bg-gray-100/70 dark:bg-gray-800/50 rounded-lg shrink-0"
+                             data-facility-shift-behavior-target="colorPreview">
+                            <select
+                                name="color"
+                                form="shift-form-{{ demandShift.id|default('new') }}"
+                                data-facility-shift-behavior-target="colorSelect"
+                                data-action="change->facility-shift-behavior#changeColor {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                                style="background-color: {{ demandShift.color|default('#3b82f6') }};"
+                                class="appearance-none w-7 h-7 rounded-lg border border-white/40 cursor-pointer hover:shadow-md hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/60 focus:scale-[1.05] transition-all duration-150"
+                                title="Farbe wählen">
+                                {% for color in colors %}
+                                    <option value="{{ color }}"
+                                            {% if demandShift.color|default('#3b82f6') == color %}selected{% endif %}
+                                            style="background-color: {{ color }};">
+                                    </option>
+                                {% endfor %}
+                            </select>
                         </div>
-                    </div>
 
+                        <select name="name"
+                                form="shift-form-{{ demandShift.id|default('new') }}"
+                                class="flex-1 min-w-0 bg-white dark:bg-gray-800 font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm"
+                                required
+                                data-action="change->facility-shift-behavior#shiftChanged {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                                data-facility-shift-behavior-target="shiftSelect">
+                            <option value="">Schicht...</option>
+                            <option value="Frühschicht" {% if demandShift.name|default('') == 'Frühschicht' %}selected{% endif %}>Frühschicht</option>
+                            <option value="Tagschicht" {% if demandShift.name|default('') == 'Tagschicht' %}selected{% endif %}>Tagschicht</option>
+                            <option value="Spätschicht" {% if demandShift.name|default('') == 'Spätschicht' %}selected{% endif %}>Spätschicht</option>
+                            <option value="Nachtschicht" {% if demandShift.name|default('') == 'Nachtschicht' %}selected{% endif %}>Nachtschicht</option>
+                        </select>
+                    </div>
                 </div>
 
-                <select name="name"
-                        form="shift-form-{{ demandShift.id|default('new') }}"
-                        class="bg-white dark:bg-gray-800 font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 rounded px-2 py-1 shift-select"
-                        required
-                        data-action="change->facility-shift-behavior#shiftChanged {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                        data-facility-shift-behavior-target="shiftSelect">
-                    <option value="">Schicht auswählen...</option>
-                    <option value="Frühschicht"
-                            {% if demandShift.name|default('') == 'Frühschicht' %}selected{% endif %}>Frühschicht
-                    </option>
-                    <option value="Tagschicht" {% if demandShift.name|default('') == 'Tagschicht' %}selected{% endif %}>
-                        Tagschicht
-                    </option>
-                    <option value="Spätschicht"
-                            {% if demandShift.name|default('') == 'Spätschicht' %}selected{% endif %}>Spätschicht
-                    </option>
-                    <option value="Nachtschicht"
-                            {% if demandShift.name|default('') == 'Nachtschicht' %}selected{% endif %}>Nachtschicht
-                    </option>
-                </select>
+                {# Qualifikation - 2 Spalten #}
+                <div class="col-span-2">
+                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        Qualifikation
+                    </label>
+                    <select name="requiredQualification"
+                            data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                            form="shift-form-{{ demandShift.id|default('new') }}"
+                            data-facility-shift-behavior-target="qualificationSelect"
+                            class="w-full bg-white dark:bg-gray-800 font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm"
+                            required>
+                        <option value="">Wählen...</option>
+                        {% for qualification in qualifications %}
+                            <option value="{{ qualification['@id'] }}"
+                                    {% if demandShift.requiredQualification.id|default('') == qualification.id %}selected{% endif %}>
+                                {{ qualification.title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Zeit - 2 Spalten #}
+                <div class="col-span-2">
+                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        Zeit
+                    </label>
+                    <div class="flex items-center gap-1.5">
+                        <input type="time" name="timeFrom"
+                               form="shift-form-{{ demandShift.id|default('new') }}"
+                               data-facility-shift-behavior-target="timeFrom"
+                               data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                               value="{% if demandShift.timeFrom|default(false) %}{{ demandShift.timeFrom|date('H:i') }}{% endif %}"
+                               class="w-full bg-white dark:bg-gray-800 rounded-lg px-2 py-2 text-sm"
+                               required>
+                        <span class="text-gray-400 text-xs shrink-0">-</span>
+                        <input type="time" name="timeTo"
+                               form="shift-form-{{ demandShift.id|default('new') }}"
+                               data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                               data-facility-shift-behavior-target="timeTo"
+                               value="{% if demandShift.timeTo|default(false) %}{{ demandShift.timeTo|date('H:i') }}{% endif %}"
+                               class="w-full bg-white dark:bg-gray-800 rounded-lg px-2 py-2 text-sm"
+                               required>
+                    </div>
+                </div>
+
+                {# Personal - 1 Spalte #}
+                <div class="col-span-1">
+                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        Pers.
+                    </label>
+                    <input type="number" name="amountEmployees"
+                           form="shift-form-{{ demandShift.id|default('new') }}"
+                           value="{{ demandShift.amountEmployees|default(1) }}"
+                           data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                           min="1" max="10"
+                           class="w-full bg-white dark:bg-gray-800 rounded-lg px-2 py-2 text-sm text-center"
+                           required>
+                </div>
+
+                {# Wochentage - 3 Spalten (mehr Platz!) #}
+                <div class="col-span-3">
+                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        Wochentage
+                    </label>
+                    <div class="flex gap-1 flex-wrap">
+                        {% set days = {
+                            'Monday': 'Mo', 'Tuesday': 'Di', 'Wednesday': 'Mi', 'Thursday': 'Do',
+                            'Friday': 'Fr', 'Saturday': 'Sa', 'Sunday': 'So'
+                        } %}
+                        {% for key, label in days %}
+                            <input type="checkbox" name="on{{ key }}" value="1"
+                                   form="shift-form-{{ demandShift.id|default('new') }}"
+                                   id="{{ key }}_{{ demandShift.id|default('new') }}"
+                                   {% if attribute(demandShift, 'on' ~ key|capitalize)|default(false) %}checked{% endif %}
+                                   class="hidden day-checkbox"
+                                   data-action="change->facility-shift-behavior#toggleDay {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                                   data-facility-shift-behavior-target="dayCheckbox">
+                            <label for="{{ key }}_{{ demandShift.id|default('new') }}"
+                                   class="{% if attribute(demandShift, 'on' ~ key|capitalize)|default(false) %}activeDay{% else %}inactiveDay{% endif %} cursor-pointer transition-all text-xs px-2 py-1 rounded">
+                                {{ label }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {# Aktionen - 1 Spalte #}
+                <div class="col-span-1">
+                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        &nbsp;
+                    </label>
+                    <div class="flex items-center justify-end gap-1">
+                        {% if demandShift.id|default(false) %}
+                            <button type="button"
+                                    data-action="facility-shift#delete"
+                                    data-facility-shift-uri-param="{{ demandShift['@id'] }}"
+                                    class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                                    title="Löschen">
+                                {{ ux_icon('lucide:trash-2', { class: 'h-4 w-4 text-gray-500 hover:text-red-600' }) }}
+                            </button>
+                        {% else %}
+                            <button type="submit" form="shift-form-{{ demandShift.id|default('new') }}"
+                                    class="p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                                    title="Speichern">
+                                {{ ux_icon('lucide:save', { class: 'h-4 w-4 text-blue-600 hover:text-blue-700' }) }}
+                            </button>
+                            <button type="button"
+                                    data-action="facility-shift-behavior#removeRow"
+                                    class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors remove-new-row"
+                                    title="Abbrechen">
+                                {{ ux_icon('lucide:x', { class: 'h-4 w-4 text-gray-500 hover:text-red-600' }) }}
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </form>
-    </td>
-
-    <td class="px-4 py-4">
-        <select name="requiredQualification"
-                data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                form="shift-form-{{ demandShift.id|default('new') }}"
-                data-facility-shift-behavior-target="qualificationSelect"
-                class="bg-white dark:bg-gray-800 font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 rounded px-2 py-1 shift-select"
-                required>
-            <option value="">Qualifikation auswählen...</option>
-
-            {% for qualification in qualifications %}
-            <option value="{{ qualification['@id'] }}"
-                    {% if demandShift.requiredQualification.id|default('') == qualification.id %}selected{% endif %}>
-                {{ qualification.title }}
-            </option>
-            {% endfor %}
-        </select>
-    </td>
-
-    <td class="px-4 py-4">
-        <div class="flex items-center gap-2">
-            <input
-                type="time"
-                name="timeFrom"
-                form="shift-form-{{ demandShift.id|default('new') }}"
-                data-facility-shift-behavior-target="timeFrom"
-                data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                value="{% if demandShift.timeFrom|default(false) %}{{ demandShift.timeFrom|date('H:i') }}{% endif %}"
-                class="bg-white dark:bg-gray-800 rounded-lg px-2 py-1 text-sm border-0"
-                required
-            >
-            <span class="text-gray-400">-</span>
-            <input
-                type="time"
-                name="timeTo"
-                form="shift-form-{{ demandShift.id|default('new') }}"
-                data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                data-facility-shift-behavior-target="timeTo"
-                value="{% if demandShift.timeTo|default(false) %}{{ demandShift.timeTo|date('H:i') }}{% endif %}"
-                class="bg-white dark:bg-gray-800 rounded-lg px-2 py-1 text-sm border-0"
-                required
-            >
         </div>
-    </td>
 
-    <td class="px-4 py-4">
-        <input
-            type="number"
-            name="amountEmployees"
-            form="shift-form-{{ demandShift.id|default('new') }}"
-            value="{{ demandShift.amountEmployees|default(1) }}"
-            data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-            min="1"
-            max="10"
-            class="w-16 bg-white dark:bg-gray-800 rounded-lg px-2 py-1 text-sm text-center border-0"
-            required
-        >
-    </td>
-
-    <td class="px-4 py-4">
-        <div class="flex gap-1">
-            {% set days = {
-                'Monday': 'Mo',
-                'Tuesday': 'Di',
-                'Wednesday': 'Mi',
-                'Thursday': 'Do',
-                'Friday': 'Fr',
-                'Saturday': 'Sa',
-                'Sunday': 'So'
-            } %}
-
-            {% for key, label in days %}
-            <input
-                type="checkbox"
-                name="on{{ key }}"
-                value="1"
-                form="shift-form-{{ demandShift.id|default('new') }}"
-                id="{{ key }}_{{ demandShift.id|default('new') }}"
-                {% if attribute(demandShift, 'on' ~ key|capitalize)|default(false) %}checked{% endif %}
-                class="hidden day-checkbox"
-                data-action="change->facility-shift-behavior#toggleDay {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                data-facility-shift-behavior-target="dayCheckbox"
-            >
-            <label
-                for="{{ key }}_{{ demandShift.id|default('new') }}"
-                class="{% if attribute(demandShift, 'on' ~ key|capitalize)|default(false) %}activeDay{% else %}inactiveDay{% endif %} cursor-pointer transition-all"
-            >
-                {{ label }}
+        {# Positionen - Volle Breite unten #}
+        <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30">
+            <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3 block">
+                Erforderliche Positionen
             </label>
-            {% endfor %}
+            <div class="flex flex-wrap gap-3">
+                {% for position in facility.positions %}
+                    <div class="flex items-center">
+                        <input data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                               form="shift-form-{{ demandShift.id|default('new') }}"
+                               id="inline-checkbox{{ position.id }}_{{ demandShift.id|default('new') }}"
+                               type="checkbox"
+                               name="requiredPositions[]"
+                               value="{{ position['@id'] }}"
+                               {% if demandShift.requiredPositions|default([])|filter(p => p.id == position.id)|length > 0 %}checked{% endif %}
+                               class="w-4 h-4 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500">
+                        <label for="inline-checkbox{{ position.id }}_{{ demandShift.id|default('new') }}"
+                               class="select-none ms-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {{ position.title }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
-    </td>
-
-    <td class="px-4 py-4">
-        <div class="flex items-center justify-center gap-1">
-            {% if demandShift.id|default(false) %}
-            <button type="button"
-                    data-action="facility-shift#delete"
-                    data-facility-shift-uri-param="{{ demandShift['@id'] }}"
-                    class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                    title="Löschen">
-                {{ ux_icon('lucide:trash-2', { class: 'h-4 w-4 text-gray-500 hover:text-red-600' }) }}
-            </button>
-            {% else %}
-            <button type="submit" form="shift-form-{{ demandShift.id|default('new') }}"
-                    class="p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
-                    title="Speichern">
-                {{ ux_icon('lucide:save', { class: 'h-4 w-4 text-blue-600 hover:text-blue-700' }) }}
-            </button>
-            <button type="button"
-                    data-action="facility-shift-behavior#removeRow"
-                    class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors remove-new-row"
-                    title="Abbrechen">
-                {{ ux_icon('lucide:x', { class: 'h-4 w-4 text-gray-500 hover:text-red-600' }) }}
-            </button>
-            {% endif %}
-        </div>
-    </td>
-</tr>
+    </form>
+</div>

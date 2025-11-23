@@ -122,8 +122,9 @@ export default class extends Controller {
     }
 
     removeRow(event) {
+        // GEÄNDERT: Von closest('tr') zu closest("[data-controller='facility-shift-behavior']")
         const button = event.target;
-        const row = button.closest('tr');
-        row.remove();
+        const card = button.closest("[data-controller='facility-shift-behavior']");
+        card.remove();
     }
 }

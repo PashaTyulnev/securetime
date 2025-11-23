@@ -4,10 +4,11 @@ namespace App\Service;
 
 use App\Repository\FacilityRepository;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class FacilityService
 {
-    public function __construct(readonly FacilityRepository $facilityRepository, readonly SerializerInterface $serializer)
+    public function __construct(readonly FacilityRepository $facilityRepository, readonly SerializerInterface $serializer, readonly HttpClientInterface $httpClient)
     {
 
     }
@@ -55,4 +56,5 @@ class FacilityService
 
         return json_decode($demandShifts, true);
     }
+
 }

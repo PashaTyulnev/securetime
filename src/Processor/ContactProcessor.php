@@ -17,8 +17,6 @@ class ContactProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-
-        dd("TEST");
         // Stelle sicher, dass $data eine Contact-Instanz ist
         if ($data instanceof Contact) {
             // Konvertiere leere Strings zu null für company

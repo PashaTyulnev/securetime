@@ -23,11 +23,14 @@ class FacilityShiftComponentController extends AbstractController
     public function loadNewFacilityShiftComponent(Request $request): Response
     {
         $facilityUri = $request->query->get('facilityUri');
+
+        // Extract facility ID from URI
+        $facilityId = (int)basename($facilityUri);
+        $facility = $this->facilityService->getFacilityById($facilityId);
+
         $qualifications = $this->employeeService->getAllQualifications();
         return $this->render('pages/facility_shift/facility_single_shift.html.twig', [
-            'facility' => [
-                '@id' => $facilityUri
-            ],
+            'facility' => $facility,
             'qualifications' => $qualifications
         ]);
     }
@@ -40,9 +43,7 @@ class FacilityShiftComponentController extends AbstractController
         $qualifications = $this->employeeService->getAllQualifications();
 
         $response = $this->render('pages/facility_shift/facility_single_shift.html.twig', [
-            'facility' => [
-                '@id' => $newShiftData['facility']
-            ],
+            'facility' => $newShiftData['facility'],
             'demandShift' => $newShiftData,
             'qualifications' => $qualifications
         ]);

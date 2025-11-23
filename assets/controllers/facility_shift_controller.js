@@ -35,7 +35,7 @@ export default class extends BaseEntityController {
     }
 
 
-    submitNewShift(event) {
+    submitShift(event) {
         event.preventDefault();
 
         let form = event.target;
@@ -52,13 +52,20 @@ export default class extends BaseEntityController {
             }
         });
 
+        const requiredPositions = formData.getAll('requiredPositions[]');
+        formData.delete('requiredPositions[]');
+
         let formattedData = Formater.formatToJson(formData);
 
-        //konvertiere amountEmployees zu integer
+        // amountEmployees zu integer konvertieren
         formattedData.amountEmployees = parseInt(formattedData.amountEmployees);
 
-        // Die aktuelle Zeile speichern um sie später zu ersetzen
-        let currentRow = form.closest('tr');
+        // requiredPositions als Array hinzufügen
+        formattedData.requiredPositions = requiredPositions;
+
+        // Die aktuelle Card speichern um sie später zu ersetzen
+        // GEÄNDERT: Von closest("tbody") zu closest("[data-controller='facility-shift-behavior']")
+        let currentCard = form.closest("[data-controller='facility-shift-behavior']")
 
         // Prüfe ob es ein Update (PUT) oder Create (POST) ist
         const shiftUri = formData.get('uri');
@@ -68,7 +75,7 @@ export default class extends BaseEntityController {
             ApiDataHandler.updateEntity(this.getEntityName(), formattedData, shiftUri)
                 .then(updatedShiftData => {
                     FacilityShiftComponentApi.getFacilityShiftComponent(updatedShiftData).then(html => {
-                        currentRow.outerHTML = html;
+                        currentCard.outerHTML = html;
                     });
                 })
                 .catch(error => {
@@ -80,12 +87,12 @@ export default class extends BaseEntityController {
             ApiDataHandler.createNewEntity(this.getEntityName(), formattedData)
                 .then(newShiftData => {
                     FacilityShiftComponentApi.getFacilityShiftComponent(newShiftData).then(html => {
-                        currentRow.outerHTML = html;
+                        currentCard.outerHTML = html;
                     });
                 })
                 .catch(error => {
                     console.error('Fehler beim Speichern der Schicht:', error);
-                    alert('Fehler beim Speichern der Schicht. Bitte versuchen Sie es erneut.');
+                    alert('Fehler beim Speichern der Schift. Bitte versuchen Sie es erneut.');
                 });
         }
     }

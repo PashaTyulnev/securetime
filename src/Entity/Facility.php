@@ -8,7 +8,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Processor\FacilityDeleteProcessor;
 use App\Repository\FacilityRepository;
+use App\Validator\NoDemandShiftsConstraint;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -16,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[NoDemandShiftsConstraint]
 #[ORM\Entity(repositoryClass: FacilityRepository::class)]
 #[Assert\Expression(
     expression: "!this.getDateTo() || !this.getDateFrom() || this.getDateTo() > this.getDateFrom()",
@@ -27,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(),
         new Post(),
         new Put(),
-        new Delete(),
+        new Delete(processor: FacilityDeleteProcessor::class),
     ],
     normalizationContext: ['groups' => ['facility:read']],
     denormalizationContext: ['groups' => ['facility:write']]
@@ -96,7 +99,7 @@ class Facility
      * @var Collection<int, FacilityPosition>
      */
     #[ORM\OneToMany(targetEntity: FacilityPosition::class, mappedBy: 'facility', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['facility:read'])]
+    #[Groups(['facility:read','demandShift:read'])]
     private Collection $positions;
 
     public function __construct()
