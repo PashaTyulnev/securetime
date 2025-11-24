@@ -2,11 +2,17 @@
 
 namespace App\Service;
 
+use App\Repository\ShiftRepository;
 use DateTime;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ScheduleService
 {
 
+    public function __construct(readonly ShiftRepository $shiftRepository,readonly SerializerInterface $serializer)
+    {
+
+    }
     public function buildWeekDaysRange(int $year, int $week): array
     {
         $date = new DateTime();
@@ -37,5 +43,26 @@ class ScheduleService
         }
 
         return $weekDays;
+    }
+
+    public function getShiftsForEmployeesInDateRange(array $datesRange)
+    {
+        $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
+        $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
+
+        $firstDate->setTime(0, 0, 0);
+        $lastDate->setTime(23, 59, 59);
+
+        $results = $this->shiftRepository->findShiftsInDateRange($firstDate, $lastDate);
+
+        $shifts = $this->serializer->serialize(
+            $results,
+            'jsonld',
+            ['groups' => ['shift:read']]
+        );
+
+        return json_decode($shifts, true);
+
+
     }
 }

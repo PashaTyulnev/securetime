@@ -3,669 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dienstplanung</title>
+    <title>Drag & Drop Beispiel</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #1e293b;
-            --secondary-color: #475569;
-            --accent-color: #3b82f6;
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --border-color: #e2e8f0;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --success-color: #22c55e;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
-        }
-
-        /* Header */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .header-title {
-            font-size: 1.75rem;
-            font-weight: 300;
-        }
-
-        .date-selector {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .date-btn {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .date-btn:hover {
-            background: var(--bg-primary);
-        }
-
-        .date-display {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .today-btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .today-btn:hover {
-            background: var(--secondary-color);
-        }
-
-        /* Tab Navigation */
-        .tabs {
-            display: flex;
-            gap: 2rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .tab {
-            padding: 0.75rem 0;
-            border: none;
-            background: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            position: relative;
-            transition: color 0.2s;
-        }
-
-        .tab:hover {
-            color: var(--text-primary);
-        }
-
-        .tab.active {
-            color: var(--primary-color);
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary-color);
-        }
-
-        /* Main Content */
         .container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        /* Filters */
-        .filters {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 2rem;
             display: flex;
-            gap: 1rem;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            gap: 20px;
+            padding: 20px;
         }
 
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
+        .drop-zone {
+            width: 200px;
+            min-height: 300px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f9f9f9;
         }
 
-        .filter-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            font-weight: 600;
+        .drop-zone.drag-over {
+            border-color: #4CAF50;
+            background-color: #e8f5e9;
         }
 
-        .filter-select {
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: white;
-            min-width: 150px;
-        }
-
-        /* Schedule Grid */
-        .schedule-wrapper {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .schedule-grid {
-            display: grid;
-            grid-template-columns: 150px repeat(7, 1fr);
-            min-height: 600px;
-        }
-
-        /* Schedule Header */
-        .schedule-header {
-            display: contents;
-        }
-
-        .schedule-corner {
-            background: var(--bg-primary);
-            border-right: 1px solid var(--border-color);
-            border-bottom: 2px solid var(--border-color);
-            padding: 1rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .day-header {
-            background: var(--bg-primary);
-            border-bottom: 2px solid var(--border-color);
-            padding: 1rem;
-            text-align: center;
-            border-right: 1px solid var(--border-color);
-        }
-
-        .day-header:last-child {
-            border-right: none;
-        }
-
-        .day-name {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .day-date {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-        }
-
-        .today .day-name {
-            color: var(--accent-color);
-        }
-
-        /* Schedule Body */
-        .facility-row {
-            display: contents;
-        }
-
-        .facility-name {
-            background: var(--bg-primary);
-            border-right: 1px solid var(--border-color);
-            padding: 1rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .facility-badge {
-            background: var(--primary-color);
+        .draggable {
+            padding: 15px;
+            margin: 5px 0;
+            background-color: #2196F3;
             color: white;
-            padding: 0.125rem 0.375rem;
             border-radius: 4px;
-            font-size: 0.625rem;
-            font-weight: 600;
+            cursor: move;
+            user-select: none;
         }
 
-        .schedule-cell {
-            border-right: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0.5rem;
-            min-height: 100px;
-            position: relative;
-        }
-
-        .schedule-cell:last-child {
-            border-right: none;
-        }
-
-        /* Shift Cards */
-        .shift-card {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            padding: 0.5rem;
-            border-radius: 6px;
-            margin-bottom: 0.5rem;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .shift-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .shift-time {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .shift-employee {
-            opacity: 0.9;
-        }
-
-        .shift-card.morning {
-            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
-        }
-
-        .shift-card.night {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-        }
-
-        .add-shift {
-            position: absolute;
-            bottom: 0.5rem;
-            right: 0.5rem;
-            width: 24px;
-            height: 24px;
-            background: var(--bg-primary);
-            border: 1px dashed var(--border-color);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .schedule-cell:hover .add-shift {
-            opacity: 1;
-        }
-
-        .add-shift:hover {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: white;
-        }
-
-        /* Stats Cards */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .stat-change {
-            font-size: 0.75rem;
-            margin-top: 0.5rem;
-        }
-
-        .stat-change.positive {
-            color: var(--success-color);
-        }
-
-        .stat-change.negative {
-            color: var(--danger-color);
-        }
-
-        /* Action Buttons */
-        .actions {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .fab {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .fab:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-        }
-
-        .fab-secondary {
-            width: 48px;
-            height: 48px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .draggable.dragging {
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
-<!-- Header -->
-<header class="header">
-    <div class="header-content">
-        <div class="header-top">
-            <h1 class="header-title">Dienstplanung</h1>
-            <div class="date-selector">
-                <button class="date-btn">←</button>
-                <span class="date-display">KW 46 - 11.11.2024 - 17.11.2024</span>
-                <button class="date-btn">→</button>
-                <button class="today-btn">Heute</button>
-            </div>
-        </div>
-        <nav class="tabs">
-            <button class="tab active">Wochenansicht</button>
-            <button class="tab">Monatsansicht</button>
-            <button class="tab">Mitarbeiter</button>
-            <button class="tab">Objekte</button>
-            <button class="tab">Berichte</button>
-        </nav>
-    </div>
-</header>
-
-<!-- Main Content -->
-<main class="container">
-    <!-- Stats -->
-    <div class="stats-container">
-        <div class="stat-card">
-            <div class="stat-label">GEPLANTE SCHICHTEN</div>
-            <div class="stat-value">42</div>
-            <div class="stat-change positive">+5 zur Vorwoche</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">BESETZTE STUNDEN</div>
-            <div class="stat-value">336h</div>
-            <div class="stat-change positive">100% Abdeckung</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">AKTIVE MITARBEITER</div>
-            <div class="stat-value">18</div>
-            <div class="stat-change">2 im Urlaub</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">OFFENE SCHICHTEN</div>
-            <div class="stat-value">0</div>
-            <div class="stat-change positive">Alle besetzt</div>
-        </div>
+<div class="container">
+    <div class="drop-zone" id="zone1">
+        <h3>Zone 1</h3>
+        <div class="draggable" draggable="true">Element 1</div>
+        <div class="draggable" draggable="true">Element 2</div>
+        <div class="draggable" draggable="true">Element 3</div>
     </div>
 
-    <!-- Filters -->
-    <div class="filters">
-        <div class="filter-group">
-            <label class="filter-label">Ansicht</label>
-            <select class="filter-select">
-                <option>Alle Objekte</option>
-                <option>Nur aktive</option>
-                <option>Mit offenen Schichten</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label class="filter-label">Schichttyp</label>
-            <select class="filter-select">
-                <option>Alle Schichten</option>
-                <option>Tagschicht</option>
-                <option>Nachtschicht</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label class="filter-label">Mitarbeiter</label>
-            <select class="filter-select">
-                <option>Alle Mitarbeiter</option>
-                <option>Verfügbar</option>
-                <option>Im Einsatz</option>
-            </select>
-        </div>
+    <div class="drop-zone" id="zone2">
+        <h3>Zone 2</h3>
     </div>
-
-    <!-- Schedule Grid -->
-    <div class="schedule-wrapper">
-        <div class="schedule-grid">
-            <!-- Header Row -->
-            <div class="schedule-header">
-                <div class="schedule-corner">OBJEKT</div>
-                <div class="day-header">
-                    <div class="day-name">Montag</div>
-                    <div class="day-date">11.11.</div>
-                </div>
-                <div class="day-header today">
-                    <div class="day-name">Dienstag</div>
-                    <div class="day-date">12.11.</div>
-                </div>
-                <div class="day-header">
-                    <div class="day-name">Mittwoch</div>
-                    <div class="day-date">13.11.</div>
-                </div>
-                <div class="day-header">
-                    <div class="day-name">Donnerstag</div>
-                    <div class="day-date">14.11.</div>
-                </div>
-                <div class="day-header">
-                    <div class="day-name">Freitag</div>
-                    <div class="day-date">15.11.</div>
-                </div>
-                <div class="day-header">
-                    <div class="day-name">Samstag</div>
-                    <div class="day-date">16.11.</div>
-                </div>
-                <div class="day-header">
-                    <div class="day-name">Sonntag</div>
-                    <div class="day-date">17.11.</div>
-                </div>
-            </div>
-
-            <!-- Facility Rows -->
-            <div class="facility-row">
-                <div class="facility-name">
-                    Hauptgebäude
-                    <span class="facility-badge">HGB</span>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card">
-                        <div class="shift-time">06:00 - 14:00</div>
-                        <div class="shift-employee">M. Schmidt</div>
-                    </div>
-                    <div class="shift-card night">
-                        <div class="shift-time">22:00 - 06:00</div>
-                        <div class="shift-employee">T. Weber</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card morning">
-                        <div class="shift-time">14:00 - 22:00</div>
-                        <div class="shift-employee">K. Müller</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card">
-                        <div class="shift-time">06:00 - 14:00</div>
-                        <div class="shift-employee">M. Schmidt</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card">
-                        <div class="shift-time">06:00 - 14:00</div>
-                        <div class="shift-employee">A. Fischer</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card night">
-                        <div class="shift-time">22:00 - 06:00</div>
-                        <div class="shift-employee">T. Weber</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-            </div>
-
-            <div class="facility-row">
-                <div class="facility-name">
-                    Parkhaus Nord
-                    <span class="facility-badge">PKN</span>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card">
-                        <div class="shift-time">08:00 - 16:00</div>
-                        <div class="shift-employee">L. Wagner</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card morning">
-                        <div class="shift-time">14:00 - 22:00</div>
-                        <div class="shift-employee">R. Klein</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card">
-                        <div class="shift-time">06:00 - 14:00</div>
-                        <div class="shift-employee">H. Bauer</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-            </div>
-
-            <div class="facility-row">
-                <div class="facility-name">
-                    Lager West
-                    <span class="facility-badge">LGW</span>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card">
-                        <div class="shift-time">10:00 - 18:00</div>
-                        <div class="shift-employee">J. Hoffmann</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card night">
-                        <div class="shift-time">22:00 - 06:00</div>
-                        <div class="shift-employee">P. Meyer</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="shift-card">
-                        <div class="shift-time">06:00 - 14:00</div>
-                        <div class="shift-employee">S. Koch</div>
-                    </div>
-                    <div class="shift-card morning">
-                        <div class="shift-time">14:00 - 22:00</div>
-                        <div class="shift-employee">M. Wolf</div>
-                    </div>
-                    <div class="add-shift">+</div>
-                </div>
-                <div class="schedule-cell">
-                    <div class="add-shift">+</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
-
-<!-- Floating Action Buttons -->
-<div class="actions">
-    <button class="fab fab-secondary" title="Drucken">🖨️</button>
-    <button class="fab fab-secondary" title="Export">📊</button>
-    <button class="fab" title="Neue Schicht">+</button>
 </div>
+
+<script>
+    const draggables = document.querySelectorAll('.draggable');
+    const dropZones = document.querySelectorAll('.drop-zone');
+
+    // Für jedes draggable Element
+    draggables.forEach(draggable => {
+        draggable.addEventListener('dragstart', () => {
+            draggable.classList.add('dragging');
+        });
+
+        draggable.addEventListener('dragend', () => {
+            draggable.classList.remove('dragging');
+        });
+    });
+
+    // Für jede Drop-Zone
+    dropZones.forEach(zone => {
+        zone.addEventListener('dragover', e => {
+            e.preventDefault(); // Wichtig! Erlaubt das Droppen
+            zone.classList.add('drag-over');
+        });
+
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('drag-over');
+        });
+
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+
+            const dragging = document.querySelector('.dragging');
+            zone.appendChild(dragging);
+        });
+    });
+</script>
 </body>
 </html>

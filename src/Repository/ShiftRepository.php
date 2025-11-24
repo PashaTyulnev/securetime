@@ -40,4 +40,15 @@ class ShiftRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function findShiftsInDateRange(\DateTime|false $firstDate, \DateTime|false $lastDate)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.date >= :firstDate')
+            ->andWhere('s.date <= :lastDate')
+            ->setParameter('firstDate', $firstDate)
+            ->setParameter('lastDate', $lastDate)
+            ->orderBy('s.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

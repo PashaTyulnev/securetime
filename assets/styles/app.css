@@ -16,3 +16,14 @@ html {
 .inactiveDay{
     @apply px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-500 rounded text-xs font-medium;
 }
+.dragging{
+    @apply opacity-70;
+}
+
+.draggable{
+    @apply cursor-move;
+}
+
+.drag-over{
+    @apply border-2 border-dashed border-blue-500;
+}

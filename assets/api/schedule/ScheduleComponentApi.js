@@ -19,5 +19,13 @@ export default class ScheduleComponentApi {
     }
 
 
-
+    static getMiniShiftComponent(newShift) {
+        return fetch(`/components/schedule/mini-shift-component`, {
+            method: "POST",
+            body: JSON.stringify(newShift),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.text());
+    }
 }

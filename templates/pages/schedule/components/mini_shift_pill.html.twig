@@ -1,0 +1,21 @@
+<div class="group/pill relative w-full mb-2 rounded-xl border border-white/20 dark:border-white/10 backdrop-blur-md flex items-center overflow-hidden shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 transition-all duration-300 hover:scale-[1.02]"
+     style="background: linear-gradient(135deg, {{ shift.demandShift.color }}, {{ shift.demandShift.color }}dd);"
+     data-shift-uri="{{ shift['@id'] }}"
+     data-controller="shift-pill"
+     data-action="mouseenter->shift-pill#showDelete mouseleave->shift-pill#hideDelete">
+
+    {# Content Container #}
+    <div class="flex-1 py-2.5 px-3 text-center">
+        <span class="text-sm font-semibold text-white tracking-wide drop-shadow-sm">
+            {{ shift.demandShift.timeFrom|date('H:i') }} – {{ shift.demandShift.timeTo|date('H:i') }}
+        </span>
+    </div>
+
+    {# Delete Button - Apple-Style #}
+    <button
+        data-action="click->schedule-week#delete"
+        data-schedule-week-shift-uri-param="{{ shift['@id'] }}"
+        class="flex items-center justify-center text-white bg-white/0 hover:bg-white/20 active:bg-white/30 rounded-lg transition-all duration-200 backdrop-blur-sm me-2">
+        {{ ux_icon('lucide:trash', { class: 'h-4 w-4' }) }}
+    </button>
+</div>

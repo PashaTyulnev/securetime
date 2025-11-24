@@ -37,27 +37,27 @@ class DemandShift
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandShifts')]
-    #[Groups(['demandShift:read','demandShift:write'])]
+    #[Groups(['demandShift:read','demandShift:write','shift:read'])]
     private ?Facility $facility = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    #[Groups(['facility:read','demandShift:read','demandShift:write','shift:read'])]
     private ?\DateTime $validFrom = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    #[Groups(['facility:read','demandShift:read','demandShift:write','shift:read'])]
     private ?\DateTime $validTo = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    #[Groups(['facility:read','demandShift:read','demandShift:write','shift:read'])]
     private ?\DateTime $timeFrom = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    #[Groups(['facility:read','demandShift:read','demandShift:write','shift:read'])]
     private ?\DateTime $timeTo = null;
 
     #[ORM\Column]
-    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    #[Groups(['facility:read','demandShift:read','demandShift:write','shift:read'])]
     private ?int $amountEmployees = null;
 
     #[ORM\Column]
@@ -98,7 +98,7 @@ class DemandShift
     private ?Qualification $requiredQualification = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['demandShift:read','demandShift:write','facility:read'])]
+    #[Groups(['demandShift:read','demandShift:write','facility:read','shift:read'])]
     private ?string $color = null;
 
     /**
@@ -108,9 +108,17 @@ class DemandShift
     #[Groups(['demandShift:read','demandShift:write','facility:read'])]
     private Collection $requiredPositions;
 
+    /**
+     * @var Collection<int, Shift>
+     */
+    #[ORM\OneToMany(targetEntity: Shift::class, mappedBy: 'demandShift')]
+    private Collection $shifts;
+
     public function __construct()
     {
         $this->requiredPositions = new ArrayCollection();
+        $this->shifts = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -346,4 +354,35 @@ class DemandShift
     {
         return $this->requiredPositions;
     }
+
+    /**
+     * @return Collection<int, Shift>
+     */
+    public function getShifts(): Collection
+    {
+        return $this->shifts;
+    }
+
+    public function addShift(Shift $shift): static
+    {
+        if (!$this->shifts->contains($shift)) {
+            $this->shifts->add($shift);
+            $shift->setDemandShift($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShift(Shift $shift): static
+    {
+        if ($this->shifts->removeElement($shift)) {
+            // set the owning side to null (unless already changed)
+            if ($shift->getDemandShift() === $this) {
+                $shift->setDemandShift(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

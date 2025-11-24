@@ -20,8 +20,9 @@ class ScheduleComponentController extends AbstractController
     {
 
     }
-    #[Route(path: '/components/schedule-week' , name: 'schedule_week_component', methods: ['GET'])]
-    public function getScheduleWeekComponent(Request $request) : Response
+
+    #[Route(path: '/components/schedule-week', name: 'schedule_week_component', methods: ['GET'])]
+    public function getScheduleWeekComponent(Request $request): Response
     {
 
         $year = $request->query->get('year');
@@ -31,15 +32,18 @@ class ScheduleComponentController extends AbstractController
         $facilities = $this->facilityService->getAllFacilities();
         $datesRange = $this->scheduleService->buildWeekDaysRange((int)$year, (int)$week);
 
+        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange);
+
         return $this->render('pages/schedule/schedule_week/schedule_week_overview.html.twig', [
             'employees' => $employees,
             'facilities' => $facilities,
             'datesRange' => $datesRange,
+            'shifts' => $shifts,
         ]);
     }
 
-    #[Route(path: '/components/schedule/demand-shifts' , name: 'schedule_demand_shifts_component', methods: ['GET'])]
-    public function getDemandShiftsOfFacilityComponent(Request $request) : Response
+    #[Route(path: '/components/schedule/demand-shifts', name: 'schedule_demand_shifts_component', methods: ['GET'])]
+    public function getDemandShiftsOfFacilityComponent(Request $request): Response
     {
 
         $facilityId = $request->query->get('facilityId');
@@ -47,6 +51,17 @@ class ScheduleComponentController extends AbstractController
 
         return $this->render('/pages/schedule/components/demand_shifts.html.twig', [
             'demandShifts' => $shifts,
+        ]);
+    }
+
+    #[Route(path: '/components/schedule/mini-shift-component', name: 'schedule_mini_shift_component', methods: ['POST'])]
+    public function getMiniShiftComponent(Request $request): Response
+    {
+
+        $shiftData = json_decode($request->getContent(), true);
+
+        return $this->render('pages/schedule/components/mini_shift_pill.html.twig', [
+            'shift' => $shiftData,
         ]);
     }
 }
