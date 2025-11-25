@@ -27,3 +27,9 @@ html {
 .drag-over{
     @apply border-2 border-dashed border-blue-500;
 }
+.successToastBackground{
+    @apply bg-green-100 dark:bg-green-800;
+}
+.errorToastBackground{
+    @apply bg-red-100 dark:bg-red-800;
+}

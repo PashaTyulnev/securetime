@@ -16,30 +16,6 @@ class ShiftRepository extends ServiceEntityRepository
         parent::__construct($registry, Shift::class);
     }
 
-    //    /**
-    //     * @return Shift[] Returns an array of Shift objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Shift
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
     public function findShiftsInDateRange(\DateTime|false $firstDate, \DateTime|false $lastDate)
     {
         return $this->createQueryBuilder('s')
@@ -47,6 +23,18 @@ class ShiftRepository extends ServiceEntityRepository
             ->andWhere('s.date <= :lastDate')
             ->setParameter('firstDate', $firstDate)
             ->setParameter('lastDate', $lastDate)
+            ->orderBy('s.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByEmployeeAndDate(?\App\Entity\Employee $employee, ?\DateTime $getDate)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.employee = :employee')
+            ->andWhere('s.date = :date')
+            ->setParameter('employee', $employee)
+            ->setParameter('date', $getDate)
             ->orderBy('s.date', 'ASC')
             ->getQuery()
             ->getResult();

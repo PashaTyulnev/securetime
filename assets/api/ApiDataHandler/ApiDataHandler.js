@@ -3,9 +3,10 @@ export default class ApiDataHandler {
      * Erstellt eine neue Entität über die API
      * @param {string} entityType - Der Typ der Entität (z.B. 'companies', 'users', etc.)
      * @param {Object} data - Die zu erstellenden Daten
+     * @param extendedInfo
      * @returns {Promise<Object>} - Die API-Antwort
      */
-    static async createNewEntity(entityType, data) {
+    static async createNewEntity(entityType, data, extendedInfo = false) {
         const response = await fetch(`/api/${entityType}`, {
             method: "POST",
             body: JSON.stringify(data),
@@ -17,20 +18,24 @@ export default class ApiDataHandler {
             }
         });
 
-        if (response.ok) {
-            // Erfolgreich → API Platform gibt das neue Objekt zurück
-            return await response.json();
+        let body;
+        try {
+            body = await response.json();
+        } catch {
+            body = {};
+        }
+
+        if (extendedInfo === false) {
+            return body
         } else {
-            // Fehler → JSON von API Platform lesen
-            let errorData;
-            try {
-                errorData = await response.json();
-            } catch {
-                errorData = {};
-            }
-            return errorData;
+            return {
+                status: response.status,
+                ok: response.ok,
+                data: body
+            };
         }
     }
+
 
     /**
      * Aktualisiert eine Entität über die API

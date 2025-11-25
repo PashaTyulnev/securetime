@@ -10,7 +10,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Processor\FacilityDeleteProcessor;
 use App\Repository\FacilityRepository;
-use App\Validator\NoDemandShiftsConstraint;
+use App\Validator\Constraint\NoDemandShiftsConstraint;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;

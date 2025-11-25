@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ShiftRepository;
+use App\Validator\Constraint\EmployeeQualificationConstraint;
+use App\Validator\Constraint\ShiftTimeRulesConstraint;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -13,6 +15,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['shift:read']],
     denormalizationContext: ['groups' => ['shift:write']])
 ]
+#[EmployeeQualificationConstraint]
+#[ShiftTimeRulesConstraint]
 class Shift
 {
     #[ORM\Id]

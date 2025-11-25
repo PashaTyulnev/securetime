@@ -86,6 +86,7 @@ export default class extends BaseEntityController {
             // CREATE: Neue Schicht erstellen (POST)
             ApiDataHandler.createNewEntity(this.getEntityName(), formattedData)
                 .then(newShiftData => {
+                    console.log(newShiftData)
                     FacilityShiftComponentApi.getFacilityShiftComponent(newShiftData).then(html => {
                         currentCard.outerHTML = html;
                     });

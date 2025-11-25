@@ -142,9 +142,15 @@ export default class extends Controller {
         const date = zone.dataset.date;
 
         this.assignShift(demandShiftUri, employeeUri, date).then(newShift => {
-            ScheduleComponentApi.getMiniShiftComponent(newShift).then(miniShiftHtml => {
-                zone.insertAdjacentHTML('beforeend', miniShiftHtml);
-            });
+
+            if (newShift.status === 201) {
+                ScheduleComponentApi.getMiniShiftComponent(newShift.data).then(miniShiftHtml => {
+                    zone.insertAdjacentHTML('beforeend', miniShiftHtml);
+                    this.displayToast('success', 'Schicht erfolgreich zugewiesen.')
+                });
+            } else {
+                this.displayToast("error", newShift.data.detail);
+            }
         });
 
     }
@@ -158,29 +164,78 @@ export default class extends Controller {
             note: ""
         }
 
-        return ApiDataHandler.createNewEntity("shifts", payload).then(response => {
-            return response;
-        });
+
+        return ApiDataHandler.createNewEntity("shifts", payload,true)
+            .then(res => {
+                return res;
+            });
     }
 
-    delete(event){
+    delete(event) {
         let shiftUri = event.params.shiftUri
 
         // Fragen ob gelöscht werden soll
-        if(!confirm("Soll diese Schicht wirklich gelöscht werden?")){
+        if (!confirm("Soll diese Schicht wirklich gelöscht werden?")) {
             return;
         }
 
-        ApiDataHandler.deleteEntity("shifts",shiftUri).then(response => {
-            if(response.ok){
+        ApiDataHandler.deleteEntity("shifts", shiftUri).then(response => {
+            if (response.ok) {
                 // Entferne das Element aus dem DOM
                 const shiftElement = this.scheduleContainerTarget.querySelector(`[data-shift-uri='${shiftUri}']`);
-                if(shiftElement){
+                if (shiftElement) {
                     shiftElement.remove();
+                    this.displayToast('success', 'Schicht erfolgreich gelöscht.');
                 }
             } else {
                 alert("Fehler beim Löschen der Schicht.");
             }
         })
     }
+
+    displayToast(type, message) {
+        const toast = document.getElementById('toast-default');
+        const toastMessage = document.getElementById('toast-message');
+        const progress = document.getElementById('toast-progress');
+
+        toastMessage.innerText = message;
+
+        // Toast einblenden
+        toast.classList.remove('opacity-0', 'translate-y-2');
+        toast.style.zIndex = '9999';
+
+        if(type === 'success') {
+            toast.classList.remove('errorToastBackground');
+            toast.classList.add('successToastBackground');
+        }else{
+            toast.classList.remove('successToastBackground');
+            toast.classList.add('errorToastBackground');
+        }
+
+        // Progressbar vorbereiten
+        progress.style.transition = 'none';  // keine Transition beim Zurücksetzen
+        progress.style.width = '100%';
+
+        // kleine Verzögerung, damit Transition greift
+        setTimeout(() => {
+            progress.style.transition = 'width 3s linear';  // Transition setzen
+            progress.style.width = '0%';                     // Start Animation
+        }, 50);
+
+        // Toast nach 3 Sekunden ausblenden
+        setTimeout(() => {
+            toast.classList.add('opacity-0', 'translate-y-2');
+
+            // Progressbar sauber zurücksetzen nach kurzer Verzögerung
+            setTimeout(() => {
+                progress.style.transition = 'none';
+                progress.style.width = '100%';
+            }, 300); // kurz nach der Toast-Transition
+
+            toast.style.zIndex = '0';
+        }, 3050)
+
+
+    }
+
 }

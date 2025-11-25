@@ -1,7 +1,7 @@
 <div
     class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-800/50 overflow-hidden">
     {# Raster-Layout: 180px für Mitarbeiter-Spalte, 7 Spalten für Wochentage #}
-    <div class="grid grid-cols-[180px_repeat(7,1fr)] min-h-[600px]">
+    <div class="grid grid-cols-[180px_repeat(7,1fr)] min-h-[300px]">
 
         {# Kopfzelle der Mitarbeiter-Spalte #}
         <div
@@ -47,7 +47,7 @@
                 dragleave->schedule-week#onDragLeave
                 drop->schedule-week#onDrop" data-employee-uri="{{ employee['@id'] }}"
                          data-date="{{ datesRange[day].date|date('Y-m-d') }}"
-                         class="drop-zone relative p-3 border-b border-r border-gray-200/50 dark:border-gray-700/50 min-h-[120px] hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 group/cell">
+                         class="drop-zone relative p-3 border-b border-r border-gray-200/50 dark:border-gray-700/50 min-h-[60px] hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 group/cell">
 
                         {% for shift in shifts %}
 

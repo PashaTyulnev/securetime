@@ -1,6 +1,7 @@
 <?php
-namespace App\Validator;
+namespace App\Validator\Constraint;
 
+use App\Validator\NoDemandShiftsValidator;
 use Symfony\Component\Validator\Constraint;
 
 #[\Attribute]
