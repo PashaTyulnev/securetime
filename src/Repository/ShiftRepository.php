@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\DemandShift;
 use App\Entity\Shift;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -36,6 +37,17 @@ class ShiftRepository extends ServiceEntityRepository
             ->setParameter('employee', $employee)
             ->setParameter('date', $getDate)
             ->orderBy('s.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByDemandShiftAndDate(DemandShift $demandShift, \DateTime $date): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.demandShift = :demandShift')
+            ->andWhere('s.date = :date')
+            ->setParameter('demandShift', $demandShift)
+            ->setParameter('date', $date)
             ->getQuery()
             ->getResult();
     }

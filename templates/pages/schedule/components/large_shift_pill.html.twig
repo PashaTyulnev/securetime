@@ -1,57 +1,175 @@
 <div data-schedule-week-target="demandShiftDraggable"
+     data-demand-shift-id="{{ demandShift.id }}"
+     data-required-count="{{ demandShift.amountEmployees }}"
+     data-on-monday="{{ demandShift.onMonday ? '1' : '0' }}"
+     data-on-tuesday="{{ demandShift.onTuesday ? '1' : '0' }}"
+     data-on-wednesday="{{ demandShift.onWednesday ? '1' : '0' }}"
+     data-on-thursday="{{ demandShift.onThursday ? '1' : '0' }}"
+     data-on-friday="{{ demandShift.onFriday ? '1' : '0' }}"
+     data-on-saturday="{{ demandShift.onSaturday ? '1' : '0' }}"
+     data-on-sunday="{{ demandShift.onSunday ? '1' : '0' }}"
      data-action="dragstart->schedule-week#onDragStart
-                      dragend->schedule-week#onDragEnd"
+                  dragend->schedule-week#onDragEnd"
      draggable="true"
+     data-demand-shift-id="{{ demandShift.id }}"
      data-demand-shift-uri="{{ demandShift['@id'] }}"
-     class="draggable rounded-2xl p-4 flex flex-col gap-2 min-w-[240px] shadow-sm hover:shadow-lg transition-all duration-300 ease-out border border-white/10 backdrop-blur-sm"
-     style="background: linear-gradient(135deg, {{ demandShift.color }}, {{ demandShift.color }}dd);">
+     class="group draggable rounded-xl p-3 flex flex-col gap-2 min-w-[260px] shadow-lg hover:shadow-xl transition-all duration-300 ease-out border border-white/20 backdrop-blur-md hover:scale-[1.02] cursor-move relative"
+     style="background: linear-gradient(135deg, {{ demandShift.color }} 0%, {{ demandShift.color }}dd 100%);">
 
-    <div class="flex flex-col gap-0.5">
-        <span class="text-sm font-semibold text-white tracking-tight">{{ demandShift.name }}</span>
-        <span class="text-[11px] text-white/70 font-medium">
-            {{ demandShift.amountEmployees }} MA • {{ demandShift.requiredQualification.title }}
-        </span>
-        <span class="text-[11px] text-white/60 font-medium leaveInMini">
-            {{ demandShift.timeFrom | date('H:i') }} – {{ demandShift.timeTo | date('H:i') }}
-        </span>
+    {# Status-Indikator (oben rechts) #}
+    {% set assignedCount = demandShift.assignedEmployeesThisWeek|default(0) %}
+    {% set requiredCount = demandShift.amountEmployees %}
+    {% set fulfillmentPercentage = requiredCount > 0 ? (assignedCount / requiredCount * 100)|round : 0 %}
+
+    <div class="absolute -top-2 -right-2 z-10">
+        {% if fulfillmentPercentage >= 100 %}
+            {# Vollständig erfüllt #}
+            <div
+                class="w-7 h-7 rounded-full bg-green-500 border-2 border-white shadow-lg flex items-center justify-center">
+                {{ ux_icon('lucide:check', { class: 'h-4 w-4 text-white' }) }}
+            </div>
+        {% elseif fulfillmentPercentage > 0 %}
+            {# Teilweise erfüllt #}
+            <div
+                class="w-7 h-7 rounded-full bg-orange-500 border-2 border-white shadow-lg flex items-center justify-center">
+                <span class="text-[10px] font-bold text-white">{{ fulfillmentPercentage|round }}%</span>
+            </div>
+        {% else %}
+            {# Nicht erfüllt #}
+            <div
+                class="w-7 h-7 rounded-full bg-red-500 border-2 border-white shadow-lg flex items-center justify-center">
+                {{ ux_icon('lucide:alert-circle', { class: 'h-4 w-4 text-white' }) }}
+            </div>
+        {% endif %}
     </div>
 
-    <div class="flex justify-between gap-1 pt-2 border-t border-white/10">
+    {# Header mit Name und Zeit #}
+    <div class="flex items-center justify-between gap-2">
+        <h3 class="text-sm font-bold text-white tracking-tight leading-tight">
+            {{ demandShift.name }}
+        </h3>
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/20 backdrop-blur-sm">
+            {{ ux_icon('lucide:clock', { class: 'h-3.5 w-3.5 text-white' }) }}
+            <span class="text-xs font-bold text-white whitespace-nowrap">
+                {{ demandShift.timeFrom | date('H:i') }}–{{ demandShift.timeTo | date('H:i') }}
+            </span>
+        </div>
+    </div>
+
+    {# Personen mit Fortschrittsanzeige #}
+    <div class="flex items-center gap-2 text-xs">
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/10 backdrop-blur-sm">
+            {{ ux_icon('lucide:users', { class: 'h-3.5 w-3.5 text-white' }) }}
+            <span class="font-semibold text-white whitespace-nowrap">
+                <span
+                    class="{% if assignedCount >= requiredCount %}text-green-200{% elseif assignedCount > 0 %}text-orange-200{% else %}text-red-200{% endif %}">
+                    {{ assignedCount }}
+                </span>
+                <span class="text-white/60">/</span>
+                {{ requiredCount }}
+            </span>
+        </div>
+
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/10 backdrop-blur-sm flex-1 min-w-0">
+            {{ ux_icon('lucide:shield-check', { class: 'h-3.5 w-3.5 text-white flex-shrink-0' }) }}
+            <span class="font-semibold text-white truncate">
+                {{ demandShift.requiredQualification.title }}
+            </span>
+        </div>
+    </div>
+
+    {# Fortschrittsbalken #}
+    {% if requiredCount > 0 %}
+        <div class="w-full h-1 bg-black/20 rounded-full overflow-hidden">
+            <div
+                class="h-full transition-all duration-500 ease-out {% if fulfillmentPercentage >= 100 %}bg-green-400{% elseif fulfillmentPercentage > 0 %}bg-orange-400{% else %}bg-red-400{% endif %}"
+                style="width: {{ fulfillmentPercentage|round }}%"></div>
+        </div>
+    {% endif %}
+
+    {# Tages-Status mit Personen-Count #}
+    <div class="flex justify-between gap-1 pt-1 border-t border-white/15">
         {% set days = {
-            'Mo': demandShift.onMonday,
-            'Di': demandShift.onTuesday,
-            'Mi': demandShift.onWednesday,
-            'Do': demandShift.onThursday,
-            'Fr': demandShift.onFriday,
-            'Sa': demandShift.onSaturday,
-            'So': demandShift.onSunday
+            'Mo': {
+                'active': demandShift.onMonday,
+                'assigned': demandShift.mondayAssignedCount|default(0)
+            },
+            'Di': {
+                'active': demandShift.onTuesday,
+                'assigned': demandShift.tuesdayAssignedCount|default(0)
+            },
+            'Mi': {
+                'active': demandShift.onWednesday,
+                'assigned': demandShift.wednesdayAssignedCount|default(0)
+            },
+            'Do': {
+                'active': demandShift.onThursday,
+                'assigned': demandShift.thursdayAssignedCount|default(0)
+            },
+            'Fr': {
+                'active': demandShift.onFriday,
+                'assigned': demandShift.fridayAssignedCount|default(0)
+            },
+            'Sa': {
+                'active': demandShift.onSaturday,
+                'assigned': demandShift.saturdayAssignedCount|default(0)
+            },
+            'So': {
+                'active': demandShift.onSunday,
+                'assigned': demandShift.sundayAssignedCount|default(0)
+            }
         } %}
 
-        {% for label, value in days %}
+        {% for label, day in days %}
             <div class="flex flex-col items-center gap-0.5">
-                <span class="text-[9px] font-semibold text-white/80 uppercase tracking-wide">{{ label }}</span>
+                <span class="text-[9px] font-bold text-white/60 uppercase">{{ label }}</span>
+                {% if day.active %}
+                    {% set isFilled = day.assigned >= requiredCount %}
+                    {% set isPartial = day.assigned > 0 and day.assigned < requiredCount %}
 
-                {% if value == true %}
-                    <div class="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                        {{ ux_icon('lucide:check', { class: 'h-3.5 w-3.5 text-white' }) }}
+                    <div class="relative w-5 h-5 rounded-full flex items-center justify-center
+                        {% if isFilled %}
+                            bg-green-400/30 border border-green-400/50
+                        {% elseif isPartial %}
+                            bg-orange-400/30 border border-orange-400/50
+                        {% else %}
+                            bg-red-400/30 border border-red-400/50
+                        {% endif %}">
+
+                        {# Zeige Count wenn > 0, sonst Icon #}
+                        {% if day.assigned > 0 %}
+                            <span class="text-[9px] font-bold
+                                {% if isFilled %}
+                                    text-green-200
+                                {% elseif isPartial %}
+                                    text-orange-200
+                                {% else %}
+                                    text-red-200
+                                {% endif %}">
+                                {{ day.assigned }}
+                            </span>
+                        {% else %}
+                            {{ ux_icon('lucide:x', { class: 'h-2.5 w-2.5 text-red-200' }) }}
+                        {% endif %}
                     </div>
                 {% else %}
-                    <div class="w-6 h-6 rounded-full bg-black/10 flex items-center justify-center">
-                        {{ ux_icon('lucide:minus', { class: 'h-2.5 w-2.5 text-white/40' }) }}
+                    <div class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center">
+                        <span class="text-white/20 text-xs">−</span>
                     </div>
                 {% endif %}
             </div>
         {% endfor %}
     </div>
-    <div>
-        {% for position in demandShift.requiredPositions %}
-            <span class="inline-flex items-center rounded-md
-             bg-gray-700/50 px-2 py-1 text-xs font-medium
-             text-gray-100
-             inset-ring inset-ring-gray-500/30">
-    {{ position.shortName }}
-</span>
 
-        {% endfor %}
-    </div>
+    {# Positionen kompakt #}
+    {% if demandShift.requiredPositions is not empty %}
+        <div class="flex flex-wrap gap-1 pt-1 border-t border-white/15">
+            {% for position in demandShift.requiredPositions %}
+                <span
+                    class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold text-white bg-black/20 backdrop-blur-sm border border-white/15">
+                    {{ position.shortName }}
+                </span>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>

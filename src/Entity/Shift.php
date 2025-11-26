@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ShiftRepository;
 use App\Validator\Constraint\EmployeeQualificationConstraint;
+use App\Validator\Constraint\ShiftCustomRulesConstraint;
 use App\Validator\Constraint\ShiftTimeRulesConstraint;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,6 +18,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 ]
 #[EmployeeQualificationConstraint]
 #[ShiftTimeRulesConstraint]
+#[ShiftCustomRulesConstraint]
 class Shift
 {
     #[ORM\Id]

@@ -9,100 +9,134 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class ShiftTimeRulesValidator extends ConstraintValidator
 {
+    private const MINIMUM_REST_HOURS = 11;
 
-    public function __construct(readonly ShiftRepository $shiftRepository)
-    {
-
+    public function __construct(
+        private readonly ShiftRepository $shiftRepository
+    ) {
     }
 
-    public function validate(mixed $shift, Constraint $constraint)
+    public function validate(mixed $shift, Constraint $constraint): void
     {
         if (!$shift instanceof Shift) {
             return;
         }
 
         $employee = $shift->getEmployee();
-        $employeeFullName = $employee->getFirstName() . " " . $employee->getLastName();
+        $existingShifts = $this->getExistingShiftsForEmployee($employee, $shift->getDate());
 
-        $newAssignment = $shift->getDemandShift();
-        $newFrom = $newAssignment->getTimeFrom();
-        $newTo   = $newAssignment->getTimeTo();
+        $newShiftTimeframe = $this->createShiftTimeframe($shift);
 
-        $date = $shift->getDate();
+        foreach ($existingShifts as $existingShift) {
+            $existingShiftTimeframe = $this->createShiftTimeframe($existingShift);
 
-        // Neue Schicht normalisieren
-        [$newStart, $newEnd] = $this->normalizeShift($date, $newFrom, $newTo);
-
-        // Alle Schichten am Tag holen
-        $employeeShifts = $this->shiftRepository
-            ->findByEmployeeAndDate($employee, $shift->getDate());
-
-        foreach ($employeeShifts as $employeeShift) {
-
-            $empDate = $employeeShift->getDate();
-            $empAssignment = $employeeShift->getDemandShift();
-
-            $empFrom = $empAssignment->getTimeFrom();
-            $empTo   = $empAssignment->getTimeTo();
-
-            // Existierende Schicht normalisieren
-            [$existStart, $existEnd] = $this->normalizeShift($empDate, $empFrom, $empTo);
-
-            // 1) SCHICHTÜBERSCHNEIDUNG
-            if ($newStart < $existEnd && $newEnd > $existStart) {
-                $this->context
-                    ->buildViolation("$employeeFullName hat bereits eine Schicht in diesem Zeitraum")
-                    ->addViolation();
+            if ($this->shiftsOverlap($newShiftTimeframe, $existingShiftTimeframe)) {
+                $this->addOverlapViolation($employee);
                 return;
             }
 
-            // 2) 11-STUNDEN RUHEZEIT
-            $minRestInterval = new \DateInterval('PT11H');
-
-            // Fall A: Neue Schicht beginnt zu früh nach der alten
-            $restAfterExisting = $existEnd->add(new \DateInterval('PT0S')); // clone workaround
-            $restAfterExisting = (clone $existEnd)->add($minRestInterval);
-
-            if ($newStart < $restAfterExisting) {
-                $this->context
-                    ->buildViolation("$employeeFullName muss mindestens 11 Stunden Ruhezeit nach der vorherigen Schicht haben")
-                    ->addViolation();
+            if ($this->violatesRestPeriodAfterExisting($newShiftTimeframe, $existingShiftTimeframe)) {
+                $this->addRestPeriodViolation($employee, 'nach');
                 return;
             }
 
-            // Fall B: Neue Schicht endet zu spät vor der alten
-            $restBeforeExisting = (clone $newEnd)->add($minRestInterval);
-
-            if ($restBeforeExisting > $existStart) {
-                $this->context
-                    ->buildViolation("$employeeFullName muss mindestens 11 Stunden Ruhezeit vor der nächsten Schicht haben")
-                    ->addViolation();
+            if ($this->violatesRestPeriodBeforeExisting($newShiftTimeframe, $existingShiftTimeframe)) {
+                $this->addRestPeriodViolation($employee, 'vor');
                 return;
             }
         }
     }
 
-
-    private function normalizeShift(\DateTime $date, \DateTime $from, \DateTime $to): array
+    private function getExistingShiftsForEmployee($employee, \DateTime $date): array
     {
-        $start = (clone $date)->setTime(
-            (int)$from->format('H'),
-            (int)$from->format('i'),
-            0
-        );
+        return $this->shiftRepository->findByEmployeeAndDate($employee, $date);
+    }
 
-        $end = (clone $date)->setTime(
-            (int)$to->format('H'),
-            (int)$to->format('i'),
-            0
-        );
+    private function createShiftTimeframe(Shift $shift): array
+    {
+        $date = $shift->getDate();
+        $demandShift = $shift->getDemandShift();
 
-        // Nachtschicht
-        if ($to < $from) {
+        return $this->normalizeShiftTimes(
+            $date,
+            $demandShift->getTimeFrom(),
+            $demandShift->getTimeTo()
+        );
+    }
+
+    private function normalizeShiftTimes(\DateTime $date, \DateTime $from, \DateTime $to): array
+    {
+        $start = $this->createDateTimeFromTime($date, $from);
+        $end = $this->createDateTimeFromTime($date, $to);
+
+        if ($this->isNightShift($from, $to)) {
             $end->modify('+1 day');
         }
 
-        return [$start, $end];
+        return ['start' => $start, 'end' => $end];
     }
 
+    private function createDateTimeFromTime(\DateTime $date, \DateTime $time): \DateTime
+    {
+        return (clone $date)->setTime(
+            (int)$time->format('H'),
+            (int)$time->format('i'),
+            0
+        );
+    }
+
+    private function isNightShift(\DateTime $from, \DateTime $to): bool
+    {
+        return $to < $from;
+    }
+
+    private function shiftsOverlap(array $newShift, array $existingShift): bool
+    {
+        return $newShift['start'] < $existingShift['end']
+            && $newShift['end'] > $existingShift['start'];
+    }
+
+    private function violatesRestPeriodAfterExisting(array $newShift, array $existingShift): bool
+    {
+        $minimumStartTime = $this->calculateMinimumRestTime($existingShift['end']);
+
+        return $newShift['start'] < $minimumStartTime;
+    }
+
+    private function violatesRestPeriodBeforeExisting(array $newShift, array $existingShift): bool
+    {
+        $minimumRestTimeAfterNewShift = $this->calculateMinimumRestTime($newShift['end']);
+
+        return $minimumRestTimeAfterNewShift > $existingShift['start'];
+    }
+
+    private function calculateMinimumRestTime(\DateTime $shiftEnd): \DateTime
+    {
+        $restInterval = new \DateInterval('PT' . self::MINIMUM_REST_HOURS . 'H');
+
+        return (clone $shiftEnd)->add($restInterval);
+    }
+
+    private function addOverlapViolation($employee): void
+    {
+        $employeeName = $this->getEmployeeFullName($employee);
+
+        $this->context
+            ->buildViolation("{$employeeName} hat bereits eine Schicht in diesem Zeitraum")
+            ->addViolation();
+    }
+
+    private function addRestPeriodViolation($employee, string $direction): void
+    {
+        $employeeName = $this->getEmployeeFullName($employee);
+
+        $this->context
+            ->buildViolation("{$employeeName} muss mindestens 11 Stunden Ruhezeit {$direction} der anderen Schicht haben")
+            ->addViolation();
+    }
+
+    private function getEmployeeFullName($employee): string
+    {
+        return $employee->getFirstName() . ' ' . $employee->getLastName();
+    }
 }

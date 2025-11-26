@@ -26,6 +26,12 @@
 
                 {# Mitarbeiter-Spalte (Linke Spalte) #}
                 <div
+                    data-action="dragover->schedule-week#onDragOver
+                dragleave->schedule-week#onDragLeave
+                drop->schedule-week#onDrop"
+                    data-employee-uri="{{ employee['@id'] }}"
+                    data-date="{{ datesRange[0].date|date('Y-m-d') }}"
+                    data-whole-week="true"
                     class="bg-white/50 dark:bg-gray-900/50 p-4 border-b border-r border-gray-200/50 dark:border-gray-700/50 sticky left-0 z-10">
                     <div class="flex items-center gap-3">
                         <div class="p-1.5 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">

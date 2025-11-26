@@ -33,7 +33,7 @@ class DemandShift
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['facility:read','demandShift:read'])]
+    #[Groups(['facility:read','demandShift:read','shift:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandShifts')]
