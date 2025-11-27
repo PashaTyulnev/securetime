@@ -8,7 +8,7 @@ export default class extends Controller {
         "timeFrom",
         "timeTo",
         "qualificationSelect",
-        "colorSelect",
+        "colorInput",
         "colorPreview"
     ];
 
@@ -33,11 +33,6 @@ export default class extends Controller {
             this.updateDayLabel(checkbox);
         });
 
-        // Farbe initialisieren
-        if (this.hasColorSelectTarget) {
-            this.updateColor(this.colorSelectTarget.value);
-        }
-
         // Select auf gespeicherten Wert setzen
         if (this.hasShiftSelectTarget) {
             const selectedOption = this.shiftSelectTarget.querySelector('option[selected]');
@@ -45,14 +40,6 @@ export default class extends Controller {
                 this.shiftSelectTarget.value = selectedOption.value;
             }
         }
-    }
-
-    // ---------------------
-    // Farb-Logik
-    // ---------------------
-    changeColor(event) {
-        const color = event.target.value;
-        this.updateColor(color);
     }
 
     updateColor(color) {
@@ -93,28 +80,34 @@ export default class extends Controller {
     updateShiftTimes(selectEl) {
         const timeFromInput = this.timeFromTarget
         const timeToInput = this.timeToTarget
+        const colorInput = this.colorInputTarget;
 
-        switch (selectEl.value) {
-            case 'Frühschicht':
-                timeFromInput.value = '06:00';
-                timeToInput.value = '14:00';
-                break;
-            case 'Tagschicht':
-                timeFromInput.value = '08:00';
-                timeToInput.value = '16:00';
-                break;
-            case 'Spätschicht':
-                timeFromInput.value = '14:00';
-                timeToInput.value = '22:00';
-                break;
-            case 'Nachtschicht':
-                timeFromInput.value = '22:00';
-                timeToInput.value = '06:00';
-                break;
-            default:
-                timeFromInput.value = '';
-                timeToInput.value = '';
+        let shiftPresets = localStorage.getItem('shiftPresets');
+        shiftPresets = shiftPresets ? JSON.parse(shiftPresets) : {};
+
+        shiftPresets = shiftPresets.member
+
+        let selectedShiftPresetName = selectEl.value
+
+        //sucheim shiftsPresets nach name
+        let selectedShiftPreset = shiftPresets.find(preset => preset.name === selectedShiftPresetName);
+
+        if (selectedShiftPreset) {
+            // Funktion, um ISO-Zeit zu HH:MM zu konvertieren
+            const formatTime = isoString => {
+                if (!isoString) return '';
+                const date = new Date(isoString);
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+
+            timeFromInput.value = formatTime(selectedShiftPreset.timeFrom);
+            timeToInput.value = formatTime(selectedShiftPreset.timeTo);
+            colorInput.value = selectedShiftPreset.color;
+            this.shiftSelectTarget.style.backgroundColor = selectedShiftPreset.color;
         }
+
     }
 
     shiftChanged(event) {

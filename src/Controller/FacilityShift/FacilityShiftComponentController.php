@@ -4,6 +4,7 @@ namespace App\Controller\FacilityShift;
 
 use App\Service\EmployeeService;
 use App\Service\FacilityService;
+use App\Service\ShiftService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +15,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class FacilityShiftComponentController extends AbstractController
 {
 
-    public function __construct(readonly FacilityService $facilityService, readonly EmployeeService $employeeService)
+    public function __construct(readonly FacilityService $facilityService,
+                                readonly ShiftService $shiftService,
+                                readonly EmployeeService $employeeService)
     {
 
     }
@@ -27,10 +30,12 @@ class FacilityShiftComponentController extends AbstractController
         // Extract facility ID from URI
         $facilityId = (int)basename($facilityUri);
         $facility = $this->facilityService->getFacilityById($facilityId);
-
         $qualifications = $this->employeeService->getAllQualifications();
+        $shiftPresets = $this->shiftService->getAllShiftPresets();
+
         return $this->render('pages/facility_shift/facility_single_shift.html.twig', [
             'facility' => $facility,
+            'shiftPresets' => $shiftPresets,
             'qualifications' => $qualifications
         ]);
     }
@@ -41,10 +46,12 @@ class FacilityShiftComponentController extends AbstractController
 
         $newShiftData = json_decode($request->getContent(), true);
         $qualifications = $this->employeeService->getAllQualifications();
-
+        $shiftPresets = $this->shiftService->getAllShiftPresets();
+        
         $response = $this->render('pages/facility_shift/facility_single_shift.html.twig', [
             'facility' => $newShiftData['facility'],
             'demandShift' => $newShiftData,
+            'shiftPresets' => $shiftPresets,
             'qualifications' => $qualifications
         ]);
 

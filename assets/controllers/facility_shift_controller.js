@@ -7,6 +7,9 @@ export default class extends BaseEntityController {
 
     static targets = BaseEntityController.targets.concat(["cityInput"]);
 
+    connect(){
+        this.loadShiftPresets()
+    }
     getEntityName() {
         return 'demand_shifts';
     }
@@ -106,5 +109,15 @@ export default class extends BaseEntityController {
 
         //trigger submit event on the form
         form.requestSubmit();
+    }
+
+    loadShiftPresets() {
+        //einfacher get request an die api um die schicht presets zu laden
+        fetch('/api/shift_presets')
+            .then(response => response.json())
+            .then(data => {
+                //to storage
+                localStorage.setItem('shiftPresets', JSON.stringify(data));
+            });
     }
 }

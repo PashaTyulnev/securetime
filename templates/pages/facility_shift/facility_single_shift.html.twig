@@ -15,53 +15,48 @@
 
                 {# Schichtname mit Farbe - 3 Spalten #}
                 <div class="col-span-3">
-                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                    <label
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
                         Schicht
                     </label>
                     <div class="flex items-center gap-2">
                         {% set shiftName = demandShift.name|default('')|lower %}
-                        {% set colors = [
-                            '#B63E3E', '#C2683E', '#6EA642', '#3B82C4', '#7B5AC1',
-                            '#C16B94', '#D1B94F', '#35988F', '#925BCF', '#D1734F'
-                        ] %}
 
-                        <div class="p-1.5 bg-gray-100/70 dark:bg-gray-800/50 rounded-lg shrink-0"
-                             data-facility-shift-behavior-target="colorPreview">
-                            <select
+
+                            <input
+                                type="hidden"
                                 name="color"
                                 form="shift-form-{{ demandShift.id|default('new') }}"
-                                data-facility-shift-behavior-target="colorSelect"
+                                data-facility-shift-behavior-target="colorInput"
                                 data-action="change->facility-shift-behavior#changeColor {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                                style="background-color: {{ demandShift.color|default('#3b82f6') }};"
                                 class="appearance-none w-7 h-7 rounded-lg border border-white/40 cursor-pointer hover:shadow-md hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/60 focus:scale-[1.05] transition-all duration-150"
-                                title="Farbe wählen">
-                                {% for color in colors %}
-                                    <option value="{{ color }}"
-                                            {% if demandShift.color|default('#3b82f6') == color %}selected{% endif %}
-                                            style="background-color: {{ color }};">
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                                title="Farbe wählen"
+                                value="{{ demandShift.color|default('#3b82f6') }}"/>
+
+
 
                         <select name="name"
+                                style="background-color: {{demandShift.color|default('#3b82f6') }};"
                                 form="shift-form-{{ demandShift.id|default('new') }}"
                                 class="flex-1 min-w-0 bg-white dark:bg-gray-800 font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm"
                                 required
                                 data-action="change->facility-shift-behavior#shiftChanged {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
                                 data-facility-shift-behavior-target="shiftSelect">
-                            <option value="">Schicht...</option>
-                            <option value="Frühschicht" {% if demandShift.name|default('') == 'Frühschicht' %}selected{% endif %}>Frühschicht</option>
-                            <option value="Tagschicht" {% if demandShift.name|default('') == 'Tagschicht' %}selected{% endif %}>Tagschicht</option>
-                            <option value="Spätschicht" {% if demandShift.name|default('') == 'Spätschicht' %}selected{% endif %}>Spätschicht</option>
-                            <option value="Nachtschicht" {% if demandShift.name|default('') == 'Nachtschicht' %}selected{% endif %}>Nachtschicht</option>
+                            <option >Schicht...</option>
+                            {% for preset in shiftPresets %}
+                                <option value="{{ preset.name }}"
+                                        {% if shiftName == preset.name|lower %}selected{% endif %}>
+                                    {{ preset.name }}
+                                </option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
 
                 {# Qualifikation - 2 Spalten #}
                 <div class="col-span-2">
-                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                    <label
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
                         Qualifikation
                     </label>
                     <select name="requiredQualification"
@@ -82,7 +77,8 @@
 
                 {# Zeit - 2 Spalten #}
                 <div class="col-span-2">
-                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                    <label
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
                         Zeit
                     </label>
                     <div class="flex items-center gap-1.5">
@@ -106,7 +102,8 @@
 
                 {# Personal - 1 Spalte #}
                 <div class="col-span-1">
-                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                    <label
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
                         Pers.
                     </label>
                     <input type="number" name="amountEmployees"
@@ -120,7 +117,8 @@
 
                 {# Wochentage - 3 Spalten (mehr Platz!) #}
                 <div class="col-span-3">
-                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                    <label
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
                         Wochentage
                     </label>
                     <div class="flex gap-1 flex-wrap">
@@ -146,7 +144,8 @@
 
                 {# Aktionen - 1 Spalte #}
                 <div class="col-span-1">
-                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                    <label
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
                         &nbsp;
                     </label>
                     <div class="flex items-center justify-end gap-1">
@@ -177,30 +176,32 @@
         </div>
 
         {% if facility.positions | length > 0 %}
-        {# Positionen - Volle Breite unten #}
-        <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30">
-            <label class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3 block">
-                Erforderliche Positionen
-            </label>
-            <div class="flex flex-wrap gap-3">
-                {% for position in facility.positions %}
-                    <div class="flex items-center">
-                        <input data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                               form="shift-form-{{ demandShift.id|default('new') }}"
-                               id="inline-checkbox{{ position.id }}_{{ demandShift.id|default('new') }}"
-                               type="checkbox"
-                               name="requiredPositions[]"
-                               value="{{ position['@id'] }}"
-                               {% if demandShift.requiredPositions|default([])|filter(p => p.id == position.id)|length > 0 %}checked{% endif %}
-                               class="w-4 h-4 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500">
-                        <label for="inline-checkbox{{ position.id }}_{{ demandShift.id|default('new') }}"
-                               class="select-none ms-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ position.title }}
-                        </label>
-                    </div>
-                {% endfor %}
+            {# Positionen - Volle Breite unten #}
+            <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30">
+                <label
+                    class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3 block">
+                    Erforderliche Positionen
+                </label>
+                <div class="flex flex-wrap gap-3">
+                    {% for position in facility.positions %}
+                        <div class="flex items-center">
+                            <input
+                                data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                                form="shift-form-{{ demandShift.id|default('new') }}"
+                                id="inline-checkbox{{ position.id }}_{{ demandShift.id|default('new') }}"
+                                type="checkbox"
+                                name="requiredPositions[]"
+                                value="{{ position['@id'] }}"
+                                {% if demandShift.requiredPositions|default([])|filter(p => p.id == position.id)|length > 0 %}checked{% endif %}
+                                class="w-4 h-4 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500">
+                            <label for="inline-checkbox{{ position.id }}_{{ demandShift.id|default('new') }}"
+                                   class="select-none ms-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {{ position.title }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
         {% endif %}
     </form>
 </div>

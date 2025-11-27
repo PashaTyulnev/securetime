@@ -433,7 +433,6 @@ export default class extends Controller {
     displayToast(type, message) {
         const toast = document.getElementById('toast-default');
         const toastMessage = document.getElementById('toast-message');
-        const progress = document.getElementById('toast-progress');
 
         toastMessage.innerText = message;
 
@@ -449,28 +448,14 @@ export default class extends Controller {
             toast.classList.add('errorToastBackground');
         }
 
-        // Progressbar vorbereiten
-        progress.style.transition = 'none';  // keine Transition beim Zurücksetzen
-        progress.style.width = '100%';
 
-        // kleine Verzögerung, damit Transition greift
-        setTimeout(() => {
-            progress.style.transition = 'width 3s linear';  // Transition setzen
-            progress.style.width = '0%';                     // Start Animation
-        }, 50);
 
         // Toast nach 3 Sekunden ausblenden
         setTimeout(() => {
             toast.classList.add('opacity-0', 'translate-y-2');
 
-            // Progressbar sauber zurücksetzen nach kurzer Verzögerung
-            setTimeout(() => {
-                progress.style.transition = 'none';
-                progress.style.width = '100%';
-            }, 300); // kurz nach der Toast-Transition
-
             toast.style.zIndex = '0';
-        }, 3050)
+        }, 10050)
 
 
     }

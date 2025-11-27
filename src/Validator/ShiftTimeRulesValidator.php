@@ -23,12 +23,14 @@ class ShiftTimeRulesValidator extends ConstraintValidator
         }
 
         $employee = $shift->getEmployee();
-        $existingShifts = $this->getExistingShiftsForEmployee($employee, $shift->getDate());
+        $existingShiftsOfSameDay = $this->getExistingShiftsForEmployee($employee, $shift->getDate());
+        $existingShiftsOfPreviousDay = $this->getExistingShiftsForEmployee($employee, (clone $shift->getDate())->modify('-1 day'));
+        $existingShiftsOfNextDay = $this->getExistingShiftsForEmployee($employee, (clone $shift->getDate())->modify('+1 day'));
 
         $newShiftTimeframe = $this->createShiftTimeframe($shift);
 
-        foreach ($existingShifts as $existingShift) {
-            $existingShiftTimeframe = $this->createShiftTimeframe($existingShift);
+        foreach ($existingShiftsOfSameDay as $existingShiftSameDay) {
+            $existingShiftTimeframe = $this->createShiftTimeframe($existingShiftSameDay);
 
             if ($this->shiftsOverlap($newShiftTimeframe, $existingShiftTimeframe)) {
                 $this->addOverlapViolation($employee);
@@ -43,6 +45,36 @@ class ShiftTimeRulesValidator extends ConstraintValidator
             if ($this->violatesRestPeriodBeforeExisting($newShiftTimeframe, $existingShiftTimeframe)) {
                 $this->addRestPeriodViolation($employee, 'vor');
                 return;
+            }
+        }
+
+        // Check previous day's shifts for rest period violations
+        foreach ($existingShiftsOfPreviousDay as $existingShiftPreviousDay) {
+            //check was overnight
+            $demandShiftOvernight = $this->demandShiftIsOvernight($existingShiftPreviousDay->getDemandShift());
+
+            if($demandShiftOvernight){
+
+                $existingShiftTimeframe = $this->createShiftTimeframe($existingShiftPreviousDay);
+                if ($this->violatesRestPeriodAfterExisting($newShiftTimeframe, $existingShiftTimeframe)) {
+                    $this->addRestPeriodViolation($employee, 'nach');
+                    return;
+                }
+            }
+
+        }
+
+        foreach ($existingShiftsOfNextDay as $existingShiftNextDay) {
+            //check was overnight
+            $demandShiftOvernight = $this->demandShiftIsOvernight($shift->getDemandShift());
+
+            if($demandShiftOvernight){
+
+                $existingShiftTimeframe = $this->createShiftTimeframe($existingShiftNextDay);
+                if ($this->violatesRestPeriodBeforeExisting($newShiftTimeframe, $existingShiftTimeframe)) {
+                    $this->addRestPeriodViolation($employee, 'vor');
+                    return;
+                }
             }
         }
     }
@@ -138,5 +170,10 @@ class ShiftTimeRulesValidator extends ConstraintValidator
     private function getEmployeeFullName($employee): string
     {
         return $employee->getFirstName() . ' ' . $employee->getLastName();
+    }
+
+    private function demandShiftIsOvernight($getDemandShift): bool
+    {
+        return $getDemandShift->getTimeTo() < $getDemandShift->getTimeFrom();
     }
 }
