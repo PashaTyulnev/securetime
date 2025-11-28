@@ -2,6 +2,7 @@
 
 namespace App\Validator;
 
+use App\Entity\DemandShift;
 use App\Entity\Shift;
 use App\Repository\ShiftRepository;
 use Symfony\Component\Validator\Constraint;
@@ -11,7 +12,8 @@ class ShiftCustomRulesValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly ShiftRepository $shiftRepository
-    ) {
+    )
+    {
     }
 
     public function validate(mixed $shift, Constraint $constraint): void
@@ -31,6 +33,8 @@ class ShiftCustomRulesValidator extends ConstraintValidator
         if ($this->maxEmployeesExceeded($demandShift, $date, $shift)) {
             $this->addMaxEmployeesViolation($demandShift);
         }
+
+        $this->maxHoursInMonthExceeded($demandShift, $shift);
     }
 
     private function isDemandShiftActiveOnDate($demandShift, \DateTime $date): bool
@@ -105,5 +109,59 @@ class ShiftCustomRulesValidator extends ConstraintValidator
         $dayOfWeek = (int)$date->format('N');
 
         return $days[$dayOfWeek] ?? 'Unbekannt';
+    }
+
+    private function maxHoursInMonthExceeded(?DemandShift $demandShift, Shift $shift)
+    {
+        $contracts = $shift->getEmployee()?->getContracts();
+        $onlyOneContract = $contracts?->first();
+
+        $maxHoursInMonth = $onlyOneContract?->getMaxMonthHours();
+
+        $firstDayOfMonth = $shift->getDate()->format('Y-m-01');
+        $lastDayOfMonth = $shift->getDate()->format('Y-m-t');
+
+        $alreadyAssignedShifts = $this->shiftRepository->getAllAssignedShiftsInRange(
+            $shift->getEmployee(),
+            $firstDayOfMonth,
+            $lastDayOfMonth
+        );
+
+        $assignedHours = 0;
+
+        foreach ($alreadyAssignedShifts as $shift) {
+
+            $demandShift = $shift->getDemandShift();
+
+            $timeFrom = $demandShift->getTimeFrom();
+            $timeTo = $demandShift->getTimeTo();
+
+            $isOvernight = $timeTo <= $timeFrom;
+
+            if ($isOvernight) {
+                $endOfDay = (new \DateTime())->setTime(23, 59, 59);
+                $startOfDay = (new \DateTime())->setTime(0, 0, 0);
+
+                $duration = ($endOfDay->getTimestamp() - $timeFrom->getTimestamp()) / 3600;
+                $duration += ($timeTo->getTimestamp() - $startOfDay->getTimestamp()) / 3600;
+                $assignedHours += $duration;
+            } else {
+                $duration = ($timeTo->getTimestamp() - $timeFrom->getTimestamp()) / 3600;
+                $assignedHours += $duration;
+            }
+        }
+
+        if ($assignedHours > $maxHoursInMonth) {
+            $employeeName = $shift->getEmployee()?->getFirstName() . ' ' . $shift->getEmployee()?->getLastName();
+            $this->addMaxHoursInMonthViolation($maxHoursInMonth, $employeeName);
+        }
+    }
+
+    private function addMaxHoursInMonthViolation($maxHoursInMonth, $employeeName): void
+    {
+
+        $this->context
+            ->buildViolation("Mitarbeiter '{$employeeName}' hat die maximalen Stunden im Monat von {$maxHoursInMonth} Stunden überschritten.")
+            ->addViolation();
     }
 }

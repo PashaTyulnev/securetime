@@ -455,7 +455,7 @@ export default class extends Controller {
             toast.classList.add('opacity-0', 'translate-y-2');
 
             toast.style.zIndex = '0';
-        }, 10050)
+        }, 10000)
 
 
     }

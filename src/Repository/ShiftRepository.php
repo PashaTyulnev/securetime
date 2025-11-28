@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\DemandShift;
+use App\Entity\Employee;
 use App\Entity\Shift;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -48,6 +49,19 @@ class ShiftRepository extends ServiceEntityRepository
             ->andWhere('s.date = :date')
             ->setParameter('demandShift', $demandShift)
             ->setParameter('date', $date)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getAllAssignedShiftsInRange(?Employee $getEmployee, string $startDate, string $endDate)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.employee = :employee')
+            ->andWhere('s.date BETWEEN :startDate AND :endDate')
+            ->setParameter('employee', $getEmployee)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->orderBy('s.date', 'ASC')
             ->getQuery()
             ->getResult();
     }

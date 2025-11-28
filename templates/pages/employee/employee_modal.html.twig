@@ -24,7 +24,7 @@
             <form data-action="submit->employee#saveNew">
                 {% endif %}
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
 
                     {% include 'elements/input.html.twig' with {
                         'title': 'Benutzername',
@@ -125,7 +125,28 @@
                         'devValue': definedEmployee.user.id|default('')
                     } %}
 
-                   
+                    {% include 'elements/select.html.twig' with {
+                        'systemName': 'contracts[type]',
+                        'title': 'Beschäftigungsverhältnis',
+                        'options': [
+                            {'value': 'geringfuegig', 'label': 'Geringfügig'},
+                            {'value': 'teilzeit', 'label': 'Teilzeit'},
+                            {'value': 'vollzeit', 'label': 'Vollzeit'}
+                        ],
+                        'defaultOption': 'Bitte wählen...',
+                        'required': 'required',
+                        'devValue': definedEmployee.contracts[0].type|default('')
+                    } %}
+
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': 'Stunden im Monat',
+                        'type': 'number',
+                        'systemName': 'contracts[maxMonthHours]',
+                        'placeholder': '160',
+                        'required': 'required',
+                        'devValue': definedEmployee.contracts[0].maxMonthHours|default('')
+                    } %}
 
                     <input name="user[active]" type="hidden" value="true">
                 </div>

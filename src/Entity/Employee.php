@@ -75,9 +75,17 @@ class Employee
     #[Groups(['employee:read', 'employee:write'])]
     private ?Qualification $qualification = null;
 
+    /**
+     * @var Collection<int, Contract>
+     */
+    #[ORM\OneToMany(targetEntity: Contract::class, mappedBy: 'employee')]
+    #[Groups(['employee:read'])]
+    private Collection $contracts;
+
     public function __construct()
     {
         $this->shifts = new ArrayCollection();
+        $this->contracts = new ArrayCollection();
     }
 
 
@@ -218,6 +226,36 @@ class Employee
     public function setQualification(?Qualification $qualification): static
     {
         $this->qualification = $qualification;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Contract>
+     */
+    public function getContracts(): Collection
+    {
+        return $this->contracts;
+    }
+
+    public function addContract(Contract $contract): static
+    {
+        if (!$this->contracts->contains($contract)) {
+            $this->contracts->add($contract);
+            $contract->setEmployee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContract(Contract $contract): static
+    {
+        if ($this->contracts->removeElement($contract)) {
+            // set the owning side to null (unless already changed)
+            if ($contract->getEmployee() === $this) {
+                $contract->setEmployee(null);
+            }
+        }
 
         return $this;
     }

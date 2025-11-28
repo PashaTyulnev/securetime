@@ -4,8 +4,10 @@ namespace App\Processor;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
+use App\Entity\Contract;
 use App\Entity\Employee;
 use App\Entity\User;
+use App\Repository\ContractRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -16,11 +18,13 @@ readonly class EmployeeProcessor implements ProcessorInterface
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private EntityManagerInterface $entityManager,
+        readonly ContractRepository $contractRepository,
         private RequestStack $requestStack
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
+
         if (!$data instanceof Employee) {
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }
@@ -36,9 +40,17 @@ readonly class EmployeeProcessor implements ProcessorInterface
         if ($operation instanceof Put && !empty($uriVariables['id'])) {
             $employee = $this->entityManager->find(Employee::class, $uriVariables['id']);
 
+
             if (!$employee) {
                 throw new \RuntimeException('Employee not found');
             }
+
+            //get data from request
+            $rawData = json_decode($request->getContent(), true);
+
+            $contractData = $rawData['contracts'] ?? null;
+
+            $this->handleContractData($employee, $contractData);
 
             // Übertrage alle Werte vom deserialisierten $data zum DB-Employee
             $employee->setFirstName($data->getFirstName());
@@ -88,6 +100,43 @@ readonly class EmployeeProcessor implements ProcessorInterface
             }
         }
 
+        if (isset($requestData['contracts'])) {
+            $this->handleContractData($data, $requestData['contracts']);
+        }
+
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+    }
+
+    private function handleContractData(&$employee, mixed $contractData): void
+    {
+
+        $type = $contractData['type'] ?? null;
+        $maxMonthHours = $contractData['maxMonthHours'] ?? null;
+
+        $existingContract = $this->contractRepository->findOneBy(['employee' => $employee]);
+
+        if($existingContract) {
+            // Update existing contract
+            if ($type !== null) {
+                $existingContract->setType($type);
+            }
+            if ($maxMonthHours !== null) {
+                $existingContract->setMaxMonthHours($maxMonthHours);
+            }
+        } else {
+            // Create new contract
+            $newContract = new Contract();
+            if ($type !== null) {
+                $newContract->setType($type);
+            }
+            if ($maxMonthHours !== null) {
+                $newContract->setMaxMonthHours($maxMonthHours);
+            }
+
+            $newContract->setEmployee($employee);
+            $this->entityManager->persist($newContract);
+
+        }
+
     }
 }
