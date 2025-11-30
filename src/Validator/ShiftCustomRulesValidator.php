@@ -204,15 +204,14 @@ class ShiftCustomRulesValidator extends ConstraintValidator
     private function checkWorkingDaysInRow(Shift $shift): void
     {
         $employee = $shift->getEmployee();
-        $date = $shift->getDate();
-
+        $date = $shift->getDate(); // DateTime, Datum des Shift-Starts
         $maxWorkingDaysInRow = self::MAX_WORKING_DAYS_IN_ROW;
 
-        // Zeitfenster: eine Woche zurück + eine Woche vorwärts
+        // Zeitfenster: eine Woche zurück + eine Woche vorwärts (oder abhängig von MAX)
         $oneWeekAgo = (clone $date)->modify('-' . $maxWorkingDaysInRow . ' days');
         $oneWeekAhead = (clone $date)->modify('+' . $maxWorkingDaysInRow . ' days');
 
-        // Schichten holen
+        // Past = strikt vor dem aktuellen Datum, Future = strikt nach dem aktuellen Datum
         $pastShifts = $this->shiftRepository->getAllAssignedShiftsInRange(
             $employee,
             $oneWeekAgo->format('Y-m-d'),
@@ -225,41 +224,40 @@ class ShiftCustomRulesValidator extends ConstraintValidator
             $oneWeekAhead->format('Y-m-d')
         );
 
-        // Sortieren (wichtig!)
-        usort($pastShifts, fn($a, $b) => $a->getDate() <=> $b->getDate());
-        usort($futureShifts, fn($a, $b) => $a->getDate() <=> $b->getDate());
+        // --- Normalisiere auf eindeutige Kalenderdaten (String 'Y-m-d') ---
+        $pastDates = [];
+        foreach ($pastShifts as $s) {
+            $pastDates[] = $s->getDate()->format('Y-m-d');
+        }
+        $pastDates = array_values(array_unique($pastDates));
+        sort($pastDates); // aufsteigend
+
+        $futureDates = [];
+        foreach ($futureShifts as $s) {
+            $futureDates[] = $s->getDate()->format('Y-m-d');
+        }
+        $futureDates = array_values(array_unique($futureDates));
+        sort($futureDates); // aufsteigend
 
         //////////////////////////////////////////////////////////////
-        // 1. Tage in Folge berechnen
+        // 1) Berechne aufeinanderfolgende Kalendertage (inkl. heute)
         //////////////////////////////////////////////////////////////
+        $consecutiveDays = 1; // zählt der aktuelle Tag
 
-        $consecutiveDays = 1; // aktueller Tag zählt
-
-        // Rückwärts
-        $daysBefore = 0;
-        for ($i = count($pastShifts) - 1; $i >= 0; $i--) {
-            $daysBefore++;
-            $expected = (clone $date)->modify("-{$daysBefore} days");
-
-            if ($pastShifts[$i]->getDate()->format('Y-m-d') === $expected->format('Y-m-d')) {
+        // rückwärts: prüfe, ob date -1, -2, ... in $pastDates vorhanden ist
+        for ($i = 1; $i < $maxWorkingDaysInRow; $i++) {
+            $check = (clone $date)->modify("-{$i} days")->format('Y-m-d');
+            if (in_array($check, $pastDates, true)) {
                 $consecutiveDays++;
             } else {
                 break;
             }
         }
 
-        // Vorwärts
-        $daysAfter = 0;
-        foreach ($futureShifts as $futureShift) {
-            // gleiche Datum = gleiche Schicht → überspringen
-            if ($futureShift->getDate()->format('Y-m-d') === $date->format('Y-m-d')) {
-                continue;
-            }
-
-            $daysAfter++;
-            $expected = (clone $date)->modify("+{$daysAfter} days");
-
-            if ($futureShift->getDate()->format('Y-m-d') === $expected->format('Y-m-d')) {
+        // vorwärts: prüfe, ob date +1, +2, ... in $futureDates vorhanden ist
+        for ($i = 1; $i < $maxWorkingDaysInRow; $i++) {
+            $check = (clone $date)->modify("+{$i} days")->format('Y-m-d');
+            if (in_array($check, $futureDates, true)) {
                 $consecutiveDays++;
             } else {
                 break;
@@ -267,56 +265,110 @@ class ShiftCustomRulesValidator extends ConstraintValidator
         }
 
         //////////////////////////////////////////////////////////////
-        // 2. Wenn 7 Tage erreicht → 24h Pause prüfen
+        // 2) Wenn Grenze erreicht oder überschritten -> 24h-Pause prüfen
         //////////////////////////////////////////////////////////////
-
+//////////////////////////////////////////////////////////////
+// 2) Wenn Grenze erreicht oder überschritten -> 24h-Pause prüfen
+//////////////////////////////////////////////////////////////
 
         if ($consecutiveDays >= $maxWorkingDaysInRow) {
+            // finde letzte Schicht VOR dem aktuellen Datum (wichtig: die mit der spätesten Endzeit)
+            $lastShift = null;
+            $lastShiftEnd = null; // DateTime
 
-            // letzte Schicht VOR aktueller finden
-            $lastShift = end($pastShifts);
-
-            if ($lastShift) {
-                $lastDate = $lastShift->getDate();
-                $lastTo   = $lastShift->getDemandShift()->getTimeTo();
-                $lastFrom = $lastShift->getDemandShift()->getTimeFrom();
-
-                // Ende der letzten Schicht
-                $lastShiftEnd = new DateTime($lastDate->format('Y-m-d') . ' ' . $lastTo->format('H:i'));
-
-                // Falls Overnight → endet am Folgetag
-                if ($this->isOvernightShift($lastShift)) {
-                    $lastShiftEnd->modify('+1 day');
+            // Durchsuche alle past shifts (originalen Objekte), bestimme Endzeit und nimm die größte Endzeit
+            foreach ($pastShifts as $ps) {
+                // nur wirklich vor dem aktuellen Datum (sicherheitshalber)
+                if ($ps->getDate()->format('Y-m-d') >= $date->format('Y-m-d')) {
+                    continue;
                 }
 
-                // Start des neuen Shifts
-                $newShiftStart = new DateTime(
-                    $date->format('Y-m-d')
-                    . ' '
-                    . $shift->getDemandShift()->getTimeFrom()->format('H:i')
-                );
+                // berechne Ende dieser Schicht (Datum + timeTo; falls Overnight -> +1 day)
+                $psDate = $ps->getDate()->format('Y-m-d');
+                $psEnd = new \DateTime($psDate . ' ' . $ps->getDemandShift()->getTimeTo()->format('H:i'));
 
-                // Stunden berechnen
-                $diffHours = ($newShiftStart->getTimestamp() - $lastShiftEnd->getTimestamp()) / 3600;
+                if ($this->isOvernightShift($ps)) {
+                    $psEnd->modify('+1 day');
+                }
 
-                if ($diffHours < 24) {
-                    $this->context
-                        ->buildViolation(sprintf(
-                            "Nach 7 Arbeitstagen in Folge müssen mindestens 24 Stunden Ruhezeit eingehalten werden. Zwischen letzter und neuer Schicht liegen nur %.1f Stunden.",
-                            $diffHours
-                        ))
-                        ->addViolation();
-
-                    return;
+                // falls mehrere Schichten am selben Tag -> wir wollen die späteste Endzeit
+                if ($lastShiftEnd === null || $psEnd->getTimestamp() > $lastShiftEnd->getTimestamp()) {
+                    $lastShiftEnd = $psEnd;
+                    $lastShift = $ps;
                 }
             }
+
+            if ($lastShift && $lastShiftEnd) {
+                // Start des neuen Shifts (Datum + timeFrom)
+                $newShiftStart = new \DateTime(
+                    $date->format('Y-m-d') . ' ' . $shift->getDemandShift()->getTimeFrom()->format('H:i')
+                );
+
+                // Prüfe ob genau am MAX. Tag -> dann muss Ende der aktuellen Schicht + 24h vor nächstem Start liegen
+                if ($consecutiveDays === $maxWorkingDaysInRow) {
+                    // Berechne Ende der AKTUELLEN Schicht
+                    $currentShiftEnd = new \DateTime(
+                        $date->format('Y-m-d') . ' ' . $shift->getDemandShift()->getTimeTo()->format('H:i')
+                    );
+                    if ($this->isOvernightShift($shift)) {
+                        $currentShiftEnd->modify('+1 day');
+                    }
+
+                    // Prüfe ob nach dieser Schicht eine weitere folgt (am nächsten Tag)
+                    $nextDayDate = (clone $currentShiftEnd)->format('Y-m-d');
+
+                    if (in_array($nextDayDate, $futureDates, true)) {
+                        // Finde die früheste Schicht am nächsten Tag
+                        $nextShiftStart = null;
+                        foreach ($futureShifts as $fs) {
+                            if ($fs->getDate()->format('Y-m-d') === $nextDayDate) {
+                                $fsStart = new \DateTime(
+                                    $fs->getDate()->format('Y-m-d') . ' ' . $fs->getDemandShift()->getTimeFrom()->format('H:i')
+                                );
+                                if ($nextShiftStart === null || $fsStart->getTimestamp() < $nextShiftStart->getTimestamp()) {
+                                    $nextShiftStart = $fsStart;
+                                }
+                            }
+                        }
+
+                        if ($nextShiftStart) {
+                            $diffHours = ($nextShiftStart->getTimestamp() - $currentShiftEnd->getTimestamp()) / 3600;
+                            if ($diffHours < 24) {
+                                $this->context
+                                    ->buildViolation(sprintf(
+                                        "Nach %d Arbeitstagen in Folge müssen mindestens 24 Stunden Ruhezeit eingehalten werden. Zwischen letzter und neuer Schicht liegen nur %.1f Stunden.",
+                                        $maxWorkingDaysInRow,
+                                        $diffHours
+                                    ))
+                                    ->addViolation();
+
+                                return;
+                            }
+                        }
+                    }
+                } else {
+                    // Mehr als MAX -> prüfe zwischen letzter vergangener und aktueller Schicht
+                    $diffHours = ($newShiftStart->getTimestamp() - $lastShiftEnd->getTimestamp()) / 3600;
+
+                    if ($diffHours < 24) {
+                        $this->context
+                            ->buildViolation(sprintf(
+                                "Nach %d Arbeitstagen in Folge müssen mindestens 24 Stunden Ruhezeit eingehalten werden. Zwischen letzter und neuer Schicht liegen nur %.1f Stunden.",
+                                $consecutiveDays,
+                                $diffHours
+                            ))
+                            ->addViolation();
+
+                        return;
+                    }
+                }
+            }
+
         }
 
-
         //////////////////////////////////////////////////////////////
-        // 3. Normale 7-Tage-Regel
+        // 3) Wenn streng > MAX -> direkte Verletzung (falls nötig)
         //////////////////////////////////////////////////////////////
-
         if ($consecutiveDays > $maxWorkingDaysInRow) {
             $this->context
                 ->buildViolation(sprintf(
@@ -328,6 +380,7 @@ class ShiftCustomRulesValidator extends ConstraintValidator
                 ->addViolation();
         }
     }
+
 
 
 
