@@ -100,7 +100,6 @@ class Facility
     public function __construct()
     {
         $this->contacts = new ArrayCollection();
-        $this->shifts = new ArrayCollection();
         $this->demandShifts = new ArrayCollection();
         $this->positions = new ArrayCollection();
     }
