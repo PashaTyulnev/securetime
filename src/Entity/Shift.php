@@ -44,6 +44,11 @@ class Shift
     #[Groups(['shift:write', 'shift:read'])]
     private ?\DateTime $date = null;
 
+    #[ORM\ManyToOne(inversedBy: 'shifts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Facility $facility = null;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -53,6 +58,18 @@ class Shift
     public function getEmployee(): ?Employee
     {
         return $this->employee;
+    }
+
+    public function getFacility(): ?Facility
+    {
+        return $this->facility;
+    }
+
+    public function setFacility(?Facility $facility): static
+    {
+        $this->facility = $facility;
+
+        return $this;
     }
 
     public function setEmployee(?Employee $employee): static

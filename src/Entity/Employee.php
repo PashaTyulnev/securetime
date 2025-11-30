@@ -68,7 +68,7 @@ class Employee
     /**
      * @var Collection<int, Shift>
      */
-    #[ORM\OneToMany(targetEntity: Shift::class, mappedBy: 'Employee')]
+    #[ORM\OneToMany(targetEntity: Shift::class, mappedBy: 'employee')]
     private Collection $shifts;
 
     #[ORM\ManyToOne(inversedBy: 'employees')]

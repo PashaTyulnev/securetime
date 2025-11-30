@@ -69,11 +69,11 @@ class DemandShift
     private ?bool $onTuesday = null;
 
     #[ORM\Column]
-    #[Groups(['facility:read','facility:write','demandShift:read','demandShift:write'])]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
     private ?bool $onWednesday = null;
 
     #[ORM\Column]
-    #[Groups(['facility:read','facility:write','demandShift:read','demandShift:write'])]
+    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
     private ?bool $onThursday = null;
 
     #[ORM\Column]
