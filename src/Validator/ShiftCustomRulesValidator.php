@@ -216,12 +216,12 @@ class ShiftCustomRulesValidator extends ConstraintValidator
         $pastShifts = $this->shiftRepository->getAllAssignedShiftsInRange(
             $employee,
             $oneWeekAgo->format('Y-m-d'),
-            $date->format('Y-m-d')
+            (clone $date)->modify('-1 day')->format('Y-m-d')
         );
 
         $futureShifts = $this->shiftRepository->getAllAssignedShiftsInRange(
             $employee,
-            $date->format('Y-m-d'),
+            (clone $date)->modify('+1 day')->format('Y-m-d'),
             $oneWeekAhead->format('Y-m-d')
         );
 
