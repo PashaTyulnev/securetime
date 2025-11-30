@@ -11,7 +11,7 @@
     {# Content Container #}
     <div class="flex-1 py-1.5 px-2.5 text-center">
         <span class="text-xs font-semibold text-white tracking-wide drop-shadow-sm">
-            {{ shift.demandShift.timeFrom|date('H:i') }}–{{ shift.demandShift.timeTo|date('H:i') }}
+            {{ shift.demandShift.timeFrom|date('H:i') }}–{{ shift.demandShift.timeTo|date('H:i') }} | {{ shift.demandShift.facility.shortTitle }}
         </span>
     </div>
 

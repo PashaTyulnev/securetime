@@ -21,6 +21,7 @@ export default class extends Controller {
     connect() {
         this.currentDate = new Date();
         this.currentWeek = DateHelper.getWeekNumber(this.currentDate);
+        this.renderWeek()
         this.checkFacilityFromUrl();
         this.initializeSchedule();
     }

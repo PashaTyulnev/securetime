@@ -48,7 +48,7 @@ class Facility
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['contact:read', 'facility:read', 'facility:write'])]
+    #[Groups(['contact:read', 'facility:read', 'facility:write','shift:read'])]
     private ?string $shortTitle = null;
 
     #[ORM\Column(length: 255, nullable: true)]

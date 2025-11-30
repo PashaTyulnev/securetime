@@ -34,11 +34,8 @@
     }
 </script>
 
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-
-
+<body >
 <div class="flex h-screen">
-
 
     {# Menü nur anzeigen, wenn Benutzer den Google-Code bereits verifiziert hat #}
     {% set current_route = app.request.attributes.get('_route') %}
@@ -51,10 +48,9 @@
         {% include 'navigation/navigation.html.twig' %}
     {% endif %}
 
+
     <!-- Main -->
     <main class="flex-1 overflow-y-auto">
-
-
 
         {% include 'elements/toast.html.twig' %}
         {% block body %}

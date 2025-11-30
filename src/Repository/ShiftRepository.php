@@ -65,4 +65,5 @@ class ShiftRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
 }
