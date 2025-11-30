@@ -438,7 +438,7 @@ export default class extends Controller {
         toastMessage.innerText = message;
 
         // Toast einblenden
-        toast.classList.remove('opacity-0', 'translate-y-2');
+        toast.classList.remove('opacity-0', 'translate-y-2','hidden');
         toast.style.zIndex = '9999';
 
         if(type === 'success') {
@@ -448,17 +448,6 @@ export default class extends Controller {
             toast.classList.remove('successToastBackground');
             toast.classList.add('errorToastBackground');
         }
-
-
-
-        // Toast nach 3 Sekunden ausblenden
-        setTimeout(() => {
-            toast.classList.add('opacity-0', 'translate-y-2');
-
-            toast.style.zIndex = '0';
-        }, 10000)
-
-
     }
 
     initDemandShiftProgress() {

@@ -87,7 +87,7 @@
                                data-facility-shift-behavior-target="timeFrom"
                                data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
                                value="{% if demandShift.timeFrom|default(false) %}{{ demandShift.timeFrom|date('H:i') }}{% endif %}"
-                               class="w-full bg-white dark:bg-gray-800 rounded-lg px-2 py-2 text-sm"
+                               class="w-full bg-white dark:bg-gray-800 rounded-lg px-2 py-2 text-sm text-white"
                                required>
                         <span class="text-gray-400 text-xs shrink-0">-</span>
                         <input type="time" name="timeTo"
@@ -95,7 +95,7 @@
                                data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
                                data-facility-shift-behavior-target="timeTo"
                                value="{% if demandShift.timeTo|default(false) %}{{ demandShift.timeTo|date('H:i') }}{% endif %}"
-                               class="w-full bg-white dark:bg-gray-800 rounded-lg px-2 py-2 text-sm"
+                               class="w-full bg-white dark:bg-gray-800 rounded-lg px-2 py-2 text-sm text-white"
                                required>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
                            value="{{ demandShift.amountEmployees|default(1) }}"
                            data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
                            min="1" max="10"
-                           class="w-full bg-white dark:bg-gray-800 rounded-lg px-2 py-2 text-sm text-center"
+                           class="w-full bg-white dark:bg-gray-800 rounded-lg px-2 py-2 text-sm text-center text-white"
                            required>
                 </div>
 
@@ -174,6 +174,7 @@
                 </div>
             </div>
         </div>
+
 
         {% if facility.positions | length > 0 %}
             {# Positionen - Volle Breite unten #}

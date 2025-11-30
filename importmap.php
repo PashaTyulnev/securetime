@@ -38,16 +38,16 @@ return [
         'version' => '2.11.8',
     ],
     'flowbite-datepicker' => [
-        'version' => '2.0.0',
+        'version' => '1.3.2',
     ],
     'flowbite/dist/flowbite.min.css' => [
-        'version' => '4.0.1',
+        'version' => '3.1.2',
         'type' => 'css',
     ],
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
     'flowbite' => [
-        'version' => '4.0.1',
+        'version' => '3.1.2',
     ],
 ];
