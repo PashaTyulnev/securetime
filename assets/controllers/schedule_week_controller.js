@@ -401,7 +401,6 @@ export default class extends Controller {
             note: ""
         }
 
-
         return ApiDataHandler.createNewEntity("shifts", payload,true)
             .then(res => {
                 return res;

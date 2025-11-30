@@ -82,11 +82,6 @@ class Facility
     #[Groups(['facility:read', 'facility:write'])]
     private ?\DateTime $dateTo = null;
 
-    /**
-     * @var Collection<int, Shift>
-     */
-    #[ORM\OneToMany(targetEntity: Shift::class, mappedBy: 'facility')]
-    private Collection $shifts;
 
     /**
      * @var Collection<int, DemandShift>
@@ -258,28 +253,6 @@ class Facility
     public function getShifts(): Collection
     {
         return $this->shifts;
-    }
-
-    public function addShift(Shift $shift): static
-    {
-        if (!$this->shifts->contains($shift)) {
-            $this->shifts->add($shift);
-            $shift->setFacility($this);
-        }
-
-        return $this;
-    }
-
-    public function removeShift(Shift $shift): static
-    {
-        if ($this->shifts->removeElement($shift)) {
-            // set the owning side to null (unless already changed)
-            if ($shift->getFacility() === $this) {
-                $shift->setFacility(null);
-            }
-        }
-
-        return $this;
     }
 
     /**

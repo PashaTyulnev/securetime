@@ -64,4 +64,25 @@ class ScheduleComponentController extends AbstractController
             'shift' => $shiftData,
         ]);
     }
+
+    #[Route(path: '/components/schedule-month', name: 'schedule_month_component', methods: ['GET'])]
+    public function getScheduleMonthComponent(Request $request): Response
+    {
+
+        $year = $request->query->get('year');
+        $month = $request->query->get('month');
+
+        $employees = $this->employeeService->getAllEmployees();
+        $facilities = $this->facilityService->getAllFacilities();
+        $datesRange = $this->scheduleService->buildMonthDaysRange((int)$year, (int)$month);
+
+        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange);
+
+        return $this->render('pages/schedule/schedule_month/schedule_month_overview.html.twig', [
+            'employees' => $employees,
+            'facilities' => $facilities,
+            'datesRange' => $datesRange,
+            'shifts' => $shifts,
+        ]);
+    }
 }

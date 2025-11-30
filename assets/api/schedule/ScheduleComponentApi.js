@@ -9,6 +9,16 @@ export default class ScheduleComponentApi {
       }).then(response => response.text());
   }
 
+    static getMonthScheduleComponent(year, month) {
+        return fetch(`/components/schedule-month?year=${year}&month=${month}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.text());
+    }
+
+
     static getDemandShiftsOfFacilityComponent(facilityId) {
         return fetch(`/components/schedule/demand-shifts?facilityId=${facilityId}`, {
             method: "GET",

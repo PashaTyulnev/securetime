@@ -65,4 +65,38 @@ class ScheduleService
 
 
     }
+
+    public function buildMonthDaysRange(int $year, int $month)
+    {
+        $date = new DateTime();
+        $date->setDate($year, $month, 1); // Erster Tag des Monats
+
+        $today = new DateTime();
+        $todayFormatted = $today->format('d.m.Y');
+
+        $monthDays = [];
+        $germanDays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+        $germanMonths = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+        $daysInMonth = (int)$date->format('t');
+
+        for ($i = 0; $i < $daysInMonth; $i++) {
+            $dateFormatted = $date->format('d.m.Y');
+            $isToday = $dateFormatted === $todayFormatted;
+
+            $day = $date->format('d');
+            $monthName = $germanMonths[(int)$date->format('m') - 1];
+            $shortName = "$day. $monthName";
+
+            $monthDays[] = [
+                'name' => $germanDays[(int)$date->format('w')],
+                'date' => $dateFormatted,
+                'shortName' => $shortName,
+                'isToday' => $isToday
+            ];
+            $date->modify('+1 day');
+        }
+
+        return $monthDays;
+    }
 }
