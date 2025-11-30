@@ -37,7 +37,10 @@
 
                         {% for shift in shifts %}
                             {% if shift.date|date('Y-m-d') == day.date|date('d.m.Y')|date('Y-m-d') and shift.employee == employee['@id'] %}
-                                <div class="w-full h-full bg-indigo-500 dark:bg-indigo-600" title="{{ shift.demandShift.timeFrom|date('H:i') }} – {{ shift.demandShift.timeTo|date('H:i') }}"></div>
+                                <div style="background: {{  shift.demandShift.color }};font-size: 10px" class="w-full h-full text-white p-1 text-center font-bold" title="{{ shift.demandShift.timeFrom|date('H:i') }} – {{ shift.demandShift.timeTo|date('H:i') }}">
+                                    {{ shift.demandShift.timeFrom|date('H') }}-{{ shift.demandShift.timeTo|date('H') }}
+                                    {{ shift.demandShift.facility.shortTitle }}
+                                </div>
                             {% endif %}
                         {% endfor %}
                     </div>
