@@ -19,8 +19,8 @@ export default class ScheduleComponentApi {
     }
 
 
-    static getDemandShiftsOfFacilityComponent(facilityId) {
-        return fetch(`/components/schedule/demand-shifts?facilityId=${facilityId}`, {
+    static getDemandShiftsOfFacilityComponent(facilityId,dateFrom,dateTo) {
+        return fetch(`/components/schedule/demand-shifts?facilityId=${facilityId}&dateFrom=${dateFrom}&dateTo=${dateTo}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'

@@ -56,6 +56,8 @@ export default class extends Controller {
         this.currentDateRangeTextTarget.textContent = WeekSwitcher.getWeekRangeText(this.currentWeek, this.currentDate.getFullYear());
         this.currentWeekInputTarget.value = this.currentWeek;
 
+
+
         // Bei Week-Changes auch auf beide warten
         Promise.all([
             this.buildScheduleElement(),
@@ -128,11 +130,18 @@ export default class extends Controller {
         });
     }
 
+
     loadDemandShifts() {
         const facilityId = this.facilitySelectTarget.value;
 
+        const firstDate = DateHelper.getFirstDateOfWeek(this.currentWeek, this.currentDate.getFullYear());
+        const lastDate = DateHelper.getLastDateOfWeek(this.currentWeek, this.currentDate.getFullYear());
+
+        const firstDateStr = DateHelper.formatDate(firstDate);
+        const lastDateStr = DateHelper.formatDate(lastDate);
+
         // WICHTIG: Promise zurückgeben!
-        return ScheduleComponentApi.getDemandShiftsOfFacilityComponent(facilityId).then(shifts => {
+        return ScheduleComponentApi.getDemandShiftsOfFacilityComponent(facilityId,firstDateStr,lastDateStr).then(shifts => {
             this.demandShiftsContainerTarget.innerHTML = shifts;
         });
     }

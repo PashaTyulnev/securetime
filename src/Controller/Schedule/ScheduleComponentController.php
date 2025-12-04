@@ -5,6 +5,7 @@ namespace App\Controller\Schedule;
 use App\Service\EmployeeService;
 use App\Service\FacilityService;
 use App\Service\ScheduleService;
+use App\Service\ShiftService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ class ScheduleComponentController extends AbstractController
 
     public function __construct(readonly EmployeeService $employeeService,
                                 readonly FacilityService $facilityService,
+                                readonly ShiftService $shiftService,
                                 readonly ScheduleService $scheduleService)
     {
 
@@ -47,7 +49,10 @@ class ScheduleComponentController extends AbstractController
     {
 
         $facilityId = $request->query->get('facilityId');
-        $shifts = $this->facilityService->getDemandShiftsOfFacility($facilityId);
+        $dateFrom = $request->query->get('dateFrom');
+        $dateTo = $request->query->get('dateTo');
+
+        $shifts = $this->shiftService->getDemandShiftsOfFacilityInDateRange($facilityId, $dateFrom, $dateTo);
 
         return $this->render('/pages/schedule/components/demand_shifts.html.twig', [
             'demandShifts' => $shifts,
