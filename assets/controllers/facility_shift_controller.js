@@ -5,11 +5,42 @@ import ApiDataHandler from "../api/ApiDataHandler/ApiDataHandler.js";
 
 export default class extends BaseEntityController {
 
-    static targets = BaseEntityController.targets.concat(["cityInput"]);
-
-    connect(){
-        this.loadShiftPresets()
+    static targets = BaseEntityController.targets.concat(["cityInput", "weekDisplay", "facilityList", "facilityButton", "demandShiftsContainer"]);
+    static values = {
+        currentWeekStart: String,
+        dateFrom: String,
+        dateTo: String,
+        selectedFacilityId: Number,
+        facilities: Array
     }
+
+    connect() {
+        this.loadAllFacilities();
+
+        this.buildFacilityList().then(() => {
+            //wenn die liste geladen hat, kann man die schichten des ersten gebäudes laden
+            //get first facilityButtonTarget
+            let firstFacilityButton = this.facilityButtonTargets[0];
+
+            //get facility id data
+            let facilityId = firstFacilityButton.dataset.facilityId;
+
+            this.selectedFacilityIdValue = facilityId;
+
+            // Format KW 12 • 20.03. - 26.03.
+            let currentWeek = this.getMondayOfCurrentWeek();
+            this.currentWeekStartValue = currentWeek;
+
+            //set current date from
+            this.dateFromValue = currentWeek;
+            this.dateToValue = this.getWeekEnd(currentWeek);
+
+            this.loadShiftsOfFacility(facilityId).then(() => {
+
+            })
+        });
+    }
+
     getEntityName() {
         return 'demand_shifts';
     }
@@ -66,11 +97,14 @@ export default class extends BaseEntityController {
         // requiredPositions als Array hinzufügen
         formattedData.requiredPositions = requiredPositions;
 
+        formattedData.validFrom = this.dateFromValue
+        formattedData.validTo = this.dateToValue
+
         // Die aktuelle Card speichern um sie später zu ersetzen
         // GEÄNDERT: Von closest("tbody") zu closest("[data-controller='facility-shift-behavior']")
         let currentCard = form.closest("[data-controller='facility-shift-behavior']")
 
-        // Prüfe ob es ein Update (PUT) oder Create (POST) ist
+        // Prüfe, ob es ein Update (PUT) oder Create (POST) ist
         const shiftUri = formData.get('uri');
 
         if (shiftUri) {
@@ -89,7 +123,6 @@ export default class extends BaseEntityController {
             // CREATE: Neue Schicht erstellen (POST)
             ApiDataHandler.createNewEntity(this.getEntityName(), formattedData)
                 .then(newShiftData => {
-                    console.log(newShiftData)
                     FacilityShiftComponentApi.getFacilityShiftComponent(newShiftData).then(html => {
                         currentCard.outerHTML = html;
                     });
@@ -101,7 +134,7 @@ export default class extends BaseEntityController {
         }
     }
 
-    update(event){
+    update(event) {
         // get the form attribute from the event target
         let formId = event.target.attributes["form"].value;
 
@@ -111,13 +144,107 @@ export default class extends BaseEntityController {
         form.requestSubmit();
     }
 
-    loadShiftPresets() {
-        //einfacher get request an die api um die schicht presets zu laden
-        fetch('/api/shift_presets')
-            .then(response => response.json())
-            .then(data => {
-                //to storage
-                localStorage.setItem('shiftPresets', JSON.stringify(data));
+    previousWeek() {
+        const date = new Date(this.currentWeekStartValue);
+        date.setDate(date.getDate() - 7);
+        this.currentWeekStartValue = this.formatDate(date);
+        this.dateFromValue = this.currentWeekStartValue;
+        this.dateToValue = this.getWeekEnd(this.currentWeekStartValue);
+        this.loadShiftsOfFacility(this.selectedFacilityIdValue);
+    }
+
+    nextWeek() {
+        const date = new Date(this.currentWeekStartValue);
+        date.setDate(date.getDate() + 7);
+        this.currentWeekStartValue = this.formatDate(date);
+        this.dateFromValue = this.currentWeekStartValue;
+        this.dateToValue = this.getWeekEnd(this.currentWeekStartValue);
+        this.loadShiftsOfFacility(this.selectedFacilityIdValue);
+
+    }
+
+
+    getMondayOfCurrentWeek() {
+        const today = new Date();
+        const day = today.getDay();
+        const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+        return this.formatDate(new Date(today.setDate(diff)));
+    }
+
+    getWeekEnd(weekStart) {
+        const date = new Date(weekStart);
+        date.setDate(date.getDate() + 6);
+        return this.formatDate(date);
+    }
+
+    formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    updateWeekDisplay() {
+        if (!this.hasWeekDisplayTarget) return;
+
+        const start = new Date(this.currentWeekStartValue);
+        const end = this.getWeekEnd(this.currentWeekStartValue);
+        const endDate = new Date(end);
+
+        const weekNumber = this.getWeekNumber(start);
+        const startFormatted = `${String(start.getDate()).padStart(2, '0')}.${String(start.getMonth() + 1).padStart(2, '0')}.`;
+        const endFormatted = `${String(endDate.getDate()).padStart(2, '0')}.${String(endDate.getMonth() + 1).padStart(2, '0')}.${endDate.getFullYear()}`;
+
+        this.weekDisplayTarget.textContent = `KW ${weekNumber} • ${startFormatted} - ${endFormatted}`;
+
+        //set dateFrom and dateTo values
+        this.dateFromValue = this.currentWeekStartValue;
+        this.dateToValue = end;
+
+    }
+
+    getWeekNumber(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+
+    loadAllFacilities() {
+        ApiDataHandler.getCollection('facilities').then(facilities => {
+            // to storage
+            this.facilities = facilities;
+        })
+    }
+
+    buildFacilityList() {
+        return FacilityShiftComponentApi.getFacilityListComponent().then(html => {
+            this.facilityListTarget.innerHTML = html;
+        });
+    }
+
+    loadShiftsOfFacility(facilityId) {
+
+        return FacilityShiftComponentApi.getDemandShiftsComponent(this.dateFromValue, this.dateToValue, facilityId).then(html => {
+            this.demandShiftsContainerTarget.innerHTML = html;
+            this.updateWeekDisplay()
+        })
+    }
+
+    selectFacility(event) {
+        let facilityId = event.currentTarget.dataset.facilityId;
+        const clickedButton = event.currentTarget;
+        this.selectedFacilityIdValue = facilityId;
+
+        this.loadShiftsOfFacility(facilityId).then(() => {
+            //remove all classes activeFacility from all facility buttons
+            this.facilityButtonTargets.forEach(button => {
+                button.classList.remove('activeFacility');
             });
+
+            //add class activeFacility to the clicked button
+            clickedButton.classList.add('activeFacility'); // Gespeicherte Variable nutzen
+
+        });
+
     }
 }

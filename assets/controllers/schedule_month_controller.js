@@ -57,4 +57,42 @@ export default class extends Controller {
             this.scheduleContainerTarget.innerHTML = demandShiftsComponent;
         });
     }
+
+    exportPdf(event){
+        let currentMonth = this.currentDate.getMonth() + 1;
+        let currentYear = this.currentDate.getFullYear();
+
+        fetch(`/api/schedule/month/pdf?month=${currentMonth}&year=${currentYear}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return Promise.all([response.blob(), response.headers.get('Content-Disposition')]);
+            })
+            .then(([blob, contentDisposition]) => {
+                // Blob in ein URL-Objekt umwandeln
+                const url = URL.createObjectURL(blob);
+
+                // Link-Element erzeugen
+                const a = document.createElement('a');
+                a.href = url;
+
+                // Den Dateinamen aus dem Content-Disposition-Header extrahieren
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename[^;=\n]*=(([\"']).*?\2|[^;\n]*)/i);
+                    if (match) {
+                        a.download = match[1].replace(/"/g, ''); // Umgebende Anführungszeichen entfernen
+                    } else {
+                        a.download = 'download.pdf'; // Standardname, falls kein Dateiname gefunden wird
+                    }
+                } else {
+                    a.download = 'download.pdf'; // Standardname, falls kein Header vorhanden ist
+                }
+                a.click();
+
+                // URL-Objekt wieder freigeben
+                URL.revokeObjectURL(url);
+            })
+
+    }
 }

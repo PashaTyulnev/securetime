@@ -2,12 +2,16 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Processor\DemandShiftDeleteProcessor;
 use App\Processor\EmployeeProcessor;
 use App\Repository\DemandShiftRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,11 +27,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new GetCollection(),
         new Post(processor:EmployeeProcessor::class),
         new Put(processor:EmployeeProcessor::class),
-        new Delete(),
+        new Delete(processor: DemandShiftDeleteProcessor::class),
     ],
     normalizationContext: ['groups' => ['demandShift:read']],
     denormalizationContext: ['groups' => ['demandShift:write']]
 )]
+#[ApiFilter(DateFilter::class, properties: ['validFrom', 'validTo'])]
+#[ApiFilter(SearchFilter::class, properties: ['facility' => 'exact'])]
 class DemandShift
 {
     #[ORM\Id]

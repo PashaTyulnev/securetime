@@ -33,3 +33,6 @@ html {
 .errorToastBackground{
     @apply bg-red-100 dark:bg-red-800;
 }
+.activeFacility{
+    @apply bg-white/80 dark:bg-gray-800/80 ring-2 ring-blue-500;
+}

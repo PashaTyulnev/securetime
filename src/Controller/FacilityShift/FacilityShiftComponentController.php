@@ -31,7 +31,7 @@ class FacilityShiftComponentController extends AbstractController
         $facilityId = (int)basename($facilityUri);
         $facility = $this->facilityService->getFacilityById($facilityId);
         $qualifications = $this->employeeService->getAllQualifications();
-        $shiftPresets = $this->shiftService->getAllShiftPresets();
+        $shiftPresets = $this->shiftService->getAllDemandShiftPresets();
 
         return $this->render('pages/facility_shift/facility_single_shift.html.twig', [
             'facility' => $facility,
@@ -46,8 +46,8 @@ class FacilityShiftComponentController extends AbstractController
 
         $newShiftData = json_decode($request->getContent(), true);
         $qualifications = $this->employeeService->getAllQualifications();
-        $shiftPresets = $this->shiftService->getAllShiftPresets();
-        
+        $shiftPresets = $this->shiftService->getAllDemandShiftPresets();
+
         $response = $this->render('pages/facility_shift/facility_single_shift.html.twig', [
             'facility' => $newShiftData['facility'],
             'demandShift' => $newShiftData,
@@ -60,5 +60,34 @@ class FacilityShiftComponentController extends AbstractController
         $response->headers->set('Expires', '0');
 
         return $response;
+    }
+
+    #[Route(path: '/fetch-facility-list-component', name: 'app_facility_list_component', methods: ['GET'])]
+    public function fetchFacilityListComponent(): Response
+    {
+
+        $facilities = $this->facilityService->getAllFacilities();
+
+        return $this->render('pages/facility_shift/facility_list.html.twig', [
+            'facilities' => $facilities
+        ]);
+    }
+
+    #[Route(path: '/fetch-demand-shifts-container-component', name: 'demand_shift_container_component', methods: ['GET'])]
+    public function fetchDemandShiftsContainerComponent(Request $request): Response
+    {
+        $facilityId = $request->query->get('facilityId');
+        $dateFrom = $request->query->get('dateFrom');
+        $dateTo = $request->query->get('dateTo');
+
+        $facility = $this->facilityService->getFacilityById($facilityId);
+        $demandShifts = $this->shiftService->getDemandShiftsOfFacilityInDateRange($facilityId, $dateFrom, $dateTo);
+
+        return $this->render('pages/facility_shift/demand_shifts_container.html.twig', [
+            'facility' => $facility,
+            'demandShifts' => $demandShifts,
+            'shiftPresets' => $this->shiftService->getAllDemandShiftPresets(),
+            'qualifications' => $this->employeeService->getAllQualifications()
+        ]);
     }
 }

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            font-size: 8pt;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #333;
+        }
+
+        .header h1 {
+            margin: 0 0 3px 0;
+            font-size: 16pt;
+            font-weight: normal;
+        }
+
+        .schedule-grid {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .schedule-grid td {
+            border: 1px solid #ddd;
+            padding: 2px;
+            height: 25px;
+            vertical-align: middle;
+            width: auto;
+        }
+
+        .header-cell {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            text-align: center;
+            font-size: 7pt;
+            padding: 4px 2px;
+        }
+
+        .employee-cell {
+            background-color: #fafafa;
+            font-weight: bold;
+            font-size: 7pt;
+            width: 80px;
+        }
+
+        .day-cell {
+            text-align: center;
+            font-size: 6pt;
+            position: relative;
+        }
+
+        .shift-box {
+            color: white;
+            padding: 1px 2px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 6pt;
+            line-height: 1.2;
+        }
+
+        .today {
+            background-color: #e3f2fd;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Objektdienstplan</h1>
+
+</div>
+
+<table class="schedule-grid">
+    <tr>
+        <td class="header-cell employee-cell">MA</td>
+        {% for day in datesRange %}
+            <td class="header-cell {% if day.isToday %}today{% endif %}">
+                {{ day.date|date('d') }}
+            </td>
+        {% endfor %}
+    </tr>
+
+    {% for employee in employees %}
+        <tr>
+            <td class="employee-cell">
+                {{ employee.firstName|slice(0,1) }}. {{ employee.lastName|slice(0,8) }}
+            </td>
+
+            {% for day in datesRange %}
+                <td class="day-cell">
+                    {% for shift in shifts %}
+                        {% if shift.date|date('Y-m-d') == day.date|date('d.m.Y')|date('Y-m-d') and shift.employee == employee['@id'] %}
+                            <div class="shift-box" style="background-color: {{ shift.demandShift.color }};">
+                                {{ shift.demandShift.timeFrom|date('H') }}-{{ shift.demandShift.timeTo|date('H') }}
+                                {{ shift.demandShift.facility.shortTitle }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

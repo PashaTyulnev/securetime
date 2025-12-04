@@ -40,4 +40,22 @@ class DemandShiftRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function findDemandShiftsOfFacilityInDateRange(float|bool|int|string|null $facilityId, float|bool|int|string|null $dateFrom, float|bool|int|string|null $dateTo)
+    {
+        $qb = $this->createQueryBuilder('d')
+            ->andWhere('d.facility = :facilityId')
+            ->setParameter('facilityId', $facilityId);
+
+        if ($dateFrom) {
+            $qb->andWhere('d.validFrom >= :dateFrom')
+               ->setParameter('dateFrom', new \DateTime($dateFrom));
+        }
+
+        if ($dateTo) {
+            $qb->andWhere('d.validTo <= :dateTo')
+               ->setParameter('dateTo', new \DateTime($dateTo));
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

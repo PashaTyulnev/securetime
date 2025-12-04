@@ -96,4 +96,29 @@ export default class ApiDataHandler {
             }
         });
     }
+
+    static async getCollection(entityType, queryParams = '') {
+
+        // Cache-Busting: Füge Timestamp zur URI hinzu
+        const separator = queryParams.includes('?') ? '&' : '?';
+        const urlWithCacheBust = `/api/${entityType}${queryParams}${separator}_t=${Date.now()}`;
+
+        const response = await fetch(urlWithCacheBust, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+
+        if (response.ok) {
+            return await response.json().member;
+        }
+
+        throw new Error(`Fehler beim Abrufen der Sammlung: ${response.status} ${response.statusText}`);
+    }
+
+
 }

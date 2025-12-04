@@ -28,49 +28,6 @@
         {% include 'pages/facility_shift/facility_shift_overview.html.twig'  %}
     </div>
 
-    <script>
-        function selectFacility(facilityId) {
-            // Hide all panels
-            document.querySelectorAll('.facility-panel').forEach(panel => {
-                panel.classList.add('hidden');
-            });
-
-            // Remove active state from all items
-            document.querySelectorAll('.facility-item').forEach(item => {
-                item.classList.remove('bg-white/80', 'dark:bg-gray-800/80', 'ring-2', 'ring-blue-500');
-            });
-
-            // Show selected panel
-            const selectedPanel = document.getElementById('facility-panel-' + facilityId);
-            if (selectedPanel) {
-                selectedPanel.classList.remove('hidden');
-            }
-
-            // Add active state to selected item
-            const selectedItem = document.querySelector(`[data-facility-id="${facilityId}"]`);
-            if (selectedItem) {
-                selectedItem.classList.add('bg-white/80', 'dark:bg-gray-800/80', 'ring-2', 'ring-blue-500');
-            }
-        }
-
-        // Toggle weekdays
-        document.querySelectorAll('td button').forEach(button => {
-            if (button.textContent.length <= 2) { // Weekday buttons
-                button.addEventListener('click', function() {
-                    if (this.classList.contains('bg-gray-200')) {
-                        // Activate
-                        this.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-500');
-                        this.classList.add('bg-blue-600', 'text-white');
-                    } else {
-                        // Deactivate
-                        this.classList.remove('bg-blue-600', 'bg-amber-600', 'bg-indigo-600', 'text-white');
-                        this.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-500');
-                    }
-                });
-            }
-        });
-    </script>
-
     <style>
         @keyframes blob {
             0% { transform: translate(0px, 0px) scale(1); }

@@ -21,15 +21,6 @@ class FacilityShiftController extends AbstractController
     #[Route(path: '/facility-shift', name: 'app_facility_shift')]
     public function loadIndexPage(Security $security): Response
     {
-
-        $allFacilities = $this->facilityService->getAllFacilities();
-        $allQualifications = $this->employeeService->getAllQualifications();
-        $shiftPresets = $this->shiftService->getAllShiftPresets();
-
-        return $this->render('pages/facility_shift/facility_shift_index.html.twig', [
-            'facilities' => $allFacilities,
-            'shiftPresets' => $shiftPresets,
-            'qualifications' => $allQualifications,
-        ]);
+        return $this->render('pages/facility_shift/facility_shift_index.html.twig');
     }
 }

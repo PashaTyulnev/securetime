@@ -87,7 +87,6 @@ class Facility
      * @var Collection<int, DemandShift>
      */
     #[ORM\OneToMany(targetEntity: DemandShift::class, mappedBy: 'facility')]
-    #[Groups(['facility:read'])]
     private Collection $demandShifts;
 
     /**

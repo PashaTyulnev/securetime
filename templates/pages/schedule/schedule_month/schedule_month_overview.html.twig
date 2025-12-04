@@ -1,9 +1,14 @@
-<div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-800/50 overflow-x-auto">
+<div class="flex justify-end p-3">
+    <a data-action="click->schedule-month#exportPdf">{{ ux_icon('lucide:file-text', { class: 'h-5 w-5 text-slate-700 dark:text-gray-300' }) }}</a>
+</div>
+
+<div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200/50 dark:border-gray-800/50 overflow-x-auto">
 
     <div class="grid min-w-full" style="grid-template-columns: 120px repeat({{ datesRange|length }}, 45px);">
 
         <!-- Header: Mitarbeiter Label -->
-        <div class="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-xl p-2 border-b-2 border-r border-gray-200/50 dark:border-gray-700/50 sticky left-0 z-10">
+        <div
+            class="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-xl p-2 border-b-2 border-r border-gray-200/50 dark:border-gray-700/50 sticky left-0 z-10">
             <span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">MA</span>
         </div>
 
@@ -11,7 +16,8 @@
         {% for day in datesRange %}
             <div class="p-1 border-b-2 border-r border-gray-200/50 dark:border-gray-700/50 text-center backdrop-blur-xl
                 {% if day.isToday %}bg-blue-50/80 dark:bg-blue-900/20{% else %}bg-gray-50/80 dark:bg-gray-800/80{% endif %}">
-                <div class="text-[10px] font-semibold {% if day.isToday %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-white{% endif %}">
+                <div
+                    class="text-[10px] font-semibold {% if day.isToday %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-white{% endif %}">
                     {{ day.date|date('d') }}
                 </div>
             </div>
@@ -22,7 +28,8 @@
             <div class="contents group">
 
                 <!-- Mitarbeiter Name -->
-                <div class="bg-white/50 dark:bg-gray-900/50 p-2 border-b border-r border-gray-200/50 dark:border-gray-700/50 sticky left-0 z-10">
+                <div
+                    class="bg-white/50 dark:bg-gray-900/50 p-2 border-b border-r border-gray-200/50 dark:border-gray-700/50 sticky left-0 z-10">
                     <div class="text-[10px] font-semibold text-gray-900 dark:text-white truncate">
                         {{ employee.firstName|slice(0,1) }}. {{ employee.lastName|slice(0,8) }}
                     </div>
@@ -30,14 +37,17 @@
 
                 <!-- Tage für diesen Mitarbeiter -->
                 {% for day in datesRange %}
-                    <div data-action="dragover->schedule-month#onDragOver dragleave->schedule-month#onDragLeave drop->schedule-month#onDrop"
-                         data-employee-uri="{{ employee['@id'] }}"
-                         data-date="{{ day.date|date('Y-m-d') }}"
-                         class="drop-zone relative border-b border-r border-gray-200/50 dark:border-gray-700/50 min-h-[40px] hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 group/cell">
+                    <div
+                        data-action="dragover->schedule-month#onDragOver dragleave->schedule-month#onDragLeave drop->schedule-month#onDrop"
+                        data-employee-uri="{{ employee['@id'] }}"
+                        data-date="{{ day.date|date('Y-m-d') }}"
+                        class="drop-zone relative border-b border-r border-gray-200/50 dark:border-gray-700/50 min-h-[40px] hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 group/cell">
 
                         {% for shift in shifts %}
                             {% if shift.date|date('Y-m-d') == day.date|date('d.m.Y')|date('Y-m-d') and shift.employee == employee['@id'] %}
-                                <div style="background: {{  shift.demandShift.color }};font-size: 10px" class="w-full h-full text-white p-1 text-center font-bold" title="{{ shift.demandShift.timeFrom|date('H:i') }} – {{ shift.demandShift.timeTo|date('H:i') }}">
+                                <div style="background: {{ shift.demandShift.color }};font-size: 10px"
+                                     class="w-full h-full text-white p-1 text-center font-bold"
+                                     title="{{ shift.demandShift.timeFrom|date('H:i') }} – {{ shift.demandShift.timeTo|date('H:i') }}">
                                     {{ shift.demandShift.timeFrom|date('H') }}-{{ shift.demandShift.timeTo|date('H') }}
                                     {{ shift.demandShift.facility.shortTitle }}
                                 </div>
