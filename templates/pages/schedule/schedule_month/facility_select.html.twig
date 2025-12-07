@@ -1,0 +1,21 @@
+
+
+        <select id="facility-select"
+                data-schedule-month-target="facilitySelect"
+                data-action="change->schedule-month#selectFacility"
+                class="block w-64 px-3 py-2 text-sm rounded-lg shadow-sm
+                       bg-white/80 dark:bg-gray-800/80 backdrop-blur
+                       border border-gray-300 dark:border-gray-700
+                       text-gray-900 dark:text-gray-100
+                       focus:ring-2 focus:ring-blue-500/50
+                       focus:border-blue-500 transition-all">
+
+            <option value="">Alle Objekte</option>
+
+            {% for facility in facilities %}
+                <option value="{{ facility['id'] }}"
+                        {% if selectedFacilityId == facility['id'] %}selected{% endif %}>
+                    {{ facility.shortTitle }} – {{ facility.title }}
+                </option>
+            {% endfor %}
+        </select>

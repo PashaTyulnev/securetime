@@ -35,6 +35,7 @@ class ScheduleController extends AbstractController
     {
         $employees = $this->employeeService->getAllEmployees();
         $facilities = $this->facilityService->getAllFacilities();
+
         return $this->render('pages/schedule/schedule_month/schedule_month_index.html.twig', [
             'employees' => $employees,
             'facilities' => $facilities

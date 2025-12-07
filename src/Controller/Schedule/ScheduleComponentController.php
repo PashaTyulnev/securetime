@@ -76,18 +76,23 @@ class ScheduleComponentController extends AbstractController
 
         $year = $request->query->get('year');
         $month = $request->query->get('month');
+        $facilityId = $request->query->get('facilityId', null);
 
+        if($facilityId === 'null'){
+            $facilityId = null;
+        }
         $employees = $this->employeeService->getAllEmployees();
         $facilities = $this->facilityService->getAllFacilities();
         $datesRange = $this->scheduleService->buildMonthDaysRange((int)$year, (int)$month);
 
-        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange);
+        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange, $facilityId);
 
         return $this->render('pages/schedule/schedule_month/schedule_month_overview.html.twig', [
             'employees' => $employees,
             'facilities' => $facilities,
             'datesRange' => $datesRange,
             'shifts' => $shifts,
+            'selectedFacilityId' => $facilityId,
         ]);
     }
 }

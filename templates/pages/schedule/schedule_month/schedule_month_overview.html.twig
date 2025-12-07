@@ -1,6 +1,15 @@
-<div class="flex justify-end p-3">
-    <a data-action="click->schedule-month#exportPdf">{{ ux_icon('lucide:file-text', { class: 'h-5 w-5 text-slate-700 dark:text-gray-300' }) }}</a>
+<div class="flex justify-between mb-2">
+    <div>
+        {% include '/pages/schedule/schedule_month/facility_select.html.twig' %}
+    </div>
+
+    <div class="flex flex-col justify-center cursor-pointer">
+        <a data-action="click->schedule-month#exportPdf" title="Monat als PDF exportieren">
+            {{ ux_icon('lucide:file-text', { class: 'h-5 w-5 text-slate-700 dark:text-gray-300' }) }}
+        </a>
+    </div>
 </div>
+
 
 <div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200/50 dark:border-gray-800/50 overflow-x-auto">
 

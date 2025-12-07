@@ -18,17 +18,28 @@ class ShiftRepository extends ServiceEntityRepository
         parent::__construct($registry, Shift::class);
     }
 
-    public function findShiftsInDateRange(\DateTime|false $firstDate, \DateTime|false $lastDate)
-    {
-        return $this->createQueryBuilder('s')
+    public function findShiftsInDateRange(
+        \DateTime|false $firstDate,
+        \DateTime|false $lastDate,
+        ?int $facilityId = null
+    ): array {
+        $qb = $this->createQueryBuilder('s')
+            ->leftJoin('s.demandShift', 'ds')
+            ->leftJoin('ds.facility', 'f')
             ->andWhere('s.date >= :firstDate')
             ->andWhere('s.date <= :lastDate')
             ->setParameter('firstDate', $firstDate)
             ->setParameter('lastDate', $lastDate)
-            ->orderBy('s.date', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('s.date', 'ASC');
+
+        if ($facilityId !== null) {
+            $qb->andWhere('f.id = :facilityId')
+                ->setParameter('facilityId', $facilityId);
+        }
+
+        return $qb->getQuery()->getResult();
     }
+
 
     public function findByEmployeeAndDate(?\App\Entity\Employee $employee, ?\DateTime $getDate)
     {

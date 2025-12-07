@@ -26,13 +26,18 @@ class ScheduleMonthPdfProvider implements ProviderInterface
         $request = $this->requestStack->getCurrentRequest();
         $month = (int) $request->query->get('month');
         $year = (int) $request->query->get('year');
+        $facilityId = $request->query->get('facilityId', null);
+
+        if($facilityId === 'null'){
+            $facilityId = null;
+        }
 
         if (!$month || !$year) {
             return new Response('Month and Year are required', 400);
         }
 
 
-        $pdfContent = $this->generatePdf($month, $year);
+        $pdfContent = $this->generatePdf($month, $year,$facilityId);
 
         return new Response(
             $pdfContent,
@@ -46,7 +51,7 @@ class ScheduleMonthPdfProvider implements ProviderInterface
         );
     }
 
-    private function generatePdf(int $month, int $year): string
+    private function generatePdf(int $month, int $year, $facilityId = null): string
     {
         $dompdf = new Dompdf();
 
@@ -54,13 +59,15 @@ class ScheduleMonthPdfProvider implements ProviderInterface
         $facilities = $this->facilityService->getAllFacilities();
         $datesRange = $this->scheduleService->buildMonthDaysRange((int)$year, (int)$month);
 
-        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange);
+        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange,$facilityId);
 
         $html = $this->twig->render('pdf/month_schedule.html.twig', [
             'employees' => $employees,
             'facilities' => $facilities,
             'datesRange' => $datesRange,
             'shifts' => $shifts,
+            'dateFrom' => $datesRange[0]['date'],
+            'dateTo' => end($datesRange)['date'],
         ]);
 
         $dompdf->loadHtml($html);

@@ -82,6 +82,10 @@ class Employee
     #[Groups(['employee:read'])]
     private Collection $contracts;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['employee:read', 'employee:write'])]
+    private ?string $guardianId = null;
+
     public function __construct()
     {
         $this->shifts = new ArrayCollection();
@@ -256,6 +260,18 @@ class Employee
                 $contract->setEmployee(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getGuardianId(): ?string
+    {
+        return $this->guardianId;
+    }
+
+    public function setGuardianId(?string $guardianId): static
+    {
+        $this->guardianId = $guardianId;
 
         return $this;
     }

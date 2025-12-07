@@ -1,7 +1,5 @@
 import {Controller} from "@hotwired/stimulus";
-import DateHelper from "../helper/date_helper.js";
 import ScheduleComponentApi from "../api/schedule/ScheduleComponentApi.js";
-import ApiDataHandler from "../api/ApiDataHandler/ApiDataHandler.js";
 
 export default class extends Controller {
     static targets = [
@@ -12,8 +10,13 @@ export default class extends Controller {
         "facilityShiftsContainer",
         "facilitySelect",
         "demandShiftsContainer",
-        "miniShiftPill"
+        "miniShiftPill",
+        "facilitySelect"
     ];
+
+    static values = {
+        selectedFacilityId: Number
+    }
 
     connect() {
         this.currentDate = new Date();
@@ -52,8 +55,9 @@ export default class extends Controller {
         let month = this.currentDate.getMonth() + 1; // Monate sind 0-basiert
         let year = this.currentDate.getFullYear();
 
-        // WICHTIG: Promise zurückgeben!
-        return ScheduleComponentApi.getMonthScheduleComponent(year, month).then(demandShiftsComponent => {
+        let selectedFacilityId = this.selectedFacilityIdValue ? this.selectedFacilityIdValue : null;
+
+        return ScheduleComponentApi.getMonthScheduleComponent(year, month, selectedFacilityId).then(demandShiftsComponent => {
             this.scheduleContainerTarget.innerHTML = demandShiftsComponent;
         });
     }
@@ -62,7 +66,9 @@ export default class extends Controller {
         let currentMonth = this.currentDate.getMonth() + 1;
         let currentYear = this.currentDate.getFullYear();
 
-        fetch(`/api/schedule/month/pdf?month=${currentMonth}&year=${currentYear}`)
+        let selectedFacilityId = this.selectedFacilityIdValue ? this.selectedFacilityIdValue : null;
+
+        fetch(`/api/schedule/month/pdf?month=${currentMonth}&year=${currentYear}&facilityId=${selectedFacilityId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -94,5 +100,12 @@ export default class extends Controller {
                 URL.revokeObjectURL(url);
             })
 
+    }
+
+    selectFacility(event) {
+
+        this.selectedFacilityIdValue = event.target.value;
+
+        this.buildScheduleElement()
     }
 }

@@ -9,8 +9,8 @@ export default class ScheduleComponentApi {
       }).then(response => response.text());
   }
 
-    static getMonthScheduleComponent(year, month) {
-        return fetch(`/components/schedule-month?year=${year}&month=${month}`, {
+    static getMonthScheduleComponent(year, month, facilityId = null) {
+        return fetch(`/components/schedule-month?year=${year}&month=${month}&facilityId=${facilityId}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'

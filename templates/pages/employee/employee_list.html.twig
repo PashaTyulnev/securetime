@@ -27,6 +27,9 @@
                     Benutzername
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Bewacher-ID
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Nummer
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -68,6 +71,7 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.user.username|default('N/A') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.guardianId }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ employee.number }}</td>
 
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">

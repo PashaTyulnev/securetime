@@ -118,13 +118,12 @@
                     } %}
 
                     {% include 'elements/input.html.twig' with {
-                        'title': '',
-                        'type': 'hidden',
-                        'systemName': 'user[id]',
+                        'title': 'Bewacher ID',
+                        'type': 'text',
+                        'systemName': 'guardianId',
                         'placeholder': '',
-                        'devValue': definedEmployee.user.id|default('')
+                        'devValue': definedEmployee.guardianId|default('')
                     } %}
-
                     {% include 'elements/select.html.twig' with {
                         'systemName': 'contracts[type]',
                         'title': 'Beschäftigungsverhältnis',
@@ -137,8 +136,6 @@
                         'required': 'required',
                         'devValue': definedEmployee.contracts[0].type|default('')
                     } %}
-
-
                     {% include 'elements/input.html.twig' with {
                         'title': 'Stunden im Monat',
                         'type': 'number',
@@ -146,6 +143,16 @@
                         'placeholder': '160',
                         'required': 'required',
                         'devValue': definedEmployee.contracts[0].maxMonthHours|default('')
+                    } %}
+
+
+
+                    {% include 'elements/input.html.twig' with {
+                        'title': '',
+                        'type': 'hidden',
+                        'systemName': 'user[id]',
+                        'placeholder': '',
+                        'devValue': definedEmployee.user.id|default('')
                     } %}
 
                     <input name="user[active]" type="hidden" value="true">

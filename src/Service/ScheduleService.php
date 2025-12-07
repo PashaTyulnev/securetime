@@ -45,7 +45,7 @@ class ScheduleService
         return $weekDays;
     }
 
-    public function getShiftsForEmployeesInDateRange(array $datesRange)
+    public function getShiftsForEmployeesInDateRange(array $datesRange, $facilityId = null): array
     {
         $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
         $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
@@ -53,7 +53,7 @@ class ScheduleService
         $firstDate->setTime(0, 0, 0);
         $lastDate->setTime(23, 59, 59);
 
-        $results = $this->shiftRepository->findShiftsInDateRange($firstDate, $lastDate);
+        $results = $this->shiftRepository->findShiftsInDateRange($firstDate, $lastDate,$facilityId);
 
         $shifts = $this->serializer->serialize(
             $results,

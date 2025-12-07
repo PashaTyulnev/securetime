@@ -21,6 +21,9 @@ export default class extends Controller {
     connect() {
         this.currentDate = new Date();
         this.currentWeek = DateHelper.getWeekNumber(this.currentDate);
+
+        this.initToast();
+
         this.renderWeek()
         this.checkFacilityFromUrl();
         this.initializeSchedule();
@@ -438,25 +441,25 @@ export default class extends Controller {
             }
         })
     }
-
     displayToast(type, message) {
-        const toast = document.getElementById('toast-default');
-        const toastMessage = document.getElementById('toast-message');
+        this.toastMessage.innerText = message;
 
-        toastMessage.innerText = message;
-
-        // Toast einblenden
-        toast.classList.remove('opacity-0', 'translate-y-2','hidden');
-        toast.style.zIndex = '9999';
-
-        if(type === 'success') {
-            toast.classList.remove('errorToastBackground');
-            toast.classList.add('successToastBackground');
-        }else{
-            toast.classList.remove('successToastBackground');
-            toast.classList.add('errorToastBackground');
+        if (type === "success") {
+            this.toast.classList.remove("errorToastBackground");
+            this.toast.classList.add("successToastBackground");
+        } else {
+            this.toast.classList.remove("successToastBackground");
+            this.toast.classList.add("errorToastBackground");
         }
+
+        // sichtbar machen
+        this.toast.classList.remove("hidden", "opacity-0", "translate-y-2");
+        this.toast.style.zIndex = "9999";
+
+        // optional automatisch ausblenden
+        setTimeout(() => this.toastDismiss.hide(), 3500);
     }
+
 
     initDemandShiftProgress() {
         // 1. Alle vergebenen Schichten sammeln
@@ -655,4 +658,15 @@ export default class extends Controller {
         // Breite animiert setzen
         progressBar.style.width = `${Math.min(percentage, 100)}%`;
     }
+
+    initToast() {
+        this.toast = document.getElementById('toast-default');
+        this.toastMessage = document.getElementById('toast-message');
+
+        this.toastDismiss = new Dismiss(
+            this.toast
+        );
+    }
+
+
 }

@@ -60,6 +60,7 @@ readonly class EmployeeProcessor implements ProcessorInterface
             $employee->setBirthDate($data->getBirthDate());
             $employee->setDepartment($data->getDepartment());
             $employee->setQualification($data->getQualification());
+            $employee->setGuardianId($data->getGuardianId());
 
             $data = $employee;
         }
