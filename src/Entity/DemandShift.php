@@ -19,14 +19,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 #[ORM\Entity(repositoryClass: DemandShiftRepository::class)]
 #[ApiResource(
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(processor:EmployeeProcessor::class),
-        new Put(processor:EmployeeProcessor::class),
+        new Post,
+        new Put,
         new Delete(processor: DemandShiftDeleteProcessor::class),
     ],
     normalizationContext: ['groups' => ['demandShift:read']],
@@ -95,7 +96,7 @@ class DemandShift
     private ?bool $onSunday = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['facility:read','demandShift:read','demandShift:write'])]
+    #[Groups(['facility:read','demandShift:read','demandShift:write','shift:read'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandShifts')]
@@ -111,7 +112,7 @@ class DemandShift
      * @var Collection<int, FacilityPosition>
      */
     #[ORM\ManyToMany(targetEntity: FacilityPosition::class, inversedBy: 'demandShifts')]
-    #[Groups(['demandShift:read','demandShift:write','facility:read'])]
+    #[Groups(['facility:read','demandShift:read','demandShift:write','shift:read'])]
     private Collection $requiredPositions;
 
     /**
@@ -119,6 +120,13 @@ class DemandShift
      */
     #[ORM\OneToMany(targetEntity: Shift::class, mappedBy: 'demandShift')]
     private Collection $shifts;
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['demandShift:write'])]
+    private ?bool $isOnCall = null;
+
+    #[Groups(['shift:read'])]
+    private int $onCall = 0;
 
     public function __construct()
     {
@@ -389,6 +397,28 @@ class DemandShift
         }
 
         return $this;
+    }
+
+    public function isOnCall(): ?bool
+    {
+        return $this->isOnCall;
+    }
+
+    public function getOnCall(): ?bool
+    {
+        return (string)$this->isOnCall;
+    }
+
+    public function setIsOnCall(bool $isOnCall): static
+    {
+        $this->isOnCall = $isOnCall;
+
+        return $this;
+    }
+
+    public function setOnCall(int $onCall): void
+    {
+        $this->onCall = $onCall;
     }
 
 }

@@ -60,7 +60,7 @@
                             {% if shift.date|date('Y-m-d') == datesRange[day].date|date('Y-m-d') %}
                                 {% if shift.employee == employee['@id'] %}
                                     {% set content = shift.demandShift.timeFrom|date('H:i') ~ ' – ' ~ shift.demandShift.timeTo|date('H:i') %}
-                                    {% include 'pages/schedule/components/mini_shift_pill.html.twig' with { 'shift':shift} %}
+                                    {% include 'pages/schedule/components/mini_shift_pill.html.twig' with {'shift':shift} %}
                                 {% endif %}
                             {% endif %}
 

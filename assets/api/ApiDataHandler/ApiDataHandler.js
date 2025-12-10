@@ -120,5 +120,58 @@ export default class ApiDataHandler {
         throw new Error(`Fehler beim Abrufen der Sammlung: ${response.status} ${response.statusText}`);
     }
 
+    static async postRequest(url, data) {
+        const response = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+
+        let body;
+        try {
+            body = await response.json();
+        } catch {
+            body = {};
+        }
+
+        return {
+            status: response.status,
+            ok: response.ok,
+            data: body
+        }
+    }
+
+    static async putRequest(url, data) {
+        const response = await fetch(url, {
+            method: "PUT",
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+
+        let body;
+        try {
+            body = await response.json();
+        } catch {
+            body = {};
+        }
+
+        return {
+            status: response.status,
+            ok: response.ok,
+            data: body
+        };
+    }
+
+
 
 }

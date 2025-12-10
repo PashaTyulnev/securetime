@@ -91,6 +91,10 @@ export default class extends BaseEntityController {
 
         let formattedData = Formater.formatToJson(formData);
 
+        if(formattedData.name === "Bereitschaft") {
+            formattedData.isOnCall = true;
+        }
+
         // amountEmployees zu integer konvertieren
         formattedData.amountEmployees = parseInt(formattedData.amountEmployees);
 

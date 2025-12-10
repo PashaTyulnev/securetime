@@ -97,7 +97,7 @@
     {% for employee in employees %}
         <tr>
             <td class="employee-cell">
-                {{ employee.firstName|slice(0,1) }}. {{ employee.lastName|slice(0,8) }}
+                {{ employee.firstName }} {{ employee.lastName }}
             </td>
 
             {% for day in datesRange %}

@@ -23,7 +23,6 @@ export default class extends Controller {
         this.currentWeek = DateHelper.getWeekNumber(this.currentDate);
 
         this.initToast();
-
         this.renderWeek()
         this.checkFacilityFromUrl();
         this.initializeSchedule();
@@ -58,7 +57,6 @@ export default class extends Controller {
         this.currentWeekTextTarget.textContent = "Woche " + this.currentWeek;
         this.currentDateRangeTextTarget.textContent = WeekSwitcher.getWeekRangeText(this.currentWeek, this.currentDate.getFullYear());
         this.currentWeekInputTarget.value = this.currentWeek;
-
 
 
         // Bei Week-Changes auch auf beide warten
@@ -144,7 +142,7 @@ export default class extends Controller {
         const lastDateStr = DateHelper.formatDate(lastDate);
 
         // WICHTIG: Promise zurückgeben!
-        return ScheduleComponentApi.getDemandShiftsOfFacilityComponent(facilityId,firstDateStr,lastDateStr).then(shifts => {
+        return ScheduleComponentApi.getDemandShiftsOfFacilityComponent(facilityId, firstDateStr, lastDateStr).then(shifts => {
             this.demandShiftsContainerTarget.innerHTML = shifts;
         });
     }
@@ -267,7 +265,7 @@ export default class extends Controller {
                 index + 1,
                 successCount,
                 errorCount + 1,
-                [...errors, { date: currentDate, reason: 'Drop-Zone nicht gefunden' }]
+                [...errors, {date: currentDate, reason: 'Drop-Zone nicht gefunden'}]
             );
             return;
         }
@@ -300,7 +298,7 @@ export default class extends Controller {
                     index + 1,
                     successCount,
                     errorCount + 1,
-                    [...errors, { date: currentDate, reason: newShift.data.detail }]
+                    [...errors, {date: currentDate, reason: newShift.data.detail}]
                 );
             }
         }).catch(error => {
@@ -314,7 +312,7 @@ export default class extends Controller {
                 index + 1,
                 successCount,
                 errorCount + 1,
-                [...errors, { date: currentDate, reason: error.message }]
+                [...errors, {date: currentDate, reason: error.message}]
             );
         });
     }
@@ -370,13 +368,13 @@ export default class extends Controller {
 
     getActiveDaysForWholeWeek(demandShiftElement) {
         const days = [
-            { index: 0, key: 'onMonday' },
-            { index: 1, key: 'onTuesday' },
-            { index: 2, key: 'onWednesday' },
-            { index: 3, key: 'onThursday' },
-            { index: 4, key: 'onFriday' },
-            { index: 5, key: 'onSaturday' },
-            { index: 6, key: 'onSunday' }
+            {index: 0, key: 'onMonday'},
+            {index: 1, key: 'onTuesday'},
+            {index: 2, key: 'onWednesday'},
+            {index: 3, key: 'onThursday'},
+            {index: 4, key: 'onFriday'},
+            {index: 5, key: 'onSaturday'},
+            {index: 6, key: 'onSunday'}
         ];
 
         return days
@@ -413,7 +411,7 @@ export default class extends Controller {
             note: ""
         }
 
-        return ApiDataHandler.createNewEntity("shifts", payload,true)
+        return ApiDataHandler.createNewEntity("shifts", payload, true)
             .then(res => {
                 return res;
             });
@@ -441,6 +439,7 @@ export default class extends Controller {
             }
         })
     }
+
     displayToast(type, message) {
         this.toastMessage.innerText = message;
 
@@ -666,6 +665,29 @@ export default class extends Controller {
         this.toastDismiss = new Dismiss(
             this.toast
         );
+    }
+
+    convertOnCallShift(event) {
+        let shiftId = event.params.shiftId;
+        const button = event.currentTarget;
+        const shiftPill = button.closest('[data-shift-uri]');
+
+        ApiDataHandler.putRequest('api/shifts/' + shiftId, {isOnCall: false}).then(newShift => {
+            if (newShift.status === 200) {
+                ScheduleComponentApi.getMiniShiftComponent(newShift.data).then(miniShiftHtml => {
+                    shiftPill.outerHTML = miniShiftHtml;
+                    this.displayToast('success', 'Schicht erfolgreich umgewandelt.');
+
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            this.initDemandShiftProgress();
+                        });
+                    });
+                });
+            } else {
+                this.displayToast("error", newShift.data.detail);
+            }
+        });
     }
 
 

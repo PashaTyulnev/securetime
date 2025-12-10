@@ -36,3 +36,17 @@ html {
 .activeFacility{
     @apply bg-white/80 dark:bg-gray-800/80 ring-2 ring-blue-500;
 }
+
+.bell-shake:hover {
+    animation: bell-swing 0.35s ease-in-out;
+    transform-origin: top center;
+}
+
+@keyframes bell-swing {
+    0%   { transform: rotate(0deg); }
+    20%  { transform: rotate(-12deg); }
+    40%  { transform: rotate(10deg); }
+    60%  { transform: rotate(-6deg); }
+    80%  { transform: rotate(4deg); }
+    100% { transform: rotate(0deg); }
+}
