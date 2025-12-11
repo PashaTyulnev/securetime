@@ -123,7 +123,7 @@ class DemandShift
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(['demandShift:write'])]
-    private ?bool $isOnCall = null;
+    private ?bool $isOnCall = false;
 
     #[Groups(['shift:read'])]
     private int $onCall = 0;
