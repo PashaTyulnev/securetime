@@ -95,4 +95,33 @@ class ScheduleComponentController extends AbstractController
             'selectedFacilityId' => $facilityId,
         ]);
     }
+
+
+    #[Route(path: '/components/schedule-two-week', name: 'schedule_two-week_component', methods: ['GET'])]
+    public function getScheduleTwoWeekComponent(Request $request): Response
+    {
+
+        $year = $request->query->get('year');
+        $week = $request->query->get('week');
+
+        $facilityId = $request->query->get('facilityId', null);
+
+        if($facilityId === 'null'){
+            $facilityId = null;
+        }
+
+        $employees = $this->employeeService->getAllEmployees();
+        $facilities = $this->facilityService->getAllFacilities();
+        $datesRange = $this->scheduleService->buildWeekDaysRange((int)$year, (int)$week,2);
+
+        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange, $facilityId);
+
+        return $this->render('pages/schedule/schedule_two_week/schedule_two_week_overview.html.twig', [
+            'employees' => $employees,
+            'facilities' => $facilities,
+            'datesRange' => $datesRange,
+            'shifts' => $shifts,
+            'selectedFacilityId' => $facilityId,
+        ]);
+    }
 }

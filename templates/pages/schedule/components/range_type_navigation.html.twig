@@ -4,6 +4,12 @@
            class="px-5 py-3 text-sm font-medium {{ app.request.attributes.get('_route') == 'app_schedule' ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600' }} transition-all duration-200">
             Wochenansicht
         </a>
+
+        <a href="{{ path('app_schedule_two_week') }}"
+           class="px-5 py-3 text-sm font-medium {{ app.request.attributes.get('_route') == 'app_schedule_two_week' ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600' }} transition-all duration-200">
+            2-Wochenansicht
+        </a>
+
         <a href="{{ path('app_schedule_month') }}"
            class="px-5 py-3 text-sm font-medium {{ app.request.attributes.get('_route') == 'app_schedule_month' ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600' }} transition-all duration-200">
             Monatsansicht

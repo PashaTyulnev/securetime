@@ -39,6 +39,7 @@ class ScheduleMonthPdfProvider implements ProviderInterface
 
         $pdfContent = $this->generatePdf($month, $year,$facilityId);
 
+
         return new Response(
             $pdfContent,
             200,
@@ -61,6 +62,13 @@ class ScheduleMonthPdfProvider implements ProviderInterface
 
         $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange,$facilityId);
 
+        $selectedFacility = null;
+
+        if($facilityId !== null){
+            $selectedFacility = $this->facilityService->getFacilityById($facilityId);
+        }
+
+
         $html = $this->twig->render('pdf/month_schedule.html.twig', [
             'employees' => $employees,
             'facilities' => $facilities,
@@ -68,6 +76,7 @@ class ScheduleMonthPdfProvider implements ProviderInterface
             'shifts' => $shifts,
             'dateFrom' => $datesRange[0]['date'],
             'dateTo' => end($datesRange)['date'],
+            'selectedFacility' => $selectedFacility,
         ]);
 
         $dompdf->loadHtml($html);

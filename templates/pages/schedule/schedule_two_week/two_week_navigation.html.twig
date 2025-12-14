@@ -1,0 +1,33 @@
+<div class="flex items-center gap-3">
+    <div class="flex items-center bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-1">
+        <button class="p-2 hover:bg-white/80 dark:hover:bg-gray-700/80 rounded-xl transition-all duration-200"
+                data-action="click->schedule-two-week#previousWeek">
+            {{ ux_icon('lucide:chevron-left', { class: 'h-4 w-4 text-gray-600 dark:text-gray-400' }) }}
+        </button>
+
+        <div class="px-4 py-2 min-w-[200px] text-center cursor-pointer select-none"
+             data-action="click->schedule-two-week#openWeekSelector">
+            <input type="hidden" data-schedule-two-week-target="currentWeekInput">
+            <div class="text-sm font-medium text-gray-900 dark:text-white"
+                 data-schedule-two-week-target="currentWeekText">
+                Woche wird geladen…
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400"
+                 data-schedule-two-week-target="currentDateRangeText">
+                …
+            </div>
+        </div>
+
+        <button class="p-2 hover:bg-white/80 dark:hover:bg-gray-700/80 rounded-xl transition-all duration-200"
+                data-action="click->schedule-two-week#nextWeek">
+            {{ ux_icon('lucide:chevron-right', { class: 'h-4 w-4 text-gray-600 dark:text-gray-400' }) }}
+        </button>
+    </div>
+
+    <button class="px-5 py-2.5 bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-200
+                   text-white dark:text-gray-900 rounded-2xl font-medium hover:shadow-xl transform hover:scale-[1.02]
+                   transition-all duration-200"
+            data-action="click->schedule-two-week#today">
+        Heute
+    </button>
+</div>

@@ -30,6 +30,18 @@ class ScheduleController extends AbstractController
         ]);
     }
 
+    #[Route(path: '/schedule/two-week', name: 'app_schedule_two_week')]
+    public function loadTwoWeekIndexPage(Security $security): Response
+    {
+        $employees = $this->employeeService->getAllEmployees();
+        $facilities = $this->facilityService->getAllFacilities();
+
+        return $this->render('pages/schedule/schedule_two_week/schedule_two_week_index.html.twig', [
+            'employees' => $employees,
+            'facilities' => $facilities
+        ]);
+    }
+
     #[Route(path: '/schedule/month', name: 'app_schedule_month')]
     public function loadMonthIndexPage(Security $security): Response
     {

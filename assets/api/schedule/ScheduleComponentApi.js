@@ -1,13 +1,22 @@
 export default class ScheduleComponentApi {
 
-  static getWeekScheduleComponent(year, week) {
-      return fetch(`/components/schedule-week?year=${year}&week=${week}`, {
+  static getWeekScheduleComponent(year, week, weekSpan = 1) {
+      return fetch(`/components/schedule-week?year=${year}&week=${week}&weekSpan=${weekSpan}`, {
           method: "GET",
           headers: {
               'Content-Type': 'application/json'
           }
       }).then(response => response.text());
   }
+
+    static getTwoWeekScheduleComponent(year, week, facilityId = null) {
+        return fetch(`/components/schedule-two-week?year=${year}&week=${week}&facilityId=${facilityId}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.text());
+    }
 
     static getMonthScheduleComponent(year, month, facilityId = null) {
         return fetch(`/components/schedule-month?year=${year}&month=${month}&facilityId=${facilityId}`, {

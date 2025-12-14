@@ -13,10 +13,10 @@ class ScheduleService
     {
 
     }
-    public function buildWeekDaysRange(int $year, int $week): array
+    public function buildWeekDaysRange(int $year, int $week, int $weekSpan = 1): array
     {
         $date = new DateTime();
-        $date->setISODate($year, $week, 1); // Montag der Woche
+        $date->setISODate($year, $week, 1); // Montag der Startwoche
 
         $today = new DateTime();
         $todayFormatted = $today->format('d.m.Y');
@@ -25,25 +25,32 @@ class ScheduleService
         $germanDays = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
         $germanMonths = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
-        for ($i = 0; $i < 7; $i++) {
+        $totalDays = 7 * $weekSpan;
+
+        for ($i = 0; $i < $totalDays; $i++) {
             $dateFormatted = $date->format('d.m.Y');
             $isToday = $dateFormatted === $todayFormatted;
 
+            $dayNumber = (int)$date->format('N') - 1; // 0 = Montag
             $day = $date->format('d');
             $month = $germanMonths[(int)$date->format('m') - 1];
             $shortName = "$day. $month";
 
             $weekDays[] = [
-                'name' => $germanDays[$i],
+                'name' => $germanDays[$dayNumber],
                 'date' => $dateFormatted,
                 'shortName' => $shortName,
-                'isToday' => $isToday
+                'isToday' => $isToday,
+                'week' => (int)$date->format('W'),
+                'year' => (int)$date->format('o'),
             ];
+
             $date->modify('+1 day');
         }
 
         return $weekDays;
     }
+
 
     public function getShiftsForEmployeesInDateRange(array $datesRange, $facilityId = null): array
     {

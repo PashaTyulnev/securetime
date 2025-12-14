@@ -10,8 +10,7 @@ export default class extends Controller {
         "facilityShiftsContainer",
         "facilitySelect",
         "demandShiftsContainer",
-        "miniShiftPill",
-        "facilitySelect"
+        "miniShiftPill"
     ];
 
     static values = {
