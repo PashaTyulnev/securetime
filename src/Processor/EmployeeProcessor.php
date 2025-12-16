@@ -1,6 +1,7 @@
 <?php
 namespace App\Processor;
 
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
@@ -8,6 +9,7 @@ use App\Entity\Contract;
 use App\Entity\Employee;
 use App\Entity\User;
 use App\Repository\ContractRepository;
+use App\Repository\ShiftRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,6 +20,7 @@ readonly class EmployeeProcessor implements ProcessorInterface
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private EntityManagerInterface $entityManager,
+        readonly ShiftRepository $shiftRepository,
         readonly ContractRepository $contractRepository,
         private RequestStack $requestStack
     ) {}
@@ -25,6 +28,7 @@ readonly class EmployeeProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
 
+        dd("TEST");
         if (!$data instanceof Employee) {
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }
@@ -35,6 +39,35 @@ readonly class EmployeeProcessor implements ProcessorInterface
         }
 
         $requestData = json_decode($request->getContent(), true);
+
+        if($operation instanceof Delete){
+            // BEI DELETE: Employee aus DB laden
+            $employee = $this->entityManager->find(Employee::class, $uriVariables['id']);
+
+            if (!$employee) {
+                throw new \RuntimeException('Angesteller nicht gefunden');
+            }
+
+            //prüfe ob der Employee zugewiesene schichten hat
+            $shifts = $this->shiftRepository->findBy(['employee' => $employee]);
+            if (count($shifts) > 0) {
+                throw new \RuntimeException('Der Angestellte kann nicht gelöscht werden, da er zugewiesene Schichten hat. Bitte Status auf inaktiv setzen. ');
+            }else{
+                // User des Employees löschen
+                $user = $employee->getUser();
+                if ($user) {
+                    $this->entityManager->remove($user);
+                }
+                // Verträge des Employees löschen
+                $contracts = $this->contractRepository->findBy(['employee' => $employee]);
+                foreach ($contracts as $contract) {
+                    $this->entityManager->remove($contract);
+                }
+                $this->entityManager->flush();
+            }
+
+            return [];
+        }
 
         // BEI PUT: Employee aus DB laden und Werte übertragen
         if ($operation instanceof Put && !empty($uriVariables['id'])) {

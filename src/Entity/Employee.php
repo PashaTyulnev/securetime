@@ -8,7 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Provider\EmployeeProvider;
+use App\Controller\ApiController\EmployeeStatusController;
 use App\Repository\EmployeeRepository;
 use App\Processor\EmployeeProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,7 +24,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new GetCollection(),
         new Post(processor:EmployeeProcessor::class),
         new Put(processor: EmployeeProcessor::class),
-        new Delete(),
+        new Put(
+            uriTemplate: '/employees/toggle-status/{employeeId}',
+            controller: EmployeeStatusController::class,
+        ),
+        new Delete(processor: EmployeeProcessor::class),
     ],
     normalizationContext: ['groups' => ['employee:read']],
     denormalizationContext: ['groups' => ['employee:write']]

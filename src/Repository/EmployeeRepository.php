@@ -20,9 +20,13 @@ class EmployeeRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('e')
             ->leftJoin('e.qualification', 'q')
+            ->leftJoin('e.user', 'u')
             ->addSelect('q')
-            ->orderBy('q.rank', 'DESC')  // höchste Qualifikation zuerst
-            ->addOrderBy('e.lastName', 'ASC')  // optional: innerhalb gleicher Rank nach Name sortieren
+            ->addSelect('u')
+            ->where('u.active = :active')
+            ->setParameter('active', true)
+            ->orderBy('q.rank', 'DESC')
+            ->addOrderBy('e.lastName', 'ASC')
             ->getQuery()
             ->getResult();
     }

@@ -6,6 +6,7 @@ use App\Service\EmployeeService;
 use App\Service\FacilityService;
 use App\Service\ScheduleService;
 use App\Service\ShiftService;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,6 +36,13 @@ class ScheduleComponentController extends AbstractController
         $datesRange = $this->scheduleService->buildWeekDaysRange((int)$year, (int)$week);
 
         $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange);
+
+        $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
+        $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
+
+        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate);
+
+        $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 
         return $this->render('pages/schedule/schedule_week/schedule_week_overview.html.twig', [
             'employees' => $employees,
@@ -87,12 +95,19 @@ class ScheduleComponentController extends AbstractController
 
         $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange, $facilityId);
 
+        $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
+        $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
+
+        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate);
+
+        $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
+
         return $this->render('pages/schedule/schedule_month/schedule_month_overview.html.twig', [
             'employees' => $employees,
             'facilities' => $facilities,
             'datesRange' => $datesRange,
             'shifts' => $shifts,
-            'selectedFacilityId' => $facilityId,
+            'selectedFacilityId' => $facilityId
         ]);
     }
 
@@ -113,8 +128,14 @@ class ScheduleComponentController extends AbstractController
         $employees = $this->employeeService->getAllEmployees();
         $facilities = $this->facilityService->getAllFacilities();
         $datesRange = $this->scheduleService->buildWeekDaysRange((int)$year, (int)$week,2);
-
         $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange, $facilityId);
+
+        $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
+        $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
+
+        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate);
+
+        $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 
         return $this->render('pages/schedule/schedule_two_week/schedule_two_week_overview.html.twig', [
             'employees' => $employees,

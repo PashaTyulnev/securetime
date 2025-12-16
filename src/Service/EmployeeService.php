@@ -55,4 +55,33 @@ class EmployeeService
 
         return json_decode($allQualifications, true);
     }
+
+    public function assignPlannedHoursToEmployees(mixed $employees, array $plannedHoursData)
+    {
+        // 1️⃣ Lookup-Tabelle nach Employee-ID
+        $plannedHoursByEmployeeId = [];
+
+        foreach ($plannedHoursData as $data) {
+            $plannedHoursByEmployeeId[$data['id']] = [
+                'total' => $data['workingHoursTotal'],
+                'regular' => $data['workingHoursRegular'],
+                'onCall' => $data['workingHoursOnCall'],
+            ];
+        }
+
+        // 2️⃣ Employees erweitern
+        foreach ($employees as &$employee) {
+            $employeeId = $employee['id'];
+
+            $employee['plannedHours'] = $plannedHoursByEmployeeId[$employeeId] ?? [
+                'total' => 0,
+                'regular' => 0,
+                'onCall' => 0,
+            ];
+        }
+
+        unset($employee); // Referenz sauber lösen
+
+        return $employees;
+    }
 }

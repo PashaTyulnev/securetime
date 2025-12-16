@@ -41,8 +41,32 @@
                             <div
                                 class="text-sm font-semibold text-gray-900 dark:text-white">{{ employee.firstName|slice(0,1)|upper }}
                                 . {{ employee.lastName }}</div>
-                            <div
-                                class="text-xs text-gray-500 dark:text-gray-400">{{ employee.qualification.title }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.qualification.title }}</div>
+                            <div class="mt-0.5">
+                                <table class="text-[8px] leading-[9px] text-gray-500 dark:text-gray-400 border-collapse">
+                                    <thead>
+                                    <tr>
+                                        <th class="px-1 text-center font-medium" title="Reguläre Arbeitszeit">Plan</th>
+                                        <th class="px-1 text-center font-medium" title="Bereitschaftsdienst">Bereit</th>
+                                        <th class="px-1 text-center font-semibold" title="Gesamt (inkl. Bereitschaft)">Total</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td class="px-1 text-center">
+                                            {{ employee.plannedHours.regular }}h
+                                        </td>
+                                        <td class="px-1 text-center">
+                                            {{ employee.plannedHours.onCall }}h
+                                        </td>
+                                        <td class="px-1 text-center font-semibold">
+                                            {{ employee.plannedHours.total }}h
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
                     </div>
                 </div>

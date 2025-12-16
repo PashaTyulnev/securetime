@@ -14,4 +14,22 @@ export default class extends BaseEntityController {
     getDeleteConfirmMessage() {
         return 'Möchten Sie diesen Mitarbeiter wirklich löschen?';
     }
+
+    toggleStatus(event) {
+
+        let employeeId = event.params.id
+
+        fetch(`/api/employees/toggle-status/${employeeId}`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload()
+            }
+        }).catch(error => {
+            alert(error)
+        })
+    }
 }

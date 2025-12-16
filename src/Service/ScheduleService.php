@@ -9,10 +9,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ScheduleService
 {
 
-    public function __construct(readonly ShiftRepository $shiftRepository,readonly SerializerInterface $serializer)
+    public function __construct(readonly ShiftRepository $shiftRepository, readonly SerializerInterface $serializer)
     {
 
     }
+
     public function buildWeekDaysRange(int $year, int $week, int $weekSpan = 1): array
     {
         $date = new DateTime();
@@ -60,7 +61,7 @@ class ScheduleService
         $firstDate->setTime(0, 0, 0);
         $lastDate->setTime(23, 59, 59);
 
-        $results = $this->shiftRepository->findShiftsInDateRange($firstDate, $lastDate,$facilityId);
+        $results = $this->shiftRepository->findShiftsInDateRange($firstDate, $lastDate, $facilityId);
 
         $shifts = $this->serializer->serialize(
             $results,
@@ -106,4 +107,58 @@ class ScheduleService
 
         return $monthDays;
     }
+
+    public function getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate): array
+    {
+        $firstDate->setTime(0, 0, 0);
+        $lastDate->setTime(23, 59, 59);
+
+        $plannedShifts = $this->shiftRepository->findShiftsInDateRange($firstDate, $lastDate);
+
+        $employeeData = [];
+
+        foreach ($plannedShifts as $shift) {
+
+            $employee = $shift->getEmployee();
+            $employeeId = $employee->getId();
+
+            $demandShift = $shift->getDemandShift();
+            $timeFrom = $demandShift->getTimeFrom();
+            $timeTo = $demandShift->getTimeTo();
+
+            // Stundenberechnung
+            $hours = (int)$timeTo->format('H') - (int)$timeFrom->format('H');
+            if ($hours < 0) {
+                $hours += 24;
+            }
+
+            if (!isset($employeeData[$employeeId])) {
+                $employeeData[$employeeId] = [
+                    'id' => $employeeId,
+                    'firstName' => $employee->getFirstName(),
+                    'lastName' => $employee->getLastName(),
+                    'dateFrom' => $firstDate->format('Y-m-d'),
+                    'dateTo' => $lastDate->format('Y-m-d'),
+
+                    // Summen
+                    'workingHoursTotal' => 0,
+                    'workingHoursRegular' => 0,
+                    'workingHoursOnCall' => 0,
+                ];
+            }
+
+            // Gesamt immer erhöhen
+            $employeeData[$employeeId]['workingHoursTotal'] += $hours;
+
+            // Aufteilen nach OnCall
+            if ($shift->isOnCall()) {
+                $employeeData[$employeeId]['workingHoursOnCall'] += $hours;
+            } else {
+                $employeeData[$employeeId]['workingHoursRegular'] += $hours;
+            }
+        }
+
+        return array_values($employeeData);
+    }
+
 }

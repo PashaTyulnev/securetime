@@ -41,7 +41,7 @@ class ShiftRepository extends ServiceEntityRepository
     }
 
 
-    public function findByEmployeeAndDate(?\App\Entity\Employee $employee, ?\DateTime $getDate)
+    public function findByEmployeeAndDate(?Employee $employee, ?\DateTime $getDate)
     {
         return $this->createQueryBuilder('s')
             ->andWhere('s.employee = :employee')
@@ -64,7 +64,7 @@ class ShiftRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getAllAssignedShiftsInRange(?Employee $getEmployee, string $startDate, string $endDate)
+    public function getAllAssignedShiftsInRange(Employee $getEmployee, string $startDate, string $endDate)
     {
         return $this->createQueryBuilder('s')
             ->andWhere('s.employee = :employee')
@@ -76,5 +76,7 @@ class ShiftRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+
 
 }
