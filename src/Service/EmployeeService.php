@@ -15,10 +15,10 @@ class EmployeeService
     {
 
     }
-    public function getAllEmployees()
+    public function getAllEmployees($withInactive = false)
     {
         //call function from other controller
-        $allEmployees = $this->employeeRepository->findAll();
+        $allEmployees = $this->employeeRepository->findAll($withInactive);
 
         $allEmployees = $this->serializer->serialize(
             $allEmployees,

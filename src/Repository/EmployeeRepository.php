@@ -16,19 +16,22 @@ class EmployeeRepository extends ServiceEntityRepository
         parent::__construct($registry, Employee::class);
     }
 
-    public function findAll(): array
+    public function findAll(bool $withInactive = false): array
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.qualification', 'q')
             ->leftJoin('e.user', 'u')
-            ->addSelect('q')
-            ->addSelect('u')
-            ->where('u.active = :active')
-            ->setParameter('active', true)
+            ->addSelect('q', 'u')
             ->orderBy('q.rank', 'DESC')
-            ->addOrderBy('e.lastName', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->addOrderBy('e.lastName', 'ASC');
+
+        if (!$withInactive) {
+            $qb->andWhere('u.active = :active')
+                ->setParameter('active', true);
+        }
+
+        return $qb->getQuery()->getResult();
     }
+
 
 }

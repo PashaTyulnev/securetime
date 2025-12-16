@@ -27,7 +27,7 @@ class EmployeeComponentController extends AbstractController
     public function getEmployeeListComponent(): Response
     {
         //call function from other controller
-        $allEmployees = $this->employeeService->getAllEmployees();
+        $allEmployees = $this->employeeService->getAllEmployees(true);
 
         return $this->render('pages/employee/employee_list.html.twig', [
             'employees' => $allEmployees
