@@ -43,11 +43,23 @@
                         {{ employee.firstName|slice(0,1) }}. {{ employee.lastName|slice(0,8) }}
                     </div>
 
-                    <div class="mt-0.5 flex gap-1 text-[9px] leading-[8px] text-gray-400 dark:text-gray-500">
-                        <span title="Reguläre Arbeitszeit">Plan <br> {{ employee.plannedHours.regular }}h</span>
-                        <span title="Bereitschaftsdienst">Bereit <br> {{ employee.plannedHours.onCall }}h</span>
-                        <span title="Gesamt (inkl. Bereitschaft)">Total <br>{{ employee.plannedHours.total }}h</span>
+                    <div class="mt-0.5 grid grid-cols-3 gap-x-2 text-[8px] leading-[9px] text-gray-500 dark:text-gray-400">
+                        <div>
+                            <div class="font-medium" title="Reguläre Arbeitszeit">Plan</div>
+                            <div>{{ employee.plannedHours.regular }}h</div>
+                        </div>
+
+                        <div>
+                            <div class="font-medium" title="Bereitschaftsdienst">Bereit</div>
+                            <div>{{ employee.plannedHours.onCall }}h</div>
+                        </div>
+
+                        <div>
+                            <div class="font-semibold" title="Gesamt (inkl. Bereitschaft)">Total</div>
+                            <div class="font-semibold">{{ employee.plannedHours.total }}h</div>
+                        </div>
                     </div>
+
 
 
                 </div>
