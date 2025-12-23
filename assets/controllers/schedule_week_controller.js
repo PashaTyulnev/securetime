@@ -42,9 +42,10 @@ export default class extends Controller {
     buildScheduleElement() {
         let year = this.currentDate.getFullYear();
         let week = this.currentWeek;
-
+        let facilityId = this.facilitySelectTarget.value;
+        console.log(facilityId)
         // WICHTIG: Promise zurückgeben!
-        return ScheduleComponentApi.getWeekScheduleComponent(year, week).then(demandShiftsComponent => {
+        return ScheduleComponentApi.getWeekScheduleComponent(year, week,facilityId).then(demandShiftsComponent => {
             this.scheduleContainerTarget.innerHTML = demandShiftsComponent;
         });
     }

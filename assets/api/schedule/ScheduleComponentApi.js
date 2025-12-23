@@ -1,7 +1,7 @@
 export default class ScheduleComponentApi {
 
-  static getWeekScheduleComponent(year, week, weekSpan = 1) {
-      return fetch(`/components/schedule-week?year=${year}&week=${week}&weekSpan=${weekSpan}`, {
+  static getWeekScheduleComponent(year, week, facilityId=null, weekSpan = 1) {
+      return fetch(`/components/schedule-week?year=${year}&week=${week}&weekSpan=${weekSpan}&facilityId=${facilityId}`, {
           method: "GET",
           headers: {
               'Content-Type': 'application/json'

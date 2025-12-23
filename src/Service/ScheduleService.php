@@ -108,12 +108,12 @@ class ScheduleService
         return $monthDays;
     }
 
-    public function getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate): array
+    public function getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate, $facilityId=null): array
     {
         $firstDate->setTime(0, 0, 0);
         $lastDate->setTime(23, 59, 59);
 
-        $plannedShifts = $this->shiftRepository->findShiftsInDateRange($firstDate, $lastDate);
+        $plannedShifts = $this->shiftRepository->findShiftsInDateRange($firstDate, $lastDate,$facilityId);
 
         $employeeData = [];
 

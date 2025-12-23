@@ -30,6 +30,11 @@ class ScheduleComponentController extends AbstractController
 
         $year = $request->query->get('year');
         $week = $request->query->get('week');
+        $facilityId = $request->query->get('facilityId', null);
+
+        if($facilityId === 'null' || $facilityId === ''){
+            $facilityId = null;
+        }
 
         $employees = $this->employeeService->getAllEmployees();
         $facilities = $this->facilityService->getAllFacilities();
@@ -40,7 +45,8 @@ class ScheduleComponentController extends AbstractController
         $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
         $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
 
-        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate);
+
+        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate,$facilityId);
 
         $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 
@@ -98,7 +104,7 @@ class ScheduleComponentController extends AbstractController
         $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
         $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
 
-        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate);
+        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate,$facilityId);
 
         $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 
@@ -133,7 +139,7 @@ class ScheduleComponentController extends AbstractController
         $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
         $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
 
-        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate);
+        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate, $facilityId);
 
         $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 

@@ -84,4 +84,25 @@ class EmployeeService
 
         return $employees;
     }
+
+    public function filterOnlyShiftedEmployees(mixed $employees, array $shifts): array
+    {
+        $displayEmployees = [];
+        $relevantEmployeeUris = [];
+        foreach ($shifts as $shift){
+            $employeeUri = $shift['employee'];
+            $relevantEmployeeUris[] = $employeeUri;
+        }
+
+        //remove duplicates
+        $relevantEmployeeUris = array_unique($relevantEmployeeUris);
+
+        foreach ($employees as $employee){
+            if(in_array($employee['@id'], $relevantEmployeeUris)){
+                $displayEmployees[] = $employee;
+            }
+        }
+
+        return $displayEmployees;
+    }
 }

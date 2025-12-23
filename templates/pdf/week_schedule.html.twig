@@ -79,7 +79,7 @@
             margin: 0;
             font-weight: bold;
             font-size: 5pt;
-            line-height: 1.0;
+            height: 30px;
         }
 
         .today {
@@ -167,12 +167,12 @@
 
     {% for employee in employees %}
         <tr>
-            <td class="employee-cell">
+            <td class="employee-cell" style="height:20px;">
                 {{ employee.firstName|slice(0,1) }}. {{ employee.lastName|slice(0,8) }}
             </td>
 
             {% for day in datesRange %}
-                <td class="day-cell">
+                <td class="day-cell" style="height:20px;">
                     {% for shift in shifts %}
                         {% if shift.date|date('Y-m-d') == day.date|date('Y-m-d') and shift.employee == employee['@id'] %}
                             <div class="shift-box" style="background-color: {{ shift.demandShift.color }};">

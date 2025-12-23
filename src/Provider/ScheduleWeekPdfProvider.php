@@ -58,11 +58,15 @@ class ScheduleWeekPdfProvider implements ProviderInterface
     {
         $dompdf = new Dompdf();
 
-        $employees = $this->employeeService->getAllEmployees();
+
         $facilities = $this->facilityService->getAllFacilities();
         $datesRange = $this->scheduleService->buildWeekDaysRange((int)$year, (int)$week, (int)$weekSpan);
 
         $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange,$facilityId);
+
+        $employees = $this->employeeService->getAllEmployees();
+
+        $relevantEmployees = $this->employeeService->filterOnlyShiftedEmployees($employees, $shifts);
 
         $selectedFacility = null;
 
@@ -71,7 +75,7 @@ class ScheduleWeekPdfProvider implements ProviderInterface
         }
 
         $html = $this->twig->render('pdf/week_schedule.html.twig', [
-            'employees' => $employees,
+            'employees' => $relevantEmployees,
             'facilities' => $facilities,
             'datesRange' => $datesRange,
             'shifts' => $shifts,

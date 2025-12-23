@@ -68,9 +68,9 @@ class ScheduleMonthPdfProvider implements ProviderInterface
             $selectedFacility = $this->facilityService->getFacilityById($facilityId);
         }
 
-
+        $relevantEmployees = $this->employeeService->filterOnlyShiftedEmployees($employees, $shifts);
         $html = $this->twig->render('pdf/month_schedule.html.twig', [
-            'employees' => $employees,
+            'employees' => $relevantEmployees,
             'facilities' => $facilities,
             'datesRange' => $datesRange,
             'shifts' => $shifts,
