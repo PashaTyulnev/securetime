@@ -6,6 +6,8 @@ use App\Repository\DepartmentRepository;
 use App\Repository\EmployeeRepository;
 use App\Service\DepartmentService;
 use App\Service\EmployeeService;
+use App\Service\PartnerService;
+use App\Service\RoleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,6 +20,8 @@ class EmployeeComponentController extends AbstractController
                                 readonly DepartmentService    $departmentService,
                                 readonly EmployeeService      $employeeService,
                                 readonly DepartmentRepository $departmentRepository,
+                                readonly PartnerService       $partnerService,
+                                readonly RoleService          $roleService,
                                 readonly EmployeeRepository   $employeeRepository)
     {
 
@@ -39,9 +43,14 @@ class EmployeeComponentController extends AbstractController
     {
         $departments = $this->departmentService->getAllDepartments();
         $qualifications = $this->employeeService->getAllQualifications();
+        $partners = $this->partnerService->getAllPartners();
+        $roles = $this->roleService->getAllRoles();
+
         return $this->render('pages/employee/employee_modal.html.twig', [
             'departments' => $departments,
-            'qualifications' => $qualifications
+            'qualifications' => $qualifications,
+            'partners' => $partners,
+            'roles' => $roles
         ]);
     }
 
@@ -50,14 +59,16 @@ class EmployeeComponentController extends AbstractController
     {
         $departments = $this->departmentService->getAllDepartments();
         $qualifications = $this->employeeService->getAllQualifications();
-
-        //call function from other controller
+        $partners = $this->partnerService->getAllPartners();
         $employee = $this->employeeService->getEmployee($employeeId);
+        $roles = $this->roleService->getAllRoles();
 
         return $this->render('pages/employee/employee_modal.html.twig', [
             'departments' => $departments,
             'employee' => $employee,
-            'qualifications' => $qualifications
+            'qualifications' => $qualifications,
+            'partners' => $partners,
+            'roles' => $roles
         ]);
     }
 }

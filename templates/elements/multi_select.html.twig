@@ -1,0 +1,99 @@
+<div class="relative" data-controller="dropdown">
+    <label
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        {{ title }}
+    </label>
+
+    {# Button #}
+    <button
+        id="{{ systemName }}Button"
+        data-dropdown-target="trigger"
+        data-dropdown-toggle="{{ systemName }}Dropdown"
+        type="button"
+        class="w-full inline-flex items-center justify-between
+               bg-gray-50 dark:bg-gray-800
+               border border-gray-200 dark:border-gray-700
+               text-gray-900 dark:text-white
+               text-sm font-medium
+               rounded-lg px-3 py-2
+               hover:bg-gray-100 dark:hover:bg-gray-700
+               focus:outline-none focus:ring-4 focus:ring-slate-300
+               dark:focus:ring-slate-600">
+
+        <span class="truncate" data-dropdown-target="label">
+            {% if devValue is defined and devValue is iterable and devValue|length > 0 %}
+                {% set selectedLabels = [] %}
+                {% for option in options %}
+                    {% if option.value in devValue %}
+                        {% set selectedLabels = selectedLabels|merge([option.label]) %}
+                    {% endif %}
+                {% endfor %}
+                {% if selectedLabels|length > 0 %}
+                    {{ selectedLabels|join(', ') }}
+                {% else %}
+                    {{ defaultOption ?? 'Auswählen' }}
+                {% endif %}
+            {% else %}
+                {{ defaultOption ?? 'Auswählen' }}
+            {% endif %}
+        </span>
+
+        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true"
+             xmlns="http://www.w3.org/2000/svg" fill="none"
+             viewBox="0 0 10 6">
+            <path stroke="currentColor" stroke-linecap="round"
+                  stroke-linejoin="round" stroke-width="2"
+                  d="m1 1 4 4 4-4"/>
+        </svg>
+    </button>
+
+    {# Dropdown #}
+    <div
+        id="{{ systemName }}Dropdown"
+        data-dropdown-target="menu"
+        class="z-10 hidden mt-1 w-full
+               bg-white dark:bg-gray-700
+               divide-y divide-gray-100 dark:divide-gray-600
+               rounded-lg shadow-sm">
+
+        <ul class="p-3 space-y-3 text-sm text-gray-700 dark:text-gray-200"
+            aria-labelledby="{{ systemName }}Button">
+
+            {% for option in options %}
+                {% set checked =
+                    devValue is defined
+                    and devValue is iterable
+                    and option.value in devValue
+                %}
+
+                <li>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input
+                            id="{{ systemName }}_{{ loop.index }}"
+                            type="checkbox"
+                            name="{{ systemName }}[]"
+                            value="{{ option.value }}"
+                            {% if checked %}checked{% endif %}
+                            data-action="change->dropdown#updateLabel"
+                            class="w-4 h-4
+                                   text-blue-600
+                                   bg-gray-100
+                                   border-gray-300
+                                   rounded-sm
+                                   focus:ring-blue-500
+                                   dark:focus:ring-blue-600
+                                   dark:ring-offset-gray-700
+                                   dark:focus:ring-offset-gray-700
+                                   focus:ring-2
+                                   dark:bg-gray-600
+                                   dark:border-gray-500">
+
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-300">
+                            {{ option.label }}
+                        </span>
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

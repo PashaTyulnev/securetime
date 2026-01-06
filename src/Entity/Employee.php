@@ -90,6 +90,10 @@ class Employee
     #[Groups(['employee:read', 'employee:write'])]
     private ?string $guardianId = null;
 
+    #[ORM\ManyToOne(inversedBy: 'employees')]
+    #[Groups(['employee:read', 'employee:write'])]
+    private ?PartnerCompany $partnerCompany = null;
+
     public function __construct()
     {
         $this->shifts = new ArrayCollection();
@@ -276,6 +280,18 @@ class Employee
     public function setGuardianId(?string $guardianId): static
     {
         $this->guardianId = $guardianId;
+
+        return $this;
+    }
+
+    public function getPartnerCompany(): ?PartnerCompany
+    {
+        return $this->partnerCompany;
+    }
+
+    public function setPartnerCompany(?PartnerCompany $partnerCompany): static
+    {
+        $this->partnerCompany = $partnerCompany;
 
         return $this;
     }

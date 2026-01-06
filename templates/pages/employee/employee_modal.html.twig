@@ -18,12 +18,10 @@
         {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-employee-target'} %}
 
         {% if employee is defined %}
-
-        <form data-action="submit->employee#saveEdit" data-employee-uri-param="{{ definedEmployee['@id'] }}">
-            {% else %}
+            <form data-action="submit->employee#saveEdit" data-employee-uri-param="{{ definedEmployee['@id'] }}">
+        {% else %}
             <form data-action="submit->employee#saveNew">
-                {% endif %}
-
+        {% endif %}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
 
                     {% include 'elements/input.html.twig' with {
@@ -47,6 +45,31 @@
                         'devValue': definedEmployee.department is defined and definedEmployee.department is not null
                         ? definedEmployee.department['@id']
                         : ''
+                    } %}
+
+                    {% include 'elements/select.html.twig' with {
+                        'systemName': 'partnerCompany',
+                        'title': 'Partnerfirma',
+                        'options': partners | map(p => {
+                            'value': p['@id'],
+                            'label': p.title
+                        }),
+                        'defaultOption': 'DWSD',
+                        'required': 'required',
+                        'devValue': definedEmployee.partnerCompany is defined and definedEmployee.partnerCompany is not null
+                        ? definedEmployee.partnerCompany['@id']
+                        : ''
+                    } %}
+
+                    {% include 'elements/multi_select.html.twig' with {
+                        systemName: 'roles',
+                        title: 'Rollen',
+                        defaultOption: 'Rollen',
+                        options: roles | map(r => {
+                            'value': r['@id'],
+                            'label': r.displayName
+                        }),
+                        devValue: definedEmployee.user.roleEntities | map(r => r['@id'])
                     } %}
 
                     {% include 'elements/select.html.twig' with {

@@ -7,8 +7,10 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Contract;
 use App\Entity\Employee;
+use App\Entity\Role;
 use App\Entity\User;
 use App\Repository\ContractRepository;
+use App\Repository\RoleRepository;
 use App\Repository\ShiftRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -22,6 +24,7 @@ readonly class EmployeeProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         readonly ShiftRepository $shiftRepository,
         readonly ContractRepository $contractRepository,
+        readonly RoleRepository $roleRepository,
         private RequestStack $requestStack
     ) {}
 
@@ -72,7 +75,6 @@ readonly class EmployeeProcessor implements ProcessorInterface
         if ($operation instanceof Put && !empty($uriVariables['id'])) {
             $employee = $this->entityManager->find(Employee::class, $uriVariables['id']);
 
-
             if (!$employee) {
                 throw new \RuntimeException('Employee not found');
             }
@@ -84,6 +86,7 @@ readonly class EmployeeProcessor implements ProcessorInterface
 
             $this->handleContractData($employee, $contractData);
 
+
             // Übertrage alle Werte vom deserialisierten $data zum DB-Employee
             $employee->setFirstName($data->getFirstName());
             $employee->setLastName($data->getLastName());
@@ -93,11 +96,13 @@ readonly class EmployeeProcessor implements ProcessorInterface
             $employee->setDepartment($data->getDepartment());
             $employee->setQualification($data->getQualification());
             $employee->setGuardianId($data->getGuardianId());
+            $employee->setPartnerCompany($data->getPartnerCompany());
 
             $data = $employee;
         }
 
         // --- HANDLE USER ---
+        $user = null;
         if (isset($requestData['user'])) {
             $userData = $requestData['user'];
 
@@ -126,11 +131,18 @@ readonly class EmployeeProcessor implements ProcessorInterface
                     $user->setEmail($userData['email']);
                 }
                 $user->setActive($userData['active'] ?? true);
-                $user->setRoles(['ROLE_EMPLOYEE']);
 
                 $this->entityManager->persist($user);
                 $data->setUser($user);
             }
+        } else {
+            // Wenn kein User im Request, aber Employee hat bereits einen User
+            $user = $data->getUser();
+        }
+
+        // --- HANDLE ROLES ---
+        if (isset($requestData['roles']) && $user) {
+            $this->handleRolesData($user, $requestData['roles']);
         }
 
         if (isset($requestData['contracts'])) {
@@ -171,5 +183,51 @@ readonly class EmployeeProcessor implements ProcessorInterface
 
         }
 
+    }
+
+    private function handleRolesData(User $user, mixed $rolesData): void
+    {
+        // Entferne alle bestehenden Rollen
+        foreach ($user->getRoleEntities() as $role) {
+            $user->removeRole($role);
+        }
+
+        // Füge neue Rollen hinzu
+        if (is_array($rolesData)) {
+            foreach ($rolesData as $roleIri) {
+                $this->addRoleToUser($user, $roleIri);
+            }
+        } else {
+            // Falls nur eine Rolle gesendet wurde (kein Array)
+            $this->addRoleToUser($user, $rolesData);
+        }
+    }
+
+    private function addRoleToUser(User $user, mixed $roleIri): void
+    {
+        if (empty($roleIri)) {
+            return;
+        }
+
+        // Extrahiere ID aus IRI (z.B. "/api/roles/1" -> 1)
+        $roleId = $this->extractIdFromIri((string) $roleIri);
+        if ($roleId) {
+            $role = $this->roleRepository->find($roleId);
+            if ($role) {
+                $user->addRole($role);
+            }
+        }
+    }
+
+    private function extractIdFromIri(string $iri): ?int
+    {
+        // Unterstützt sowohl "/api/roles/1" als auch nur "1"
+        if (preg_match('/\/(\d+)$/', $iri, $matches)) {
+            return (int) $matches[1];
+        }
+        if (is_numeric($iri)) {
+            return (int) $iri;
+        }
+        return null;
     }
 }

@@ -5,7 +5,21 @@ export default class Formater {
         console.log("FORMATIERE JSON")
         const jsonData = {};
 
+        // Sammle alle Array-Keys (z.B. roles[], requiredPositions[])
+        const arrayKeys = new Set();
+        for (const key of formData.keys()) {
+            if (key.endsWith('[]')) {
+                arrayKeys.add(key);
+            }
+        }
+
+        // Verarbeite normale Felder
         for (const [key, value] of formData.entries()) {
+            // Überspringe Array-Felder, die separat behandelt werden
+            if (key.endsWith('[]')) {
+                continue;
+            }
+
             if (value === '' || value === null || value === undefined) {
                 continue;
             }
@@ -53,6 +67,15 @@ export default class Formater {
             }
 
             current[lastKey] = processedValue;
+        }
+
+        // Verarbeite Array-Felder
+        for (const arrayKey of arrayKeys) {
+            const arrayName = arrayKey.replace('[]', '');
+            const values = formData.getAll(arrayKey);
+            if (values.length > 0) {
+                jsonData[arrayName] = values;
+            }
         }
 
         return jsonData;

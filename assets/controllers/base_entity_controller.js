@@ -109,7 +109,19 @@ export default class extends Controller {
 
         // Formulardaten als JSON (verschachtelte Felder werden unterstützt)
         const formData = new FormData(event.target);
+        
+        // Arrays explizit behandeln (z.B. roles[])
+        const roles = formData.getAll('roles[]');
+        if (roles.length > 0) {
+            formData.delete('roles[]');
+        }
+        
         const jsonData = Formater.formatToJson(formData);
+        
+        // Arrays zum JSON hinzufügen
+        if (roles.length > 0) {
+            jsonData.roles = roles;
+        }
 
         // API-Aufruf
         apiCall(jsonData)

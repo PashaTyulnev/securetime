@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
-import {Modal} from 'flowbite';
+import {Modal, initFlowbite} from 'flowbite';
 
 export default class extends Controller {
 
@@ -15,6 +15,12 @@ export default class extends Controller {
 
         // options mit Standardwerten
         const options = {
+            onShow: () => {
+                // Flowbite Komponenten nach dem Öffnen des Modals initialisieren
+                setTimeout(() => {
+                    initFlowbite();
+                }, 100);
+            },
             onHide: () => {
                 console.log('Modal wird geschlossen');
             }
