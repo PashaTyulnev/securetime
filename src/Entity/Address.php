@@ -29,31 +29,31 @@ class Address
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['company:read', 'company:write', 'facility:read'])]
+    #[Groups(['company:read', 'company:write', 'facility:read', 'partner:read', 'partner:write'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['company:read', 'company:write', 'facility:read','facility:write'])]
+    #[Groups(['company:read', 'company:write', 'facility:read','facility:write', 'partner:read', 'partner:write'])]
     private ?string $street = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['company:read', 'company:write', 'facility:read','facility:write'])]
+    #[Groups(['company:read', 'company:write', 'facility:read','facility:write', 'partner:read', 'partner:write'])]
     private ?string $zip = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['company:read', 'company:write', 'facility:read','facility:write'])]
+    #[Groups(['company:read', 'company:write', 'facility:read','facility:write', 'partner:read', 'partner:write'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['company:read', 'company:write', 'facility:read','facility:write'])]
+    #[Groups(['company:read', 'company:write', 'facility:read','facility:write', 'partner:read', 'partner:write'])]
     private ?string $country = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['company:read', 'company:write', 'facility:read','facility:write'])]
+    #[Groups(['company:read', 'company:write', 'facility:read','facility:write', 'partner:read', 'partner:write'])]
     private ?float $longitude = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['company:read', 'company:write', 'facility:read','facility:write'])]
+    #[Groups(['company:read', 'company:write', 'facility:read','facility:write', 'partner:read', 'partner:write'])]
     private ?float $altitude = null;
 
     public function getId(): ?int
