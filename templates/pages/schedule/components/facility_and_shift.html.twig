@@ -8,7 +8,12 @@
             data-schedule-week-target="facilitySelect"
             data-action="change->schedule-week#selectFacility"
             class="px-4 py-2 bg-blue-100/80 dark:bg-blue-900/40 rounded-xl border-0 text-sm font-bold text-blue-900 dark:text-blue-200 focus:ring-2 focus:ring-blue-500">
+            {% if is_granted("ROLE_ADMIN") %}
             <option class="bg-blue-100/80 dark:bg-blue-900/40" value="null">Bitte für Planung auswählen...</option>
+
+            {% else %}
+            <option class="bg-blue-100/80 dark:bg-blue-900/40" value="null">Alle Objekte anzeigen</option>
+            {% endif %}
 
             {% for facility in facilities %}
                 <option class="bg-blue-100/80 dark:bg-blue-900/40" value="{{ facility.id }}"
@@ -17,10 +22,12 @@
         </select>
     </div>
 
-    <!-- Schichtenreihe -->
-    <div class="flex gap-4 overflow-x-auto pt-5">
-        <div data-schedule-week-target="demandShiftsContainer" class="flex gap-4">
+   {% if is_granted("ROLE_ADMIN") %}
+        <!-- Schichtenreihe -->
+        <div class="flex gap-4 overflow-x-auto pt-5">
+            <div data-schedule-week-target="demandShiftsContainer" class="flex gap-4">
 
+            </div>
         </div>
-    </div>
+    {% endif %}
 </div>

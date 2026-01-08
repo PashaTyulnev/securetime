@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Employee;
+use App\Entity\PartnerCompany;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,7 +17,7 @@ class EmployeeRepository extends ServiceEntityRepository
         parent::__construct($registry, Employee::class);
     }
 
-    public function findAll(bool $withInactive = false): array
+    public function findAll(bool $withInactive = false, ?PartnerCompany $partnerCompany = null): array
     {
         $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.qualification', 'q')
@@ -28,6 +29,11 @@ class EmployeeRepository extends ServiceEntityRepository
         if (!$withInactive) {
             $qb->andWhere('u.active = :active')
                 ->setParameter('active', true);
+        }
+
+        if ($partnerCompany) {
+            $qb->andWhere('e.partnerCompany = :partner')
+                ->setParameter('partner', $partnerCompany);
         }
 
         return $qb->getQuery()->getResult();

@@ -30,7 +30,8 @@
                         'systemName': 'user[username]',
                         'placeholder': 'aschmidt',
                         'required': 'required',
-                        'devValue': definedEmployee.user.username|default('')
+                        'devValue': definedEmployee.user.username|default(''),
+                        'target': "data-employee-target=userName"
                     } %}
 
                     {% include 'elements/select.html.twig' with {
@@ -62,14 +63,14 @@
                     } %}
 
                     {% include 'elements/multi_select.html.twig' with {
-                        systemName: 'roles',
-                        title: 'Rollen',
-                        defaultOption: 'Rollen',
-                        options: roles | map(r => {
+                        'systemName': 'roles',
+                        'title': 'Rollen',
+                        'defaultOption': 'Rollen',
+                        'options': roles | map(r => {
                             'value': r['@id'],
                             'label': r.displayName
                         }),
-                        devValue: definedEmployee.user.roleEntities | map(r => r['@id'])
+                        'devValue': definedEmployee.partnerCompany is defined and definedEmployee.user.roleEntities | map(r => r['@id'])
                     } %}
 
                     {% include 'elements/select.html.twig' with {
@@ -101,7 +102,9 @@
                         'systemName': 'firstName',
                         'placeholder': 'Alexander',
                         'required': 'required',
-                        'devValue': definedEmployee.firstName|default('')
+                        'devValue': definedEmployee.firstName|default(''),
+                        'action': "data-action=input->employee#updateUsername",
+                        'target': "data-employee-target=firstName"
                     } %}
 
                     {% include 'elements/input.html.twig' with {
@@ -110,7 +113,9 @@
                         'systemName': 'lastName',
                         'placeholder': 'Schmidt',
                         'required': 'required',
-                        'devValue': definedEmployee.lastName|default('')
+                        'devValue': definedEmployee.lastName|default(''),
+                        'action': "data-action=input->employee#updateUsername",
+                        'target': "data-employee-target=lastName"
                     } %}
 
                     {% include 'elements/input.html.twig' with {

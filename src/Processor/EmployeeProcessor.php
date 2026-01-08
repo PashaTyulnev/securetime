@@ -102,7 +102,6 @@ readonly class EmployeeProcessor implements ProcessorInterface
         }
 
         // --- HANDLE USER ---
-        $user = null;
         if (isset($requestData['user'])) {
             $userData = $requestData['user'];
 

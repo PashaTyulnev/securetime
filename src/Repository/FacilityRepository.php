@@ -16,28 +16,16 @@ class FacilityRepository extends ServiceEntityRepository
         parent::__construct($registry, Facility::class);
     }
 
-    //    /**
-    //     * @return Facility[] Returns an array of Facility objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Facility
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findByEmployees(array $employeeIds): array
+    {
+        return $this->createQueryBuilder('f')
+            ->innerJoin('f.demandShifts', 'ds')
+            ->innerJoin('ds.shifts', 's')
+            ->innerJoin('s.employee', 'e')
+            ->where('e.id IN (:employeeIds)')
+            ->setParameter('employeeIds', $employeeIds)
+            ->groupBy('f.id')
+            ->getQuery()
+            ->getResult();
+    }
 }

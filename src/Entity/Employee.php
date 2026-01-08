@@ -118,6 +118,11 @@ class Employee
         return $this;
     }
 
+    #[Groups(['employee:read'])]
+    public function hasPassword(): bool
+    {
+        return $this->user && $this->user->getPassword();
+    }
     public function getLastName(): ?string
     {
         return $this->lastName;

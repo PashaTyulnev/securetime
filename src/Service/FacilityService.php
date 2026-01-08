@@ -3,18 +3,29 @@
 namespace App\Service;
 
 use App\Repository\FacilityRepository;
+use App\Repository\ShiftRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class FacilityService
 {
-    public function __construct(readonly FacilityRepository $facilityRepository, readonly SerializerInterface $serializer, readonly HttpClientInterface $httpClient)
+    public function __construct(readonly FacilityRepository  $facilityRepository,
+                                readonly SerializerInterface $serializer,
+                                readonly HttpClientInterface $httpClient,
+                                readonly EmployeeService     $employeeService,
+                                readonly ShiftRepository     $shiftRepository,
+    )
     {
 
     }
+
     public function getAllFacilities()
     {
-        $facilities = $this->facilityRepository->findAll();
+        $contextEmployees = $this->employeeService->getAllEmployees();
+        $employeeIds = array_map(fn($emp) => $emp['id'], $contextEmployees);
+
+        $facilities = $this->facilityRepository->findByEmployees($employeeIds);
 
         $facilities = $this->serializer->serialize(
             $facilities,
@@ -42,7 +53,7 @@ class FacilityService
     {
         $facility = $this->facilityRepository->find($facilityId);
 
-        if( !$facility) {
+        if (!$facility) {
             return [];
         }
 

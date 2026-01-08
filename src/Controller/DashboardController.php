@@ -6,11 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Attribute\Route;
 
-class TestController extends AbstractController
+class DashboardController extends AbstractController
 {
 
     #[Route(path: '/', name: 'app_dashboard')]
-    public function test(Security $security): \Symfony\Component\HttpFoundation\Response
+    public function index(Security $security): \Symfony\Component\HttpFoundation\Response
     {
 //        //prüfe ob user google token nicht null ist
 //        $user = $security->getUser();
@@ -24,12 +24,4 @@ class TestController extends AbstractController
         return $this->render('empty.html.twig');
     }
 
-    #[Route(path: '/protected', name: 'app_protected')]
-    public function testprotected()
-    {
-
-        return $this->render('testprotect.html.twig', [
-
-        ]);
-    }
 }

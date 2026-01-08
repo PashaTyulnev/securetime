@@ -44,6 +44,9 @@
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Status
                 </th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Passwort angelegt
+                </th>
                 <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Aktionen
                 </th>
@@ -66,6 +69,7 @@
                                     class="text-sm font-medium text-gray-900 dark:text-white">{{ employee.firstName }} {{ employee.lastName }}</div>
 
                                 <div class="text-xs text-gray-500 dark:text-gray-400">{% if employee.department.shortTitle is defined %} {{ employee.department.shortTitle}} {% endif %} | {{ employee.qualification.title }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{% if employee.partnerCompany is not null  %} {{ employee.partnerCompany.title}} {% endif %}</div>
 
                             </div>
                         </div>
@@ -89,9 +93,21 @@
                                 class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 cursor-pointer hover:brightness-90 transition">Inaktiv</span>
                         {% endif %}
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                        {% if employee.password %}
+                            <span
+                                class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 cursor-pointer hover:brightness-90 transition">Ja</span>
+
+                        {% else %}
+                            <span
+                                class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 cursor-pointer hover:brightness-90 transition"
+                                data-action="click->employee#sendPasswordEmail"
+                                data-employee-email-param="{{ employee.user.email }}">Senden</span>
+                        {% endif %}
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end space-x-2">
-                            {% if is_granted("ROLE_ADMIN") %}
+                            {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_PARTNER_ADMIN") %}
                                 <button data-action="click->employee#openEditModal"
                                         data-employee-id-param="{{ employee.id }}"
                                         class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">

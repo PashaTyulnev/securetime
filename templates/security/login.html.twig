@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}DWD - Anmeldung{% endblock %}
+{% block title %}SecureTime - Anmeldung{% endblock %}
 
 {% block body %}
     <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black relative overflow-hidden">
@@ -128,7 +128,7 @@
 
                 {# Zusätzliche Links #}
                 <div class="pt-4 text-center">
-                    <a href="#" class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 font-light">
+                    <a href="{{ path('app_forgot_password_request') }}" class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 font-light">
                         Passwort vergessen?
                     </a>
                 </div>

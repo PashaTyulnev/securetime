@@ -29,10 +29,10 @@ class LoginSuccessSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($user->getGoogleAuthenticatorSecret() === null) {
-            $url = $this->urlGenerator->generate('app_register_google_auth');
-            $event->setResponse(new RedirectResponse($url));
-        }
+//        if ($user->getGoogleAuthenticatorSecret() === null) {
+//            $url = $this->urlGenerator->generate('app_register_google_auth');
+//            $event->setResponse(new RedirectResponse($url));
+//        }
     }
 }
 

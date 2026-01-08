@@ -5,20 +5,25 @@ namespace App\Service;
 use App\Repository\EmployeeRepository;
 use App\Repository\FacilityRepository;
 use App\Repository\QualificationRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class EmployeeService
 {
     public function __construct(readonly EmployeeRepository $employeeRepository,
                                 readonly QualificationRepository $qualificationRepository,
+                                readonly Security $security,
                                 readonly SerializerInterface $serializer)
     {
 
     }
     public function getAllEmployees($withInactive = false)
     {
+        $currentUser = $this->security->getUser();
+        $partnerCompany = $currentUser->getEmployee()->getPartnerCompany();
+
         //call function from other controller
-        $allEmployees = $this->employeeRepository->findAll($withInactive);
+        $allEmployees = $this->employeeRepository->findAll($withInactive,$partnerCompany);
 
         $allEmployees = $this->serializer->serialize(
             $allEmployees,

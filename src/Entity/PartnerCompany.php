@@ -44,7 +44,7 @@ class PartnerCompany
     private ?string $logoLink = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['partner:read','partner:write'])]
+    #[Groups(['partner:read','partner:write','employee:read'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
