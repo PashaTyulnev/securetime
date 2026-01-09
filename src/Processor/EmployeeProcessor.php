@@ -12,7 +12,9 @@ use App\Entity\User;
 use App\Repository\ContractRepository;
 use App\Repository\RoleRepository;
 use App\Repository\ShiftRepository;
+use App\Service\PartnerService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -25,7 +27,9 @@ readonly class EmployeeProcessor implements ProcessorInterface
         readonly ShiftRepository $shiftRepository,
         readonly ContractRepository $contractRepository,
         readonly RoleRepository $roleRepository,
-        private RequestStack $requestStack
+        readonly PartnerService $partnerService,
+        private RequestStack $requestStack,
+        readonly Security $security
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
@@ -96,7 +100,6 @@ readonly class EmployeeProcessor implements ProcessorInterface
             $employee->setDepartment($data->getDepartment());
             $employee->setQualification($data->getQualification());
             $employee->setGuardianId($data->getGuardianId());
-            $employee->setPartnerCompany($data->getPartnerCompany());
 
             $data = $employee;
         }
@@ -148,9 +151,26 @@ readonly class EmployeeProcessor implements ProcessorInterface
             $this->handleContractData($data, $requestData['contracts']);
         }
 
+        $this->handlePartnerOperations($data);
+
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
     }
 
+    private function handlePartnerOperations(&$data): void
+    {
+        // wenn man als Partner eingeloggt ist, dann setze den Partner automatisch
+        $currentUser = $this->security->getUser();
+        
+        if ($currentUser) {
+            $currentEmployee = $currentUser->getEmployee();
+            if ($currentEmployee) {
+                $currentPartner = $currentEmployee->getPartnerCompany();
+                if ($currentPartner) {
+                    $data->setPartnerCompany($currentPartner);
+                }
+            }
+        }
+    }
     private function handleContractData(&$employee, mixed $contractData): void
     {
 

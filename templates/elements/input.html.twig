@@ -1,4 +1,4 @@
-<div>
+<div class="{% if classList is defined %} {{ classList }} {% endif %}">
     <label for="{{ systemName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ title }}</label>
     <input type="{{ type }}" id="{{ systemName }}" name="{{ systemName }}"
         {% if action is defined %} {{ action }}{% endif %}

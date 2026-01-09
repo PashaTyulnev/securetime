@@ -11,13 +11,23 @@ use Symfony\Component\Serializer\SerializerInterface;
 class RoleService
 {
     public function __construct(readonly RoleRepository $roleRepository,
+                                readonly PartnerService $partnerService,
                                 readonly SerializerInterface $serializer)
     {
     }
 
     public function getAllRoles()
     {
-        $roles = $this->roleRepository->findAll();
+        $loggedInPartner = $this->partnerService->getLoggedInPartner();
+
+        if($loggedInPartner){
+            //nur rollen ROLE_EMPLOYEE und ROLE_PARTNER_ADMIN
+            $roles = $this->roleRepository->findBy(['name' => ['ROLE_EMPLOYEE', 'ROLE_PARTNER_ADMIN']]);
+        }
+        else{
+            //alle rollen
+            $roles = $this->roleRepository->findAll();
+        }
 
         $roles = $this->serializer->serialize(
             $roles,
