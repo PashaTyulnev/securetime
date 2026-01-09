@@ -105,7 +105,9 @@
                             'label': r.displayName
                         }),
                         'required': 'required',
-                        'devValue': definedEmployee.partnerCompany is defined and definedEmployee.user.roleEntities | map(r => r['@id'])
+                        'devValue': (definedEmployee.user is defined and definedEmployee.user.roleEntities is defined and definedEmployee.user.roleEntities is iterable)
+                            ? definedEmployee.user.roleEntities | map(r => r['@id'] is defined ? r['@id'] : r)
+                            : []
                     } %}
 
 
