@@ -2,12 +2,17 @@
 
 namespace App\Controller;
 
+use App\Repository\ShiftRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Attribute\Route;
 
 class DashboardController extends AbstractController
 {
+    public function __construct(
+        private readonly ShiftRepository $shiftRepository
+    ) {
+    }
 
     #[Route(path: '/', name: 'app_dashboard')]
     public function index(Security $security): \Symfony\Component\HttpFoundation\Response
@@ -21,7 +26,11 @@ class DashboardController extends AbstractController
 //            return $this->redirectToRoute('app_register_google_auth');
 //        }
 
-        return $this->render('empty.html.twig');
+        $todayShifts = $this->shiftRepository->findShiftsForToday();
+
+        return $this->render('empty.html.twig', [
+            'todayShifts' => $todayShifts
+        ]);
     }
 
 }
