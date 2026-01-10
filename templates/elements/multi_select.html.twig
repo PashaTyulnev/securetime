@@ -3,83 +3,50 @@
         {{ title }}
     </label>
 
-    {# Button #}
     <button
-        id="{{ systemName }}Button"
-        data-dropdown-target="trigger"
-        data-dropdown-toggle="{{ systemName }}Dropdown"
         type="button"
+        data-dropdown-target="trigger"
         class="w-full inline-flex items-center justify-between
                bg-gray-50 dark:bg-gray-800
                border border-gray-200 dark:border-gray-700
                text-gray-900 dark:text-white
                text-sm font-medium
-               rounded-lg px-3 py-2
-               hover:bg-gray-100 dark:hover:bg-gray-700
-               focus:outline-none focus:ring-4 focus:ring-slate-300
-               dark:focus:ring-slate-600">
+               rounded-lg px-3 py-2">
 
         <span class="truncate" data-dropdown-target="label">
-            {% if devValue is defined and devValue is iterable and devValue|length > 0 %}
-                {% set selectedLabels = [] %}
-                {% for option in options %}
-                    {% if option.value in devValue %}
-                        {% set selectedLabels = selectedLabels|merge([option.label]) %}
-                    {% endif %}
-                {% endfor %}
-                {% if selectedLabels|length > 0 %}
-                    {{ selectedLabels|join(', ') }}
-                {% else %}
-                    {{ defaultOption ?? 'Auswählen' }}
-                {% endif %}
-            {% else %}
-                {{ defaultOption ?? 'Auswählen' }}
-            {% endif %}
+            {{ defaultOption ?? 'Auswählen' }}
         </span>
 
-        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true"
-             xmlns="http://www.w3.org/2000/svg" fill="none"
-             viewBox="0 0 10 6">
-            <path stroke="currentColor" stroke-linecap="round"
-                  stroke-linejoin="round" stroke-width="2"
-                  d="m1 1 4 4 4-4"/>
+        <svg class="w-2.5 h-2.5 ms-3" viewBox="0 0 10 6">
+            <path d="m1 1 4 4 4-4" stroke="currentColor" stroke-width="2"/>
         </svg>
     </button>
 
-    {# Dropdown #}
     <div
-        id="{{ systemName }}Dropdown"
         data-dropdown-target="menu"
         class="z-10 hidden mt-1 w-full
                bg-white dark:bg-gray-700
-               divide-y divide-gray-100 dark:divide-gray-600
                rounded-lg shadow-sm">
 
-        <ul class="p-3 space-y-3 text-sm text-gray-700 dark:text-gray-200"
-            aria-labelledby="{{ systemName }}Button">
-
+        <ul class="p-3 space-y-3 text-sm">
             {% for option in options %}
-                {% set checked = devValue is defined and devValue is iterable and option.value in devValue %}
-
                 <li>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input
-                            id="{{ systemName }}_{{ loop.index }}"
                             type="checkbox"
                             name="{{ systemName }}[]"
                             value="{{ option.value }}"
-                            {% if checked %}checked{% endif %}
-                            {% if required is defined %}required{% endif %}
-                            {% if formId is defined %}form="{{ formId }}"{% endif %}
-                            {% if updateAction is defined and updateAction %}data-action="change->{{ updateAction }} change->dropdown#updateLabel"{% else %}data-action="change->dropdown#updateLabel"{% endif %}
-                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm
-                                   focus:ring-blue-500 dark:focus:ring-blue-600
-                                   dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700
-                                   focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                            {% if option.value in devValue %}checked{% endif %}
+                            {% if formId is defined and formId %}
+                                form="{{ formId }}"
+                            {% endif %}
+                            data-action="
+                                change->dropdown#updateLabel
+                               {% if updateAction is defined and updateAction %} change->{{ updateAction }}{% endif %}
+                            "
+                            class="w-4 h-4 rounded">
 
-                        <span class="text-sm font-medium text-gray-900 dark:text-gray-300">
-                            {{ option.label }}
-                        </span>
+                        <span>{{ option.label }}</span>
                     </label>
                 </li>
             {% endfor %}

@@ -6,6 +6,11 @@ export default class extends Controller {
 
     // Hilfsfunktion zur korrekten Umschaltung der Icons
     setTriggerVisibility(isDarkMode) {
+        // Защитные проверки: если один из expected targets отсутствует, пропустить логику
+        if (!this.hasLightModeTriggerTarget || !this.hasDarkModeTriggerTarget) {
+            return;
+        }
+
         if (isDarkMode) {
             // Dark Mode ist aktiv: Zeige den Light Mode Umschalter (Sonne)
             this.lightModeTriggerTarget.classList.remove('hidden');
@@ -19,8 +24,9 @@ export default class extends Controller {
         }
     }
 
-    initialize() {
-        // Verwende 'theme' anstelle von 'darkMode' für Konsistenz mit dem FOUC-Skript
+    // Логика, которая использует targets, должна выполняться в connect(),
+    // потому что initialize() запускается раньше, чем targets будут привязаны.
+    connect() {
         const theme = localStorage.getItem('theme');
         const isDarkMode = theme === 'dark';
 
