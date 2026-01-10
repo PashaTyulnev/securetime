@@ -89,6 +89,10 @@ export default class extends BaseEntityController {
         const requiredPositions = formData.getAll('requiredPositions[]');
         formData.delete('requiredPositions[]');
 
+        // Извлечь выбранные partnerVisibility, даже если их нет (получим пустой массив)
+        const partnerVisibility = formData.getAll('partnerVisibility[]');
+        formData.delete('partnerVisibility[]');
+
         let formattedData = Formater.formatToJson(formData);
 
         if(formattedData.name === "Bereitschaft") {
@@ -100,6 +104,9 @@ export default class extends BaseEntityController {
 
         // requiredPositions als Array hinzufügen
         formattedData.requiredPositions = requiredPositions;
+
+        // partnerVisibility als Array hinzufügen (wird [] sein, wenn keine Checkbox ausgewählt)
+        formattedData.partnerVisibility = partnerVisibility;
 
         formattedData.validFrom = this.dateFromValue
         formattedData.validTo = this.dateToValue

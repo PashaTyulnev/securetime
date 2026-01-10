@@ -438,6 +438,20 @@ class DemandShift
         return $this->partnerVisibility;
     }
 
+    public function setPartnerVisibility(?iterable $partners): self
+    {
+        // 🔥 KRITISCH: Collection IMMER zuerst leeren
+        $this->partnerVisibility->clear();
+
+        if ($partners) {
+            foreach ($partners as $partner) {
+                $this->addPartnerVisibility($partner);
+            }
+        }
+
+        return $this;
+    }
+
     public function addPartnerVisibility(PartnerCompany $partnerVisibility): static
     {
         if (!$this->partnerVisibility->contains($partnerVisibility)) {
