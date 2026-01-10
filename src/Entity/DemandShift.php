@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Processor\DemandShiftDeleteProcessor;
 use App\Processor\EmployeeProcessor;
+use App\Provider\DemandShiftProvider;
 use App\Repository\DemandShiftRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -24,7 +25,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
 #[ORM\Entity(repositoryClass: DemandShiftRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(),
+        new Get(provider: DemandShiftProvider::class),
         new GetCollection(),
         new Post,
         new Put,
@@ -128,10 +129,18 @@ class DemandShift
     #[Groups(['shift:read'])]
     private int $onCall = 0;
 
+    /**
+     * @var Collection<int, PartnerCompany>
+     */
+    #[ORM\ManyToMany(targetEntity: PartnerCompany::class, inversedBy: 'demandShifts')]
+    #[Groups(['facility:read','demandShift:read','demandShift:write','shift:read'])]
+    private Collection $partnerVisibility;
+
     public function __construct()
     {
         $this->requiredPositions = new ArrayCollection();
         $this->shifts = new ArrayCollection();
+        $this->partnerVisibility = new ArrayCollection();
 
     }
 
@@ -419,6 +428,30 @@ class DemandShift
     public function setOnCall(int $onCall): void
     {
         $this->onCall = $onCall;
+    }
+
+    /**
+     * @return Collection<int, PartnerCompany>
+     */
+    public function getPartnerVisibility(): Collection
+    {
+        return $this->partnerVisibility;
+    }
+
+    public function addPartnerVisibility(PartnerCompany $partnerVisibility): static
+    {
+        if (!$this->partnerVisibility->contains($partnerVisibility)) {
+            $this->partnerVisibility->add($partnerVisibility);
+        }
+
+        return $this;
+    }
+
+    public function removePartnerVisibility(PartnerCompany $partnerVisibility): static
+    {
+        $this->partnerVisibility->removeElement($partnerVisibility);
+
+        return $this;
     }
 
 }

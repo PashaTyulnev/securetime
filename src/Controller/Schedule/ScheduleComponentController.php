@@ -4,6 +4,7 @@ namespace App\Controller\Schedule;
 
 use App\Service\EmployeeService;
 use App\Service\FacilityService;
+use App\Service\PartnerService;
 use App\Service\ScheduleService;
 use App\Service\ShiftService;
 use DateTime;
@@ -19,6 +20,7 @@ class ScheduleComponentController extends AbstractController
     public function __construct(readonly EmployeeService $employeeService,
                                 readonly FacilityService $facilityService,
                                 readonly ShiftService $shiftService,
+                                readonly PartnerService $partnerService,
                                 readonly ScheduleService $scheduleService)
     {
 
@@ -54,7 +56,7 @@ class ScheduleComponentController extends AbstractController
             'employees' => $employees,
             'facilities' => $facilities,
             'datesRange' => $datesRange,
-            'shifts' => $shifts,
+            'shifts' => $shifts
         ]);
     }
 

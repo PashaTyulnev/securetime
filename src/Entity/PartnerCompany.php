@@ -32,19 +32,19 @@ class PartnerCompany
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['partner:read','employee:read'])]
+    #[Groups(['partner:read','employee:read','demandShift:read','shift:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(cascade: ['persist'])]
-    #[Groups(['partner:read','partner:write'])]
+    #[Groups(['partner:read','partner:write','demandShift:read'])]
     private ?Address $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['partner:read','partner:write'])]
+    #[Groups(['partner:read','partner:write','demandShift:read'])]
     private ?string $logoLink = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['partner:read','partner:write','employee:read'])]
+    #[Groups(['partner:read','partner:write','employee:read','demandShift:read'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
@@ -70,9 +70,16 @@ class PartnerCompany
     #[Groups(['partner:read'])]
     private Collection $employees;
 
+    /**
+     * @var Collection<int, DemandShift>
+     */
+    #[ORM\ManyToMany(targetEntity: DemandShift::class, mappedBy: 'partnerVisibility')]
+    private Collection $demandShifts;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
+        $this->demandShifts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -192,5 +199,32 @@ class PartnerCompany
     public function setTitle(?string $title): void
     {
         $this->title = $title;
+    }
+
+    /**
+     * @return Collection<int, DemandShift>
+     */
+    public function getDemandShifts(): Collection
+    {
+        return $this->demandShifts;
+    }
+
+    public function addDemandShift(DemandShift $demandShift): static
+    {
+        if (!$this->demandShifts->contains($demandShift)) {
+            $this->demandShifts->add($demandShift);
+            $demandShift->addPartnerVisibility($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemandShift(DemandShift $demandShift): static
+    {
+        if ($this->demandShifts->removeElement($demandShift)) {
+            $demandShift->removePartnerVisibility($this);
+        }
+
+        return $this;
     }
 }

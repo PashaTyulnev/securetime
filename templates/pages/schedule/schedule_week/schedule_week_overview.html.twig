@@ -1,89 +1,125 @@
 <div
-    class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-800/50 overflow-hidden">
-    {# Raster-Layout: 180px für Mitarbeiter-Spalte, 7 Spalten für Wochentage #}
-    <div class="grid grid-cols-[180px_repeat(7,1fr)] min-h-[300px]">
+    class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl
+           border border-gray-200/50 dark:border-gray-800/50 overflow-hidden">
 
-        {# Kopfzelle der Mitarbeiter-Spalte #}
+    {# Raster-Layout: 180px Mitarbeiter, 7 Tage #}
+    <div class="grid grid-cols-[180px_repeat(7,1fr)] min-h-[220px]">
+
+        {# Kopfzelle Mitarbeiter #}
         <div
-            class="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-xl p-4 border-b-2 border-r border-gray-200/50 dark:border-gray-700/50 sticky left-0 z-10">
+            class="bg-gray-50/80 dark:bg-gray-800/80
+                   backdrop-blur-xl
+                   px-3 py-2
+                   border-b border-r border-gray-200/50 dark:border-gray-700/50
+                   sticky left-0 z-10">
             <span
-                class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Mitarbeiter</span>
+                class="text-[10px] font-semibold uppercase tracking-wider
+                       text-gray-500 dark:text-gray-400">
+                Mitarbeiter
+            </span>
         </div>
 
-
+        {# Kopfzellen Tage #}
         {% for day in datesRange %}
             <div
-                class="p-4 border-b-2 border-r border-gray-200/50 dark:border-gray-700/50 text-center backdrop-blur-xl {% if day.isToday %}bg-blue-50/80 dark:bg-blue-900/20{% else %}bg-gray-50/80 dark:bg-gray-800/80{% endif %}">
+                class="px-2 py-2 text-center
+                       border-b border-r border-gray-200/50 dark:border-gray-700/50
+                       backdrop-blur-xl
+                       {% if day.isToday %}
+                           bg-blue-50/80 dark:bg-blue-900/20
+                       {% else %}
+                           bg-gray-50/80 dark:bg-gray-800/80
+                       {% endif %}">
                 <div
-                    class="text-sm font-semibold {% if day.isToday %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-white{% endif %}">{{ day.name }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ day.shortName }}</div>
+                    class="text-xs font-semibold leading-tight
+                           {% if day.isToday %}
+                               text-blue-600 dark:text-blue-400
+                           {% else %}
+                               text-gray-900 dark:text-white
+                           {% endif %}">
+                    {{ day.name }}
+                </div>
+                <div class="text-[10px] leading-tight text-gray-500 dark:text-gray-400">
+                    {{ day.shortName }}
+                </div>
             </div>
         {% endfor %}
-
 
         {% for employee in employees %}
             <div class="contents group">
 
-                {# Mitarbeiter-Spalte (Linke Spalte) #}
+                {# Mitarbeiter-Zelle #}
                 <div
                     data-action="dragover->schedule-week#onDragOver
-                dragleave->schedule-week#onDragLeave
-                drop->schedule-week#onDrop"
+                                 dragleave->schedule-week#onDragLeave
+                                 drop->schedule-week#onDrop"
                     data-employee-uri="{{ employee['@id'] }}"
                     data-date="{{ datesRange[0].date|date('Y-m-d') }}"
                     data-whole-week="true"
-                    class="bg-white/50 dark:bg-gray-900/50 p-4 border-b border-r border-gray-200/50 dark:border-gray-700/50 sticky left-0 z-10">
-                    <div class="flex items-center gap-3">
-                        <div class="p-1.5 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-                            {{ ux_icon('lucide:user', { class: 'h-4 w-4 text-indigo-600 dark:text-indigo-400' }) }}
+                    class="bg-white/50 dark:bg-gray-900/50
+                           px-3 py-2
+                           border-b border-r border-gray-200/50 dark:border-gray-700/50
+                           sticky left-0 z-10">
+
+                    <div class="flex items-center gap-2">
+                        <div class="p-1 bg-indigo-100 dark:bg-indigo-900/30 rounded-md">
+                            {{ ux_icon('lucide:user', { class: 'h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400' }) }}
                         </div>
-                        <div>
+
+                        <div class="leading-tight">
+                            <div class="text-xs font-semibold text-gray-900 dark:text-white">
+                                {{ employee.firstName|slice(0,1)|upper }}. {{ employee.lastName }}
+                            </div>
+                            <div class="text-[10px] text-gray-500 dark:text-gray-400">
+                                {{ employee.qualification.title }}
+                            </div>
+
                             <div
-                                class="text-sm font-semibold text-gray-900 dark:text-white">{{ employee.firstName|slice(0,1)|upper }}
-                                . {{ employee.lastName }}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.qualification.title }}</div>
-                            <div class="mt-0.5 grid grid-cols-3 gap-x-2 text-[8px] leading-[9px] text-gray-500 dark:text-gray-400">
+                                class="mt-0.5 grid grid-cols-3 gap-x-1
+                                       text-[9px] leading-[10px]
+                                       text-gray-500 dark:text-gray-400">
                                 <div>
-                                    <div class="font-medium" title="Reguläre Arbeitszeit">Plan</div>
+                                    <div class="font-medium">Plan</div>
                                     <div>{{ employee.plannedHours.regular }}h</div>
                                 </div>
-
                                 <div>
-                                    <div class="font-medium" title="Bereitschaftsdienst">Bereit</div>
+                                    <div class="font-medium">Bereit</div>
                                     <div>{{ employee.plannedHours.onCall }}h</div>
                                 </div>
-
                                 <div>
-                                    <div class="font-semibold" title="Gesamt (inkl. Bereitschaft)">Total</div>
+                                    <div class="font-semibold">Total</div>
                                     <div class="font-semibold">{{ employee.plannedHours.total }}h</div>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
 
-                {# TAGES-ZELLEN (Schichten des Mitarbeiters) #}
+                {# Tages-Zellen #}
                 {% for day in 0..6 %}
-                    <div data-action="dragover->schedule-week#onDragOver
-                dragleave->schedule-week#onDragLeave
-                drop->schedule-week#onDrop" data-employee-uri="{{ employee['@id'] }}"
-                         data-date="{{ datesRange[day].date|date('Y-m-d') }}"
-                         class="drop-zone relative p-3 border-b border-r border-gray-200/50 dark:border-gray-700/50 min-h-[60px] hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 group/cell">
+                    <div
+                        data-action="dragover->schedule-week#onDragOver
+                                     dragleave->schedule-week#onDragLeave
+                                     drop->schedule-week#onDrop"
+                        data-employee-uri="{{ employee['@id'] }}"
+                        data-date="{{ datesRange[day].date|date('Y-m-d') }}"
+                        class="drop-zone relative
+                               px-2 py-1.5
+                               min-h-[44px]
+                               border-b border-r border-gray-200/50 dark:border-gray-700/50
+                               hover:bg-gray-50/50 dark:hover:bg-gray-800/50
+                               transition-colors duration-200
+                               group/cell">
 
                         {% for shift in shifts %}
-
-                            {% if shift.date|date('Y-m-d') == datesRange[day].date|date('Y-m-d') %}
-                                {% if shift.employee == employee['@id'] %}
-                                    {% set content = shift.demandShift.timeFrom|date('H:i') ~ ' – ' ~ shift.demandShift.timeTo|date('H:i') %}
-                                    {% include 'pages/schedule/components/mini_shift_pill.html.twig' with {'shift':shift} %}
-                                {% endif %}
+                            {% if shift.date|date('Y-m-d') == datesRange[day].date|date('Y-m-d')
+                                and shift.employee == employee['@id'] %}
+                                {% include 'pages/schedule/components/mini_shift_pill.html.twig' with {'shift': shift} %}
                             {% endif %}
-
                         {% endfor %}
                     </div>
                 {% endfor %}
+
             </div>
         {% endfor %}
     </div>

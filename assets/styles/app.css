@@ -2,7 +2,7 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 html {
-    color-scheme: light;
+    color-scheme: dark;
 }
 
 .app-button{
@@ -53,4 +53,23 @@ html {
 
 button{
     cursor: pointer;
+}
+
+@media (min-width: 1100px) {
+    body {
+        zoom: calc(100vw / 1920);
+    }
+}
+
+
+h1{
+    @apply text-3xl font-light tracking-tight
+    bg-gradient-to-r from-slate-900 to-slate-600
+    dark:from-white dark:to-gray-400
+    p-2
+    bg-clip-text text-transparent;
+}
+
+.flex-column{
+    flex-direction: column;
 }

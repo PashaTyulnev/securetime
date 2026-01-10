@@ -22,7 +22,7 @@
         </select>
     </div>
 
-   {% if is_granted("ROLE_ADMIN") %}
+   {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_PARTNER_ADMIN") %}
         <!-- Schichtenreihe -->
         <div class="flex gap-4 overflow-x-auto pt-5">
             <div data-schedule-week-target="demandShiftsContainer" class="flex gap-4">

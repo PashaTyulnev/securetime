@@ -1,81 +1,45 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}WachZeit - Mitarbeiterverwaltung{% endblock %}
+{% block title %}Mitarbeiterverwaltung{% endblock %}
 
 {% block body %}
 
-    <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden " data-controller="employee">
-        <div data-employee-target="modalContainer">
+    <div data-controller="employee">
 
-        </div>
-{#        {% include 'employee/newEmployeeModal.html.twig' %}#}
-        {# Hauptinhalt #}
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm">
-            <div class="container mx-auto px-6 py-8">
+        <div data-employee-target="modalContainer"></div>
 
-                {# Header mit Titel und Button #}
-                <div class="mb-8">
-                    <div class="flex justify-between items-center">
-                        <h1 class="text-3xl font-light text-gray-900 dark:text-white tracking-tight">Mitarbeiterverwaltung</h1>
-                        <!-- Modal toggle -->
-                        <button data-action="click->employee#openCreationModal"
-                                class="app-button">
-                            {{ ux_icon('lucide:user-plus', { class: 'w-5 h-5' }) }}
-                            <span>Neuer Mitarbeiter</span>
-                        </button>
-                    </div>
-                </div>
+        {# ================= HEADER ================= #}
+        <header class="relative z-10
+                   -mx-6 px-6
+                   backdrop-blur-xl bg-white/70 dark:bg-gray-900/70
+                   border-b border-gray-200/50 dark:border-gray-800/50">
 
-                <div>
-                    <turbo-frame id="employee-table" src="{{ path('all_employee_list_component') }}">
-                        <div class="loading">
-                            <twig:Loader/>
-                        </div>
-                    </turbo-frame>
-                </div>
+            <div class="px-6 py-4 flex items-center justify-between">
+                <h1 class="text-3xl font-light tracking-tight
+                       bg-gradient-to-r from-slate-900 to-slate-600
+                       dark:from-white dark:to-gray-400
+                       bg-clip-text text-transparent">
+                    Mitarbeiterverwaltung
+                </h1>
+
+                <button
+                    data-action="click->employee#openCreationModal"
+                    class="app-button">
+                    {{ ux_icon('lucide:user-plus', { class: 'w-5 h-5' }) }}
+                    <span>Neuer Mitarbeiter</span>
+                </button>
             </div>
-        </main>
+        </header>
+
+        {# ================= CONTENT ================= #}
+        <div class="p-5">
+            <turbo-frame id="employee-table" src="{{ path('all_employee_list_component') }}">
+                <div class="py-12 flex justify-center">
+                    <twig:Loader/>
+                </div>
+            </turbo-frame>
+        </div>
+
     </div>
-
-    {# Modal Animation Styles #}
-    <style>
-        @keyframes modal-enter {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        @keyframes bounce-in {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            70% {
-                transform: scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .animate-modal-enter {
-            animation: modal-enter 0.4s ease-out;
-        }
-
-        .animate-bounce-in {
-            animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-    </style>
-
-    {# JavaScript für Modal-Funktionalität #}
 
 {% endblock %}

@@ -13,7 +13,7 @@
       <paths name="dwd">
         <serverdata>
           <mappings>
-            <mapping deploy="/www/htdocs/w020c679/app.dwd-sicherheit.de" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/www/htdocs/w020c679/app.dwsd-sicherheit.de" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

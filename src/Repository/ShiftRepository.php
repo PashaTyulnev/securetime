@@ -77,22 +77,23 @@ class ShiftRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findShiftsForToday(): array
+    public function findShiftsForToday(array $employees): array
     {
-        $today = new \DateTime();
-        $today->setTime(0, 0, 0);
-        
+        $today = new \DateTimeImmutable('today');
+
         return $this->createQueryBuilder('s')
             ->leftJoin('s.employee', 'e')
             ->leftJoin('s.demandShift', 'ds')
             ->leftJoin('ds.facility', 'f')
             ->andWhere('s.date = :today')
-            ->andWhere('s.employee IS NOT NULL')
+            ->andWhere('s.employee IN (:employees)')
             ->setParameter('today', $today)
+            ->setParameter('employees', $employees)
             ->orderBy('e.lastName', 'ASC')
             ->addOrderBy('e.firstName', 'ASC')
             ->getQuery()
             ->getResult();
     }
+
 
 }

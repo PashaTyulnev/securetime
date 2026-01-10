@@ -4,6 +4,7 @@ namespace App\Controller\FacilityShift;
 
 use App\Service\EmployeeService;
 use App\Service\FacilityService;
+use App\Service\PartnerService;
 use App\Service\ShiftService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -16,7 +17,8 @@ class FacilityShiftComponentController extends AbstractController
 {
 
     public function __construct(readonly FacilityService $facilityService,
-                                readonly ShiftService $shiftService,
+                                readonly ShiftService    $shiftService,
+                                readonly PartnerService  $partnerService,
                                 readonly EmployeeService $employeeService)
     {
 
@@ -32,11 +34,13 @@ class FacilityShiftComponentController extends AbstractController
         $facility = $this->facilityService->getFacilityById($facilityId);
         $qualifications = $this->employeeService->getAllQualifications();
         $shiftPresets = $this->shiftService->getAllDemandShiftPresets();
+        $partners = $this->partnerService->getAllPartners();
 
         return $this->render('pages/facility_shift/facility_single_shift.html.twig', [
             'facility' => $facility,
             'shiftPresets' => $shiftPresets,
-            'qualifications' => $qualifications
+            'qualifications' => $qualifications,
+            'partners' => $partners
         ]);
     }
 
@@ -47,12 +51,14 @@ class FacilityShiftComponentController extends AbstractController
         $newShiftData = json_decode($request->getContent(), true);
         $qualifications = $this->employeeService->getAllQualifications();
         $shiftPresets = $this->shiftService->getAllDemandShiftPresets();
+        $partners = $this->partnerService->getAllPartners();
 
         $response = $this->render('pages/facility_shift/facility_single_shift.html.twig', [
             'facility' => $newShiftData['facility'],
             'demandShift' => $newShiftData,
             'shiftPresets' => $shiftPresets,
-            'qualifications' => $qualifications
+            'qualifications' => $qualifications,
+            'partners' => $partners
         ]);
 
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
@@ -83,11 +89,14 @@ class FacilityShiftComponentController extends AbstractController
         $facility = $this->facilityService->getFacilityById($facilityId);
         $demandShifts = $this->shiftService->getDemandShiftsOfFacilityInDateRange($facilityId, $dateFrom, $dateTo);
 
+        $partners = $this->partnerService->getAllPartners();
+
         return $this->render('pages/facility_shift/demand_shifts_container.html.twig', [
             'facility' => $facility,
             'demandShifts' => $demandShifts,
             'shiftPresets' => $this->shiftService->getAllDemandShiftPresets(),
-            'qualifications' => $this->employeeService->getAllQualifications()
+            'qualifications' => $this->employeeService->getAllQualifications(),
+            'partners' => $partners
         ]);
     }
 }

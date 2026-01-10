@@ -23,26 +23,25 @@
                         {% set shiftName = demandShift.name|default('')|lower %}
 
 
-                            <input
-                                type="hidden"
-                                name="color"
-                                form="shift-form-{{ demandShift.id|default('new') }}"
-                                data-facility-shift-behavior-target="colorInput"
-                                data-action="change->facility-shift-behavior#changeColor {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                                class="appearance-none w-7 h-7 rounded-lg border border-white/40 cursor-pointer hover:shadow-md hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/60 focus:scale-[1.05] transition-all duration-150"
-                                title="Farbe wählen"
-                                value="{{ demandShift.color|default('#3b82f6') }}"/>
-
+                        <input
+                            type="hidden"
+                            name="color"
+                            form="shift-form-{{ demandShift.id|default('new') }}"
+                            data-facility-shift-behavior-target="colorInput"
+                            data-action="change->facility-shift-behavior#changeColor {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
+                            class="appearance-none w-7 h-7 rounded-lg border border-white/40 cursor-pointer hover:shadow-md hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/60 focus:scale-[1.05] transition-all duration-150"
+                            title="Farbe wählen"
+                            value="{{ demandShift.color|default('#3b82f6') }}"/>
 
 
                         <select name="name"
-                                style="background-color: {{demandShift.color|default('#3b82f6') }};"
+                                style="background-color: {{ demandShift.color|default('#3b82f6') }};"
                                 form="shift-form-{{ demandShift.id|default('new') }}"
                                 class="flex-1 min-w-0 bg-white dark:bg-gray-800 font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm"
                                 required
                                 data-action="change->facility-shift-behavior#shiftChanged {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
                                 data-facility-shift-behavior-target="shiftSelect">
-                            <option >Schicht...</option>
+                            <option>Schicht...</option>
                             {% for preset in shiftPresets %}
                                 <option value="{{ preset.name }}"
                                         {% if shiftName == preset.name|lower %}selected{% endif %}>
@@ -175,34 +174,45 @@
             </div>
         </div>
 
+        <div class="flex">
 
         {% if facility.positions | length > 0 %}
-            {# Positionen - Volle Breite unten #}
-            <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30">
-                <label
-                    class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3 block">
-                    Erforderliche Positionen
-                </label>
-                <div class="flex flex-wrap gap-3">
-                    {% for position in facility.positions %}
-                        <div class="flex items-center">
-                            <input
-                                data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
-                                form="shift-form-{{ demandShift.id|default('new') }}"
-                                id="inline-checkbox{{ position.id }}_{{ demandShift.id|default('new') }}"
-                                type="checkbox"
-                                name="requiredPositions[]"
-                                value="{{ position['@id'] }}"
-                                {% if demandShift.requiredPositions|default([])|filter(p => p.id == position.id)|length > 0 %}checked{% endif %}
-                                class="w-4 h-4 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500">
-                            <label for="inline-checkbox{{ position.id }}_{{ demandShift.id|default('new') }}"
-                                   class="select-none ms-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ position.title }}
-                            </label>
-                        </div>
-                    {% endfor %}
-                </div>
+            <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
+                {% include 'elements/multi_select.html.twig' with {
+                    'systemName': 'requiredPositions',
+                    'title': 'Erforderliche Positionen',
+                    'defaultOption': 'Positionen wählen',
+                    'options': facility.positions | map(p => {
+                        'value': p['@id'],
+                        'label': p.title
+                    }),
+                    'devValue': (demandShift.requiredPositions is defined and demandShift.requiredPositions is iterable)
+                    ? demandShift.requiredPositions | map(p => p['@id'] is defined ? p['@id'] : p)
+                    : [],
+                    'formId': 'shift-form-' ~ (demandShift.id|default('new')),
+                    'updateAction': demandShift.id|default(false) ? 'facility-shift#update' : null
+                } %}
             </div>
         {% endif %}
+
+        <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
+            {% include 'elements/multi_select.html.twig' with {
+                'systemName': 'partnerVisibility',
+                'title': 'Partnerfirma Sichtbarkeit',
+                'defaultOption': 'Partnerfirmen wählen',
+                'options': partners | map(p => {
+                    'value': p['@id'],
+                    'label': p.title
+                }),
+                'devValue': (demandShift.partnerVisibility is defined and demandShift.partnerVisibility is iterable)
+                ? demandShift.partnerVisibility | map(p => p['@id'] is defined ? p['@id'] : p)
+                : [],
+                'formId': 'shift-form-' ~ (demandShift.id|default('new')),
+                'updateAction': demandShift.id|default(false) ? 'facility-shift#update' : null
+            } %}
+        </div>
+
+        </div>
+
     </form>
 </div>

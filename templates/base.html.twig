@@ -11,10 +11,7 @@
 </head>
 
 <script>
-    // **WICHTIG:** Verwende den Schlüssel 'theme' konsistent
     const savedTheme = localStorage.getItem('theme');
-
-    // Ermittle den gewünschten Dark-Mode-Zustand
     let isDarkMode = false;
 
     if (savedTheme === 'dark') {
@@ -22,59 +19,76 @@
     } else if (savedTheme === 'light') {
         isDarkMode = false;
     } else {
-        // KEINE GESPEICHERTE PRÄFERENZ: Verwende die System-Präferenz als Fallback
         isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        // Speichere den Startwert, um ihn beim nächsten Laden nicht erneut abfragen zu müssen
         localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
     }
 
-    if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', isDarkMode);
 </script>
 
-<body >
-<div class="flex h-screen">
+<body class="relative min-h-screen overflow-hidden">
+{% set current_route = app.request.attributes.get('_route') %}
+{% set hide_on_routes = [
+    'app_login',
+    'app_register_google_auth',
+    'app_2fa_manual',
+    'app_2fa_manual_check'
+] %}
 
-    {# Menü nur anzeigen, wenn Benutzer den Google-Code bereits verifiziert hat #}
-    {% set current_route = app.request.attributes.get('_route') %}
-    {% set hide_on_routes = ['app_register_google_auth', 'app_2fa_manual', 'app_2fa_manual_check'] %}
+{% set hasSidebar =
+    is_granted('IS_AUTHENTICATED_FULLY')
+    and app.user
+    and current_route not in hide_on_routes
+%}
+<!-- 🌌 GLOBAL BACKGROUND -->
+<div class="fixed inset-0 -z-10 bg-gradient-to-br
+            from-gray-50 via-slate-50 to-gray-100
+            dark:from-gray-950 dark:via-slate-950 dark:to-gray-900">
 
-{#    {% if is_granted('IS_AUTHENTICATED_FULLY')#}
-{#        and app.user#}
-{#        and app.user.googleAuthenticatorSecret#}
-{#        and not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS')#}
-{#        and current_route not in hide_on_routes %}#}
-{#        {% include 'navigation/navigation.html.twig' %}#}
-{#    {% endif %}#}
+    <!-- Animated blobs -->
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full
+                mix-blend-multiply dark:mix-blend-screen blur-3xl
+                opacity-10 dark:opacity-20 animate-blob"></div>
 
-    {% if is_granted('IS_AUTHENTICATED_FULLY')
-        and app.user
-        and current_route not in hide_on_routes %}
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full
+                mix-blend-multiply dark:mix-blend-screen blur-3xl
+                opacity-10 dark:opacity-20 animate-blob animation-delay-2000"></div>
+</div>
+
+<div class="flex min-h-screen flex-column">
+    {% if hasSidebar %}
         {% include 'navigation/navigation.html.twig' %}
     {% endif %}
 
+    <!-- 🧱 MAIN CONTENT -->
+    <main class="
+    flex-1 min-h-screen overflow-y-auto scrollbar-thin
+    {{ hasSidebar ? 'sm:ml-72' : '' }}
+">
 
-    <!-- Main -->
-    <main class="flex-1 overflow-y-auto dark:bg-gray-900/95">
+        <!-- Einheitliches Padding -->
+        <div class="w-full">
+            {% include 'elements/toast.html.twig' %}
+            {% block body %}{% endblock %}
+        </div>
 
-        {% include 'elements/toast.html.twig' %}
-        {% block body %}
-
-            <div class="p-8">
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                    <h2 class="text-lg font-semibold mb-4">Willkommen im Dashboard</h2>
-                    <p class="text-gray-600 dark:text-gray-400">
-                        Hier sehen Sie eine Übersicht über alle wichtigen Informationen Ihrer Objektsicherheitsfirma.
-                    </p>
-                </div>
-            </div>
-
-        {% endblock %}
     </main>
 </div>
+
+<style>
+    @keyframes blob {
+        0%   { transform: translate(0, 0) scale(1); }
+        33%  { transform: translate(30px, -50px) scale(1.1); }
+        66%  { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-blob {
+        animation: blob 7s infinite;
+    }
+    .animation-delay-2000 {
+        animation-delay: 2s;
+    }
+</style>
+
 </body>
 </html>

@@ -33,6 +33,14 @@ class EmployeeService
 
         return json_decode($allEmployees, true);
     }
+
+    public function getAllEmployeeEntities(bool $withInactive = false): array
+    {
+        $currentUser = $this->security->getUser();
+        $partnerCompany = $currentUser->getEmployee()->getPartnerCompany();
+
+        return $this->employeeRepository->findAll($withInactive, $partnerCompany);
+    }
     public function getEmployee($id)
     {
         //call function from other controller

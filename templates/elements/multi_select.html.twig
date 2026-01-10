@@ -1,6 +1,5 @@
 <div class="relative" data-controller="dropdown">
-    <label
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         {{ title }}
     </label>
 
@@ -60,11 +59,7 @@
             aria-labelledby="{{ systemName }}Button">
 
             {% for option in options %}
-                {% set checked =
-                    devValue is defined
-                    and devValue is iterable
-                    and option.value in devValue
-                %}
+                {% set checked = devValue is defined and devValue is iterable and option.value in devValue %}
 
                 <li>
                     <label class="flex items-center gap-2 cursor-pointer">
@@ -74,19 +69,13 @@
                             name="{{ systemName }}[]"
                             value="{{ option.value }}"
                             {% if checked %}checked{% endif %}
-                            data-action="change->dropdown#updateLabel"
-                            class="w-4 h-4
-                                   text-blue-600
-                                   bg-gray-100
-                                   border-gray-300
-                                   rounded-sm
-                                   focus:ring-blue-500
-                                   dark:focus:ring-blue-600
-                                   dark:ring-offset-gray-700
-                                   dark:focus:ring-offset-gray-700
-                                   focus:ring-2
-                                   dark:bg-gray-600
-                                   dark:border-gray-500">
+                            {% if required is defined %}required{% endif %}
+                            {% if formId is defined %}form="{{ formId }}"{% endif %}
+                            {% if updateAction is defined and updateAction %}data-action="change->{{ updateAction }} change->dropdown#updateLabel"{% else %}data-action="change->dropdown#updateLabel"{% endif %}
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm
+                                   focus:ring-blue-500 dark:focus:ring-blue-600
+                                   dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700
+                                   focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
 
                         <span class="text-sm font-medium text-gray-900 dark:text-gray-300">
                             {{ option.label }}

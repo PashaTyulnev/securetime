@@ -4,77 +4,42 @@
 
 {% block body %}
 
-    <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden" data-controller="company">
+    <div data-controller="company">
 
-        <div data-company-target="modalContainer">
+        <div data-company-target="modalContainer"></div>
 
+        {# ================= HEADER ================= #}
+        <header
+            class="relative z-10
+           backdrop-blur-xl bg-white/70 dark:bg-gray-900/70
+           border-b border-gray-200/50 dark:border-gray-800/50">
+
+            <div class="px-6 py-4 flex items-center justify-between">
+                <h1>
+                    Auftraggeber
+                </h1>
+
+                <button
+                    data-action="click->company#openCreationModal"
+                    class="app-button">
+                    {{ ux_icon('lucide:building-2', { class: 'w-5 h-5' }) }}
+                    <span>Firma anlegen</span>
+                </button>
+            </div>
+        </header>
+
+        {# ================= CONTENT ================= #}
+        <div class="relative p-5">
+            <turbo-frame id="companies-table" src="{{ path('all_company_list_component') }}">
+                <div class="py-12 flex justify-center">
+                    <twig:Loader/>
+                </div>
+            </turbo-frame>
         </div>
 
-        {# Hauptinhalt #}
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm">
-            <div class="container mx-auto px-6 py-8">
-
-                {# Header mit Titel und Button #}
-                <div class="mb-8">
-                    <div class="flex justify-between items-center">
-                        <h1 class="text-3xl font-light text-gray-900 dark:text-white tracking-tight">Auftraggeber</h1>
-                        <!-- Modal toggle -->
-                        <button data-action="click->company#openCreationModal"
-                                class="app-button">
-                            {{ ux_icon('lucide:building-2', { class: 'w-5 h-5' }) }}
-                            <span>Firma anlegen</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <turbo-frame id="companies-table" src="{{ path('all_company_list_component') }}">
-                        <div class="loading">
-                            <twig:Loader/>
-                        </div>
-                    </turbo-frame>
-                </div>
-            </div>
-        </main>
     </div>
 
-    {# Modal Animation Styles #}
-    <style>
-        @keyframes modal-enter {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
 
-        @keyframes bounce-in {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            70% {
-                transform: scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
 
-        .animate-modal-enter {
-            animation: modal-enter 0.4s ease-out;
-        }
-
-        .animate-bounce-in {
-            animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-    </style>
 
 {% endblock %}

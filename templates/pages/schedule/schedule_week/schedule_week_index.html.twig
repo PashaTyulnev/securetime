@@ -2,84 +2,66 @@
 
 {% block body %}
 
-
-    <div data-controller="schedule-week"
-         class="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-gray-950 dark:via-slate-950 dark:to-gray-900">
+    <div
+        data-controller="schedule-week"
+        class="min-h-screen bg-gradient-to-br
+           from-gray-50 via-slate-50 to-gray-100
+           dark:from-gray-950 dark:via-slate-950 dark:to-gray-900">
 
         {# Animated Background Gradients #}
-        <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
             <div
-                class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-10 dark:opacity-20 animate-blob"></div>
+                class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full
+               blur-3xl opacity-10 animate-blob"></div>
+
             <div
-                class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-10 dark:opacity-20 animate-blob animation-delay-2000"></div>
-            <div
-                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-10 dark:opacity-20 animate-blob animation-delay-4000"></div>
+                class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full
+               blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
         </div>
 
-        {# Header with Glassmorphism #}
+        {# ================= HEADER ================= #}
         <header
-            class="sticky top-0 z-50 backdrop-blur-2xl bg-white/70 dark:bg-gray-900/70 border-b border-gray-200/50 dark:border-gray-800/50">
-            <div class="w-full mx-auto">
-                {# Top Bar #}
-                <div class="px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-6">
-                            <h1 class="text-3xl font-extralight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-                                Objektdienstplan
-                            </h1>
-                        </div>
+            class="relative z-10
+           backdrop-blur-xl bg-white/70 dark:bg-gray-900/70
+           border-b border-gray-200/50 dark:border-gray-800/50">
 
-                        {# Date Navigation #}
-                        {% include "/pages/schedule/schedule_week/week_navigation.html.twig" %}
-                    </div>
-                </div>
+            {# Top Bar #}
+            <div class="px-6 py-4 flex items-center justify-between">
+                <h1
+                    class="text-3xl font-light tracking-tight
+                   bg-gradient-to-r from-slate-900 to-slate-600
+                   dark:from-white dark:to-gray-400
+                   bg-clip-text text-transparent">
+                    Objektdienstplan
+                </h1>
 
-                {# Tab Navigation - Zeitraum Typ #}
-                {% include '/pages/schedule/components/range_type_navigation.html.twig' %}
+                {% include "/pages/schedule/schedule_week/week_navigation.html.twig" %}
             </div>
+
+            {# Zeitraum / Tabs #}
+            {% include '/pages/schedule/components/range_type_navigation.html.twig' %}
         </header>
 
-        {# Main Content #}
-        <main class="w-full mx-auto px-6 py-8">
-            <div>
+
+        {# ================= STICKY DRAG & DROP BAR ================= #}
+        <div class="sticky top-0 z-40
+
+           border-b border-gray-200/40 dark:border-gray-800/40
+           max-h-[25vh]">
+
+            <div class="px-6 py-2 overflow-y-auto">
                 {% include '/pages/schedule/components/facility_and_shift.html.twig' %}
             </div>
+        </div>
 
 
+        {# ================= MAIN CONTENT ================= #}
+        <main class="w-full mx-auto px-6 pt-20">
             <div data-schedule-week-target="scheduleContainer">
-
+                {# Dynamischer Wocheninhalt #}
             </div>
         </main>
 
-
     </div>
 
-    <style>
-        @keyframes blob {
-            0% {
-                transform: translate(0px, 0px) scale(1);
-            }
-            33% {
-                transform: translate(30px, -50px) scale(1.1);
-            }
-            66% {
-                transform: translate(-20px, 20px) scale(0.9);
-            }
-            100% {
-                transform: translate(0px, 0px) scale(1);
-            }
-        }
-
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
-    </style>
 {% endblock %}
