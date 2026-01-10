@@ -55,23 +55,18 @@
                 opacity-10 dark:opacity-20 animate-blob animation-delay-2000"></div>
 </div>
 
-<div class="flex min-h-screen flex-column">
+<div class="flex min-h-screen flex-col">
     {% if hasSidebar %}
         {% include 'navigation/navigation.html.twig' %}
     {% endif %}
 
-    <!-- 🧱 MAIN CONTENT -->
-    <main class="
-    flex-1 min-h-screen overflow-y-auto scrollbar-thin
-    {{ hasSidebar ? 'sm:ml-72' : '' }}
-">
+    <main class="flex-1 min-h-0 overflow-y-auto scrollbar-thin
+        {{ hasSidebar ? 'sm:ml-72' : '' }}">
 
-        <!-- Einheitliches Padding -->
         <div class="w-full">
             {% include 'elements/toast.html.twig' %}
             {% block body %}{% endblock %}
         </div>
-
     </main>
 </div>
 
