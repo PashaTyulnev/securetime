@@ -1,33 +1,63 @@
 <div
-    class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl p-4 mb-8 border border-gray-200/50 dark:border-gray-800/50 flex flex-col gap-4 shadow-sm">
+    class="bg-white/60 dark:bg-gray-900/60
+           backdrop-blur-xl
+           rounded-3xl p-4 mb-8
+           border border-gray-200/50 dark:border-gray-800/50
+           flex flex-col gap-4
+           shadow-sm">
 
-    <!-- Objektauswahl -->
+    {# ========= Objektauswahl ========= #}
     <div class="flex items-center gap-2">
-        <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Objekt</span>
+        <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+            Objekt
+        </span>
+
         <select
             data-schedule-week-target="facilitySelect"
             data-action="change->schedule-week#selectFacility"
-            class="px-4 py-2 bg-blue-100/80 dark:bg-blue-900/40 rounded-xl border-0 text-sm font-bold text-blue-900 dark:text-blue-200 focus:ring-2 focus:ring-blue-500">
-            {% if is_granted("ROLE_ADMIN") %}
-            <option class="bg-blue-100/80 dark:bg-blue-900/40" value="null">Bitte für Planung auswählen...</option>
+            class="px-4 py-2
+                   bg-blue-100/80 dark:bg-blue-900/40
+                   rounded-xl border-0
+                   text-sm font-bold
+                   text-blue-900 dark:text-blue-200
+                   focus:ring-2 focus:ring-blue-500">
 
+            {% if is_granted("ROLE_ADMIN") %}
+                <option value="null">
+                    Bitte für Planung auswählen…
+                </option>
             {% else %}
-            <option class="bg-blue-100/80 dark:bg-blue-900/40" value="null">Alle Objekte anzeigen</option>
+                <option value="null">
+                    Alle Objekte anzeigen
+                </option>
             {% endif %}
 
             {% for facility in facilities %}
-                <option class="bg-blue-100/80 dark:bg-blue-900/40" value="{{ facility.id }}"
-                        {% if facility.id == 1 %}selected{% endif %}>{{ facility.title }}</option>
+                <option value="{{ facility.id }}"
+                        {% if facility.id == 1 %}selected{% endif %}>
+                    {{ facility.title }}
+                </option>
             {% endfor %}
         </select>
     </div>
 
-   {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_PARTNER_ADMIN") %}
-        <!-- Schichtenreihe -->
-        <div class="flex gap-4 overflow-x-auto pt-5">
-            <div data-schedule-week-target="demandShiftsContainer" class="flex gap-4">
+    {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_PARTNER_ADMIN") %}
+
+        {# ========= Demand-Shifts-Row ========= #}
+        <div
+            class="relative
+                   overflow-x-auto
+                   pt-4
+                   min-h-[180px]">
+
+            <div
+                data-schedule-week-target="demandShiftsContainer"
+                class="flex gap-4 items-start">
+
+                {# DemandShift Cards kommen hier rein #}
 
             </div>
         </div>
+
     {% endif %}
 </div>
