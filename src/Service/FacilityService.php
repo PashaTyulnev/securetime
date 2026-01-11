@@ -13,6 +13,7 @@ class FacilityService
     public function __construct(readonly FacilityRepository  $facilityRepository,
                                 readonly SerializerInterface $serializer,
                                 readonly HttpClientInterface $httpClient,
+                                readonly Security $security,
                                 readonly EmployeeService     $employeeService,
                                 readonly ShiftRepository     $shiftRepository,
     )
@@ -24,10 +25,19 @@ class FacilityService
 
     public function getAllFacilities()
     {
-        $contextEmployees = $this->employeeService->getAllEmployees();
-        $employeeIds = array_map(fn($emp) => $emp['id'], $contextEmployees);
+        $currentRoles = $this->security->getUser()?->getRoles();
 
-        $facilities = $this->facilityRepository->findByEmployees($employeeIds);
+        if(in_array('ROLE_ADMIN', $currentRoles, true)) {
+            $facilities = $this->facilityRepository->findAll();
+        }else{
+            $contextEmployees = $this->employeeService->getAllEmployees();
+
+            $employeeIds = array_map(fn($emp) => $emp['id'], $contextEmployees);
+
+            $facilities = $this->facilityRepository->findByEmployees($employeeIds);
+        }
+
+
 
         $facilities = $this->serializer->serialize(
             $facilities,
