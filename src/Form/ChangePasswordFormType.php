@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class ChangePasswordFormType extends AbstractType
 {
@@ -34,11 +35,9 @@ class ChangePasswordFormType extends AbstractType
                             'minMessage' => 'Ihr Passwort muss mindestens {{ limit }} Zeichen lang sein',
                             'max' => 4096,
                         ]),
-                        new PasswordStrength([
-                            'message' => 'Das Passwort ist zu schwach',
-                        ]),
-                        new NotCompromisedPassword([
-                            'message' => 'Dieses Passwort wurde kompromittiert',
+                        new Regex([
+                            'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$/',
+                            'message' => 'Das Passwort muss Groß- und Kleinbuchstaben sowie mindestens ein Sonderzeichen enthalten',
                         ]),
                     ],
                     'label' => 'Neues Passwort',
