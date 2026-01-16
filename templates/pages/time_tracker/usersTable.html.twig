@@ -1,0 +1,45 @@
+<div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+    {# Alle Anzeigen Button #}
+    <div class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 cursor-pointer transition-all"
+         data-action="click->timetracker--admin#displayAllUserTimes"
+         id="displayAllButton">
+        <p class="text-center text-white font-medium py-3 px-4">Alle Anzeigen</p>
+    </div>
+
+    {# User Liste #}
+    <div class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+        {% for singleUserData in userInformation %}
+            <div class="px-4 py-3 cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-all userTimeRow"
+                {% if is_granted('ROLE_ADMIN') or app.user.id == singleUserData.userId %}
+                    data-action="click->timetracker--admin#loadSingleUserData"
+                    data-timetracker--admin-user_id-param="{{ singleUserData.userId }}"
+                {% endif %}
+                 id="userTimeRow-{{ singleUserData.userId }}">
+
+                <div class="flex items-center justify-between">
+                    {# Username #}
+                    <div class="flex-1">
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ singleUserData.username }}</span>
+                    </div>
+
+                    {# Status mit Icon #}
+                    <div class="flex items-center gap-3">
+                        {% set colors = { 'checkin': 'text-green-600', 'checkout': 'text-red-600', 'pause': 'text-blue-600' } %}
+                        {% set bgColors = { 'checkin': 'bg-green-100 dark:bg-green-900/30', 'checkout': 'bg-red-100 dark:bg-red-900/30', 'pause': 'bg-blue-100 dark:bg-blue-900/30' } %}
+                        {% set icons = { 'checkin': 'lucide:circle-check', 'checkout': 'lucide:circle-x', 'pause': 'lucide:pause-circle' } %}
+
+                        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg {{ bgColors[singleUserData.type] }}">
+                            {{ ux_icon(icons[singleUserData.type], { class: 'h-4 w-4 ' ~ colors[singleUserData.type] }) }}
+                            <span class="text-xs font-medium {{ colors[singleUserData.type] }}">{{ singleUserData.type }}</span>
+                        </div>
+
+                        {# Zeit #}
+                        <span class="text-xs text-gray-500 dark:text-gray-400 min-w-[100px] text-right">
+                            {{ singleUserData.lastActionTimeStamp.date|date("d.m.Y H:i") }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

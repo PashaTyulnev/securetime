@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Zeiterfassung{% endblock %}
+
+{% block body %}
+
+    <div data-controller="timetracker--admin">
+
+        <div data-timetracker--admin-target="toastContainer"></div>
+        <input type="hidden" data-timetracker--admin-target="currentUser" value="{{ app.user.id }}">
+
+        {# ================= HEADER ================= #}
+        <header class="relative
+                   -mx-6 px-6
+                   backdrop-blur-xl bg-white/70 dark:bg-gray-900/70
+                   border-b border-gray-200/50 dark:border-gray-800/50">
+
+            <div class="px-6 py-4 flex items-center justify-between">
+                <h1 class="text-3xl font-light tracking-tight
+                       bg-gradient-to-r from-slate-900 to-slate-600
+                       dark:from-white dark:to-gray-400
+                       bg-clip-text text-transparent">
+                    Zeiterfassung
+                </h1>
+
+                <div class="flex items-center gap-3">
+                    <select data-action="change->timetracker--admin#triggerSelectedMonth"
+                            data-timetracker--admin-target="monthSelect"
+                            class="bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 transition-all">
+                    </select>
+
+                    <button data-action="click->timetracker--admin#exportPdf"
+                            class="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                        {{ ux_icon('lucide:file-down', { class: 'h-5 w-5' }) }}
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        {# ================= CONTENT ================= #}
+        <div class="p-5">
+            <div class="space-y-5">
+
+
+
+
+                {# Two Column Layout #}
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                    {# Work Time Summary - 1/3 #}
+                    <div class="lg:col-span-1">
+
+                        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden"
+                             data-timetracker--admin-target="trackedTimesContainer">
+                        </div>
+                    </div>
+
+                    {# Tracked Times - 2/3 #}
+                    <div class="lg:col-span-2">
+                        <div class="w-full mb-5">
+                            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden"
+                                 data-timetracker--admin-target="singleUserTotals">
+                            </div>
+                        </div>
+
+                        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl "
+                             data-timetracker--admin-target="usersWorkTimeSummary">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -16,7 +16,8 @@ use Twig\Environment;
 
 class ScheduleMonthPdfProvider implements ProviderInterface
 {
-    public function __construct(private RequestStack $requestStack, readonly Environment $twig,
+    public function __construct(private RequestStack $requestStack,
+                                readonly Environment $twig,
                                 readonly EmployeeService $employeeService,
                                 readonly FacilityService $facilityService,
                                 readonly ScheduleService $scheduleService) {}

@@ -1,0 +1,37 @@
+<table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <tr>
+        <th scope="col" class="px-6 py-3">
+            Name
+        </th>
+        <th scope="col" class="px-6 py-3">
+            Status
+        </th>
+
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for singleUserData in userInformation %}
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <td scope="col" class="px-6 py-3">
+                {{ singleUserData.username }}
+            </td>
+
+            <td scope="col" class="px-6 py-3">
+                {% set colors = { 'checkin': 'text-green-600', 'checkout': 'text-red-600', 'pause': 'text-blue-600' } %}
+                {% set icons = { 'checkin': 'lucide:circle-check', 'checkout': 'lucide:circle-stop', 'pause': 'lucide:pause' } %}
+
+                <div class="flex items-center {{ colors[singleUserData.type] }}">
+                    {{ ux_icon(icons[singleUserData.type], { class: 'h-5 w-5 mr-1' }) }}
+                    <p class="font-medium">{{ singleUserData.type }}</p>
+                </div>
+            </td>
+
+
+
+        </tr>
+
+    {% endfor %}
+    </tbody>
+</table>

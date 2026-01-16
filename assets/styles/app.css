@@ -73,3 +73,7 @@ h1{
 .flex-column{
     flex-direction: column;
 }
+
+header{
+    @apply hidden sm:block;
+}

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeiterfassung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .company-info {
+            margin-bottom: 20px;
+            font-size: 11px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        td {
+            font-size: 11px;
+        }
+
+        .date-time {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .working-time {
+            font-weight: bold;
+        }
+
+        .signature-section {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signature-field {
+            width: 45%;
+            text-align: center;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid #333;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+
+        .signature-label {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .summary-section {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .summary-section h3 {
+            margin: 0 0 15px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        .summary-table {
+            width: 50%;
+            border: none;
+            margin-bottom: 0;
+        }
+
+        .summary-table td {
+            border: none;
+            padding: 5px 10px 5px 0;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        .summary-table td:last-child {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .summary-value {
+            min-width: 80px;
+        }
+
+        @media print {
+            body {
+                margin: 15px;
+            }
+            .signature-section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Zeiterfassung</h1>
+    <div class="company-info">
+        <strong>Zeitraum:</strong> {{ totals.dateFrom|date('d.m.Y') }} - {{ totals.dateTo|date('d.m.Y') }} &nbsp;&nbsp;&nbsp;
+        <strong>Mitarbeiter:</strong> {{ totals.username }}
+    </div>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Mitarbeiter</th>
+        <th>Beginn<br><small>(Datum / Zeit)</small></th>
+        <th>Ende<br><small>(Datum / Zeit)</small></th>
+        <th>Dauer</th>
+        <th>Pause</th>
+        <th>Arbeitszeit</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for trackedTime in trackedTimes %}
+        <tr>
+            <td>{{ trackedTime.username }}</td>
+            <td>
+                <span class="date-time">{{ trackedTime.shiftStart.date|date('d.m.Y') }}</span>
+                <span class="date-time">{{ trackedTime.shiftStart.date|date('H:i') }}</span>
+            </td>
+            <td>
+                {% if trackedTime.shiftEnd is not null %}
+                    <span class="date-time">{{ trackedTime.shiftEnd.date|date('d.m.Y') }}</span>
+                    <span class="date-time">{{ trackedTime.shiftEnd.date|date('H:i') }}</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if trackedTime.shiftDuration is not null %}
+                    {{ trackedTime.shiftDuration }}
+                {% endif %}
+            </td>
+            <td>{{ trackedTime.pauseDuration }}</td>
+            <td class="working-time">
+                {% if trackedTime.totalWorkingTime is not null %}
+                    {{ trackedTime.totalWorkingTime }}
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="summary-section">
+    <h3>Zusammenfassung</h3>
+    <table class="summary-table">
+        <tr>
+            <td><strong>Gesamtarbeitszeit (ohne Pause):</strong></td>
+            <td class="summary-value">{{ totals.totalWorkingTime }}</td>
+        </tr>
+        <tr>
+            <td><strong>Gesamtarbeitszeit (mit Pause):</strong></td>
+            <td class="summary-value">{{ totals.totalShiftDuration }}</td>
+        </tr>
+        <tr>
+            <td><strong>Gesamtpause:</strong></td>
+            <td class="summary-value">{{ totals.totalPause }}</td>
+        </tr>
+        {% if totals.totalNightShiftWorkingTime != "00:00" %}
+            <tr>
+                <td><strong>Nachtschichtzuschlag (ohne Pause):</strong></td>
+                <td class="summary-value">{{ totals.totalNightShiftWorkingTime }}</td>
+            </tr>
+        {% endif %}
+    </table>
+</div>
+
+<div class="signature-section">
+    <div class="signature-field">
+        <div class="signature-line"></div>
+        <div class="signature-label">Unterschrift Mitarbeiter</div>
+    </div>
+    <div class="signature-field">
+        <div class="signature-line"></div>
+        <div class="signature-label">Unterschrift Vorgesetzter</div>
+    </div>
+</div>
+</body>
+</html>

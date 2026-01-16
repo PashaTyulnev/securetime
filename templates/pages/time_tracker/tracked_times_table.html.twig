@@ -1,0 +1,103 @@
+<div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50/80 dark:bg-gray-800/80">
+            <tr>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Mitarbeiter
+                </th>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Beginn
+                </th>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Ende
+                </th>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Dauer
+                </th>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Pause
+                </th>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Arbeitszeit
+                </th>
+                <th class="px-3 py-2 w-10"></th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+            {% for trackedTime in trackedTimes %}
+                <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                    <td class="px-3 py-2">
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">{{ trackedTime.username }}</span>
+                        <input type="hidden" name="timeTrackerId" value="{{ trackedTime.timeTrackerId }}">
+                    </td>
+
+                    <td class="px-3 py-2">
+                        <div class="flex gap-2">
+                            <input type="date"
+                                   class="bg-transparent border-0 text-xs text-gray-900 dark:text-white w-28 px-1 focus:outline-none focus:ring-1 focus:ring-slate-500/50 rounded"
+                                   name="shiftStartDate"
+                                   data-action="change->timetracker--admin#displaySaveButton"
+                                   value="{{ trackedTime.shiftStart.date|date('Y-m-d') }}"
+                                   {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
+
+                            <input type="time"
+                                   class="bg-transparent border-0 text-xs text-gray-900 dark:text-white w-16 px-1 focus:outline-none focus:ring-1 focus:ring-slate-500/50 rounded"
+                                   name="shiftStartTime"
+                                   data-action="change->timetracker--admin#displaySaveButton"
+                                   value="{{ trackedTime.shiftStart.date|date('H:i') }}"
+                                   {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
+                        </div>
+                    </td>
+
+                    <td class="px-3 py-2">
+                        {% if trackedTime.shiftEnd is not null %}
+                            <div class="flex gap-2">
+                                <input type="date"
+                                       class="bg-transparent border-0 text-xs text-gray-900 dark:text-white w-28 px-1 focus:outline-none focus:ring-1 focus:ring-slate-500/50 rounded"
+                                       name="shiftEndDate"
+                                       data-action="change->timetracker--admin#displaySaveButton"
+                                       value="{{ trackedTime.shiftEnd.date|date('Y-m-d') }}"
+                                       {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
+
+                                <input type="time"
+                                       class="bg-transparent border-0 text-xs text-gray-900 dark:text-white w-16 px-1 focus:outline-none focus:ring-1 focus:ring-slate-500/50 rounded"
+                                       name="shiftEndTime"
+                                       data-action="change->timetracker--admin#displaySaveButton"
+                                       value="{{ trackedTime.shiftEnd.date|date('H:i') }}"
+                                       {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
+                            </div>
+                        {% endif %}
+                    </td>
+
+                    <td class="px-3 py-2">
+                        {% if trackedTime.shiftDuration is not null %}
+                            <span class="text-xs text-gray-900 dark:text-white">{{ trackedTime.shiftDuration }}</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="px-3 py-2">
+                        <span class="text-xs text-gray-900 dark:text-white">{{ trackedTime.pauseDuration }}</span>
+                    </td>
+
+                    <td class="px-3 py-2">
+                        {% if trackedTime.totalWorkingTime is not null %}
+                            <span class="text-xs font-semibold text-gray-900 dark:text-white">{{ trackedTime.totalWorkingTime }}</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="px-3 py-2">
+                        {% if is_granted("ROLE_ADMIN") %}
+                            <button
+                                class="hidden saveChangedTimeEntryButton p-1.5 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400 transition-all"
+                                data-action="click->timetracker--admin#saveChangedTimeEntry">
+                                {{ ux_icon('lucide:save', { class: 'h-4 w-4' }) }}
+                            </button>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
