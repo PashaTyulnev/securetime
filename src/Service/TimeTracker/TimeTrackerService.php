@@ -354,7 +354,7 @@ readonly class TimeTrackerService
             $userName = $userTimeTrackingData[0]->username;
         }
 
-        $userTimeTrackingData = $this->calculateNightShiftWorkingTime($userTimeTrackingData);
+        $userTimeTrackingData = $this->calculateNightShiftWorkingTime($userTimeTrackingData,23,6);
 
         $summaryData = $this->calculateTotalsOfTimeSummary($userTimeTrackingData);
 
@@ -639,10 +639,11 @@ readonly class TimeTrackerService
     }
 
     /**
-     * Zählt wie viele Minuten in der Nacht gearbeitet wurden ( 00:00 - 06:00)
+     * Zählt wie viele Minuten in der Nacht gearbeitet wurden ( 23:00 - 06:00)
      */
-    private function calculateNightShiftWorkingTime(mixed $userTimeTrackingData, $nightShiftBeginHour = 0, $nightShiftEndHour = 6): array
+    private function calculateNightShiftWorkingTime(mixed $userTimeTrackingData, $nightShiftBeginHour, $nightShiftEndHour): array
     {
+
         foreach ($userTimeTrackingData as $timeEntry) {
             if ($timeEntry->shiftStart === null || $timeEntry->shiftEnd === null) {
                 continue;
@@ -679,7 +680,6 @@ readonly class TimeTrackerService
 
             $nightShiftTotalMinutes = $this->getNightShiftMinutesBetweenTimestamps($shiftStartCarbon, $shiftEndCarbon, $nightShiftBeginHour, $nightShiftEndHour);
 
-
             $nightShiftTotalString = $this->formatMinutesToTime($nightShiftTotalMinutes);
             $nightShiftPauseString = $this->formatMinutesToTime($nightShiftPauseDuration);
             $totalNightShiftWithoutPause = $nightShiftTotalMinutes - $nightShiftPauseDuration;
@@ -696,21 +696,30 @@ readonly class TimeTrackerService
     }
 
 
-    public function getNightShiftMinutesBetweenTimestamps(Carbon $fromCarbon, Carbon $toCarbon, mixed $nightShiftBeginHour, mixed $nightShiftEndHour): int
+    public function getNightShiftMinutesBetweenTimestamps(Carbon $fromCarbon, Carbon $toCarbon, $nightShiftBeginHour, $nightShiftEndHour): int
     {
         $nightShiftMinutes = 0;
+        $current = $fromCarbon->copy();
 
-        $shiftStartTimeStamp = $fromCarbon->timestamp;
-        $shiftEndTimeStamp = $toCarbon->timestamp;
+        while ($current < $toCarbon) {
+            $hour = $current->hour;
 
-        //iterate over all minutes of the shift
-        for ($currentTimeStamp = $shiftStartTimeStamp; $currentTimeStamp <= $shiftEndTimeStamp; $currentTimeStamp += 60) {
-            $currentTime = Carbon::createFromTimestamp($currentTimeStamp);
-            //check if the current time is between 00:00 and 06:00
-            if ($currentTime->isBetween($fromCarbon, $toCarbon) && $currentTime->hour >= $nightShiftBeginHour && $currentTime->hour < $nightShiftEndHour) {
-                $nightShiftMinutes++;
+            //check if new day
+            if ($nightShiftEndHour > $nightShiftBeginHour) {
+                //Normalfall z.B. 22-06 Uhr
+                if ($hour < $nightShiftEndHour && $hour >= $nightShiftBeginHour) {
+                    $nightShiftMinutes++;
+                }
+            } else {
+                //Über Mitternacht z.B. 23-06 Uhr
+                if ($hour < $nightShiftEndHour || $hour >= $nightShiftBeginHour) {
+                    $nightShiftMinutes++;
+                }
             }
+
+            $current->addMinute();
         }
+
         return $nightShiftMinutes;
     }
 
