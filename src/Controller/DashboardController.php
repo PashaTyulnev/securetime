@@ -27,10 +27,24 @@ class DashboardController extends AbstractController
 //            return $this->redirectToRoute('app_register_google_auth');
 //        }
 
+        $user = $security->getUser();
         $todayShifts = $this->shiftService->findShiftsForToday();
 
+        $isPlannedToday = false;
+
+        if ($user) {
+            foreach ($todayShifts as $shift) {
+                $employee = $shift->getEmployee();
+                if ($employee && $employee->getUser() && $employee->getUser()->getId() === $user->getId()) {
+                    $isPlannedToday = true;
+                    break;
+                }
+            }
+        }
+
         return $this->render('empty.html.twig', [
-            'todayShifts' => $todayShifts
+            'todayShifts' => $todayShifts,
+            'isPlannedToday' => $isPlannedToday,
         ]);
     }
 

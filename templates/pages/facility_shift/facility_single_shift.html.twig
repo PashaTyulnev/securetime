@@ -1,4 +1,6 @@
+{% set presetsArray = shiftPresets.member is defined ? shiftPresets.member : shiftPresets %}
 <div data-controller="facility-shift-behavior"
+     data-facility-shift-behavior-shift-presets-value="{{ {'member': presetsArray}|json_encode|e('html_attr') }}"
      class="border border-gray-200/30 dark:border-gray-700/30 rounded-xl bg-white/50 dark:bg-gray-800/50 hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all mb-3 overflow-visible">
 
     <form method="post" id="shift-form-{{ demandShift.id|default('new') }}"
@@ -42,7 +44,7 @@
                                 data-action="change->facility-shift-behavior#shiftChanged {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
                                 data-facility-shift-behavior-target="shiftSelect">
                             <option>Schicht...</option>
-                            {% for preset in shiftPresets %}
+                            {% for preset in presetsArray %}
                                 <option value="{{ preset.name }}"
                                         {% if shiftName == preset.name|lower %}selected{% endif %}>
                                     {{ preset.name }}

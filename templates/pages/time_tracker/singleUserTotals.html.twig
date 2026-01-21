@@ -26,8 +26,31 @@
 
             <div class="px-4 py-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
                 <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Gesetzliche Mindestpause</span>
+                    <span class="text-xs font-medium text-gray-900 dark:text-white">{{ timeTrackingSummary.requiredPause|default('00:00') }} h</span>
+                </div>
+            </div>
+
+            <div class="px-4 py-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Pausen-Differenz (Ist - Soll)</span>
+                    <span class="text-xs font-medium {% if timeTrackingSummary.pauseDeficitMinutes|default(0) >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                        {{ timeTrackingSummary.pauseDeficit|default('+00:00') }} h
+                    </span>
+                </div>
+            </div>
+
+            <div class="px-4 py-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                <div class="flex justify-between items-center">
                     <span class="text-xs text-gray-600 dark:text-gray-400">Schichten Total (ohne Pausen)</span>
                     <span class="text-xs font-medium text-gray-900 dark:text-white">{{ timeTrackingSummary.totalShiftDuration }} h</span>
+                </div>
+            </div>
+
+            <div class="px-4 py-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Soll-Zeiten (aus Schichten)</span>
+                    <span class="text-xs font-medium text-gray-900 dark:text-white">{{ timeTrackingSummary.plannedHours|default('00:00') }} h</span>
                 </div>
             </div>
         </div>
@@ -72,6 +95,37 @@
         <div class="flex justify-between items-center">
             <span class="text-sm font-bold text-gray-900 dark:text-white">Arbeitszeit Total (abzgl. Pausen)</span>
             <span class="text-sm font-bold text-slate-900 dark:text-white">{{ timeTrackingSummary.totalWorkingTime }} h</span>
+        </div>
+    </div>
+</div>
+
+{# Vergleich Ist vs. Soll #}
+<div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden mt-4">
+    <div class="px-4 py-2 border-b border-gray-200/50 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80">
+        <h3 class="text-xs font-medium text-gray-900 dark:text-white">
+            Vergleich Ist vs. Soll
+        </h3>
+    </div>
+    <div class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+        <div class="px-4 py-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+            <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-600 dark:text-gray-400">Ist-Zeiten</span>
+                <span class="text-xs font-medium text-gray-900 dark:text-white">{{ timeTrackingSummary.totalWorkingTime }} h</span>
+            </div>
+        </div>
+        <div class="px-4 py-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+            <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-600 dark:text-gray-400">Soll-Zeiten</span>
+                <span class="text-xs font-medium text-gray-900 dark:text-white">{{ timeTrackingSummary.plannedHours|default('00:00') }} h</span>
+            </div>
+        </div>
+        <div class="px-4 py-2 bg-blue-50/50 dark:bg-blue-900/20">
+            <div class="flex justify-between items-center">
+                <span class="text-xs font-semibold text-gray-900 dark:text-white">Differenz</span>
+                <span class="text-xs font-bold {% if timeTrackingSummary.differenceMinutes|default(0) >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                    {{ timeTrackingSummary.differenceHours|default('+00:00') }} h
+                </span>
+            </div>
         </div>
     </div>
 </div>

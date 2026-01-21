@@ -57,4 +57,17 @@ class TimeTrackerRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Liefert alle TimeTracker-Einträge einer Schicht (Main-Checkin + Kinder) chronologisch.
+     */
+    public function findShiftEntries(TimeTracker $mainCheckin): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t = :mainCheckin OR t.parent = :mainCheckin')
+            ->setParameter('mainCheckin', $mainCheckin)
+            ->orderBy('t.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

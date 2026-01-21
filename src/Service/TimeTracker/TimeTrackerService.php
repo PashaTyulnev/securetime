@@ -6,6 +6,8 @@ use App\Entity\TimeTracker;
 use App\Entity\User;
 
 use App\Repository\TimeTrackerRepository;
+use App\Repository\ShiftRepository;
+use App\Repository\EmployeeRepository;
 use Carbon\Carbon;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,7 +25,9 @@ readonly class TimeTrackerService
     public function __construct(public EntityManagerInterface $em,
                                 public TimeTrackerRepository  $timeTrackerRepository,
                                 public Security               $security,
-                                public Environment            $twig
+                                public Environment            $twig,
+                                public ShiftRepository        $shiftRepository,
+                                public EmployeeRepository     $employeeRepository
     )
     {
 
@@ -38,6 +42,7 @@ readonly class TimeTrackerService
         $userHasPause = $this->checkIfUserHasPause($user);
 
         if (!$userIsCheckedIn && !$userHasPause) {
+            // Neuer Schichtbeginn - prüfe ob Mitarbeiter verplant ist
             $this->createTimeTrackerEntry($user, "checkin", true, null);
         } elseif (!$userIsCheckedIn && $userHasPause) {
             $lastMainCheckin = $this->getLastMainCheckin($user);
@@ -54,11 +59,62 @@ readonly class TimeTrackerService
         $timeTracker = new TimeTracker();
         $timeTracker->setUser($user);
         $timeTracker->setCreatedAt(new \DateTimeImmutable());
-        $timeTracker->setTimestamp(new \DateTimeImmutable());
+        $checkinTimestamp = new \DateTimeImmutable();
+        $timeTracker->setTimestamp($checkinTimestamp);
         $timeTracker->setType($type);
 
         if ($type === "checkin" and $isShiftStart) {
             $timeTracker->setShiftStart(true);
+
+            // Prüfe ob Mitarbeiter verplant ist und setze Facility + Abweichung
+            if (!$user instanceof User) {
+                throw new \Exception('Ungültiger Benutzer-Typ');
+            }
+
+            $employee = $user->getEmployee();
+            if (!$employee) {
+                throw new \Exception('Kein Mitarbeiter-Profil für diesen Benutzer gefunden');
+            }
+
+            // Prüfe ob an diesem Tag eine Schicht existiert
+            $today = new \DateTime('today');
+            $shifts = $this->shiftRepository->findByEmployeeAndDate($employee, $today);
+
+            if (empty($shifts)) {
+                throw new \Exception('Sie sind für heute nicht verplant. Bitte kontaktieren Sie Ihren Vorgesetzten.');
+            }
+
+            // Nimm die erste Schicht (falls mehrere am selben Tag)
+            $shift = $shifts[0];
+            $demandShift = $shift->getDemandShift();
+
+            if (!$demandShift || !$demandShift->getFacility()) {
+                throw new \Exception('Kein Objekt für die geplante Schicht gefunden');
+            }
+
+            $facility = $demandShift->getFacility();
+            $timeTracker->setFacility($facility);
+
+            // Berechne Abweichung zwischen Checkin-Zeit und geplanter Schicht-Zeit
+            $plannedStartTime = $demandShift->getTimeFrom();
+            if ($plannedStartTime) {
+                // Kombiniere Datum und Zeit für geplanten Start
+                $plannedDateTime = new \DateTime($today->format('Y-m-d') . ' ' . $plannedStartTime->format('H:i:s'));
+
+                // Berechne Differenz in Minuten
+                $diffInSeconds = $checkinTimestamp->getTimestamp() - $plannedDateTime->getTimestamp();
+                $diffInMinutes = (int)round($diffInSeconds / 60);
+
+                // Maximal 2 Stunden (120 Minuten) Abweichung erlauben
+                if (abs($diffInMinutes) > 120) {
+                    throw new \Exception(sprintf(
+                        'Die Checkin-Zeit weicht um mehr als 2 Stunden von der geplanten Schicht-Zeit ab (Abweichung: %d Minuten). Bitte kontaktieren Sie Ihren Vorgesetzten.',
+                        abs($diffInMinutes)
+                    ));
+                }
+
+                $timeTracker->setTimeDeviation($diffInMinutes);
+            }
         } else {
             $timeTracker->setShiftStart(false);
         }
@@ -73,12 +129,90 @@ readonly class TimeTrackerService
     {
         $userIsCheckedOut = $this->checkIfUserIsCheckedOut($user);
 
-        if (!$userIsCheckedOut) {
-            $lastMainCheckin = $this->getLastMainCheckin($user);
-            $this->createTimeTrackerEntry($user, "checkout", false, $lastMainCheckin);
-        } else {
+        if ($userIsCheckedOut) {
             throw new \Exception('Benutzer ist schon ausgecheckt');
         }
+
+        // Letzten Main-Checkin (Beginn der Schicht) holen
+        $lastMainCheckin = $this->getLastMainCheckin($user);
+
+        if (!$lastMainCheckin) {
+            throw new \Exception('Kein Schichtbeginn gefunden');
+        }
+
+        // Alle Einträge dieser Schicht laden
+        $shiftEntries = $this->timeTrackerRepository->findShiftEntries($lastMainCheckin);
+
+        // Temporär: Checkout-Zeitpunkt ist jetzt
+        $checkoutTimestamp = new \DateTimeImmutable();
+
+        // Virtueller Checkout-Zeitpunkt für die Berechnung:
+        // 1 Sekunde VOR dem eigentlichen Checkout, damit in der Übersicht
+        // der echte Checkout als letztes Event bleibt.
+        $virtualCheckoutTimestamp = $checkoutTimestamp->sub(new \DateInterval('PT1S'));
+
+        // Füge einen virtuellen Checkout-Eintrag hinzu, um die aktuelle Schicht komplett auszuwerten
+        // WICHTIG: Dieser Eintrag wird NICHT persistiert, sondern nur für die Berechnung genutzt.
+        $virtualCheckout = new TimeTracker();
+        $virtualCheckout->setUser($user);
+        $virtualCheckout->setCreatedAt(new \DateTimeImmutable());
+        $virtualCheckout->setTimestamp($virtualCheckoutTimestamp);
+        $virtualCheckout->setType('checkout');
+        $virtualCheckout->setShiftStart(false);
+        $virtualCheckout->setParent($lastMainCheckin);
+
+        $shiftEntriesWithVirtualCheckout = $shiftEntries;
+        $shiftEntriesWithVirtualCheckout[] = $virtualCheckout;
+
+        // Nutze die bestehende Logik zur Auswertung (eine Schicht)
+        $processed = $this->processTimeTrackEntities($shiftEntriesWithVirtualCheckout);
+
+        if (empty($processed)) {
+            // Fallback: direkt auschecken
+            $this->createTimeTrackerEntry($user, "checkout", false, $lastMainCheckin);
+            return;
+        }
+
+        $summaryData = $this->calculateTotalsOfTimeSummary($processed);
+
+        // Bereits erfasste Pausen & benötigte Pausen
+        $totalPauseMinutes = $this->timeStringToMinutes($summaryData['totalPauseMinutes']);
+        $requiredPauseMinutes = $summaryData['requiredPauseMinutes'];
+
+        // Wenn zu wenig Pause genommen wurde, automatisch Pause nachtragen
+        if ($totalPauseMinutes < $requiredPauseMinutes) {
+            $missingPauseMinutes = $requiredPauseMinutes - $totalPauseMinutes;
+
+            // Wir fügen eine Pause + Checkin direkt vor dem virtuellen Checkout hinzu:
+            // pause:   virtualCheckout - missingPause
+            // checkin: virtualCheckout
+            $pauseStart = $virtualCheckoutTimestamp->sub(new \DateInterval(sprintf('PT%dM', $missingPauseMinutes)));
+
+            // 1) Pause-Eintrag
+            $pauseEntry = new TimeTracker();
+            $pauseEntry->setUser($user);
+            $pauseEntry->setCreatedAt(new \DateTimeImmutable());
+            $pauseEntry->setTimestamp($pauseStart);
+            $pauseEntry->setType('pause');
+            $pauseEntry->setShiftStart(false);
+            $pauseEntry->setParent($lastMainCheckin);
+            $this->em->persist($pauseEntry);
+
+            // 2) Checkin-Eintrag (Ende der Pause)
+            $checkinEntry = new TimeTracker();
+            $checkinEntry->setUser($user);
+            $checkinEntry->setCreatedAt(new \DateTimeImmutable());
+            $checkinEntry->setTimestamp($virtualCheckoutTimestamp);
+            $checkinEntry->setType('checkin');
+            $checkinEntry->setShiftStart(false);
+            $checkinEntry->setParent($lastMainCheckin);
+            $this->em->persist($checkinEntry);
+
+            $this->em->flush();
+        }
+
+        // Abschließend regulären Checkout-Eintrag speichern
+        $this->createTimeTrackerEntry($user, "checkout", false, $lastMainCheckin);
     }
 
 
@@ -191,10 +325,11 @@ readonly class TimeTrackerService
         $type = $entity->getType();
         $timestamp = $entity->getTimestamp();
         $parent = $entity->getParent()?->getId();
+        $userId = $user->getId();
 
 
         if ($entity->isShiftStart()) {
-            $this->handleShiftStart($output, $id, $user->getEmployee()->getFullName(), $timestamp);
+            $this->handleShiftStart($output, $id, $user->getEmployee()->getFullName(), $timestamp, $userId);
         } elseif (isset($output[$parent]) && $type === 'checkout') {
             $this->handleShiftEnd($output[$parent], $timestamp);
         } elseif (isset($output[$parent]) && $type === 'pause') {
@@ -207,7 +342,7 @@ readonly class TimeTrackerService
 
     }
 
-    private function handleShiftStart(array &$output, int $id, string $username, $timestamp): void
+    private function handleShiftStart(array &$output, int $id, string $username, $timestamp, ?int $userId = null): void
     {
         $output[$id] = [
             'timeTrackerId' => $id,
@@ -217,6 +352,7 @@ readonly class TimeTrackerService
             'shiftDuration' => null,
             'pauseDuration' => new \DateInterval('PT0S'),
             'pausePeriods' => [],
+            'userId' => $userId,
         ];
     }
 
@@ -350,8 +486,11 @@ readonly class TimeTrackerService
 
         if ($this->hasDifferentUsers($userTimeTrackingData)) {
             $userName = "Alle User";
+            $userId = null;
         } else {
             $userName = $userTimeTrackingData[0]->username;
+            // Versuche userId aus den Daten zu extrahieren
+            $userId = $userTimeTrackingData[0]->userId ?? null;
         }
 
         $userTimeTrackingData = $this->calculateNightShiftWorkingTime($userTimeTrackingData,23,6);
@@ -365,9 +504,25 @@ readonly class TimeTrackerService
         $totalNightShiftPause = $summaryData['totalNightShiftPause'];
         $totalNightShiftWorkingTime = $summaryData['totalNightShiftWorkingTime'];
         $totalNightShiftWithoutPause = $summaryData['totalNightShiftWithoutPause'];
+        $requiredPause = $summaryData['requiredPause'];
+        $pauseDeficit = $summaryData['pauseDeficit'];
+        $pauseDeficitMinutes = $summaryData['pauseDeficitMinutes'];
 
         $dateRange = $this->getDateRange($userTimeTrackingData);
 
+        // Berechne Soll-Zeiten aus vergebenen Schichten
+        $plannedHours = $this->calculatePlannedHoursFromShifts(
+            $dateRange['minDate'],
+            $dateRange['maxDate'],
+            $userId
+        );
+
+        // Berechne Differenz zwischen Ist und Soll
+        $istMinutes = $this->timeStringToMinutes($totalWorkingMinutes);
+        $sollMinutes = $this->timeStringToMinutes($plannedHours);
+        $diffMinutes = $istMinutes - $sollMinutes;
+        $diffHours = $this->formatMinutesToTime(abs($diffMinutes));
+        $diffSign = $diffMinutes >= 0 ? '+' : '-';
 
         return [
             'totalWorkingTime' => $totalWorkingMinutes,
@@ -379,7 +534,12 @@ readonly class TimeTrackerService
             'totalNightShiftPause' => $totalNightShiftPause,
             'totalNightShiftWorkingTime' => $totalNightShiftWorkingTime,
             'totalNightShiftWithoutPause' => $totalNightShiftWithoutPause,
-
+            'plannedHours' => $plannedHours,
+            'differenceHours' => $diffSign . $diffHours,
+            'differenceMinutes' => $diffMinutes,
+            'requiredPause' => $requiredPause,
+            'pauseDeficit' => $pauseDeficit,
+            'pauseDeficitMinutes' => $pauseDeficitMinutes,
         ];
     }
 
@@ -415,9 +575,18 @@ readonly class TimeTrackerService
         $totalNightShiftWithoutPause = 0;
 
         foreach ($userTimeTrackingData as $timeEntry) {
-            $workingTime = $timeEntry->totalWorkingTime; // Format "hh:mm"
-            $pauseTime = $timeEntry->pauseDuration; // Format "hh:mm"
-            $shiftTime = $timeEntry->shiftDuration; // Format "hh:mm"
+            // Unterstützt sowohl Array- als auch Objekt-Struktur
+            $workingTime = is_array($timeEntry)
+                ? ($timeEntry['totalWorkingTime'] ?? null)
+                : ($timeEntry->totalWorkingTime ?? null); // Format "hh:mm"
+
+            $pauseTime = is_array($timeEntry)
+                ? ($timeEntry['pauseDuration'] ?? null)
+                : ($timeEntry->pauseDuration ?? null); // Format "hh:mm"
+
+            $shiftTime = is_array($timeEntry)
+                ? ($timeEntry['shiftDuration'] ?? null)
+                : ($timeEntry->shiftDuration ?? null); // Format "hh:mm"
 
             if ($workingTime !== null) {
                 list($hours, $minutes) = explode(":", $workingTime);
@@ -434,23 +603,48 @@ readonly class TimeTrackerService
                 $totalShiftDuration += ((int)$hours * 60) + (int)$minutes;
             }
 
-            if (isset($timeEntry->nightShiftPause)) {
-                list($hours, $minutes) = explode(":", $timeEntry->nightShiftPause);
+            $nightShiftPause = is_array($timeEntry)
+                ? ($timeEntry['nightShiftPause'] ?? null)
+                : ($timeEntry->nightShiftPause ?? null);
+
+            if ($nightShiftPause !== null) {
+                list($hours, $minutes) = explode(":", $nightShiftPause);
                 $totalNightShiftPause += ((int)$hours * 60) + (int)$minutes;
             }
 
-            if (isset($timeEntry->nightShiftTotal)) {
+            $nightShiftTotal = is_array($timeEntry)
+                ? ($timeEntry['nightShiftTotal'] ?? null)
+                : ($timeEntry->nightShiftTotal ?? null);
 
-                list($hours, $minutes) = explode(":", $timeEntry->nightShiftTotal);
+            if ($nightShiftTotal !== null) {
+                list($hours, $minutes) = explode(":", $nightShiftTotal);
                 $totalNightShiftWorkingTime += ((int)$hours * 60) + (int)$minutes;
 
             }
 
-            if (isset($timeEntry->nightShiftWithoutPause)) {
-                list($hours, $minutes) = explode(":", $timeEntry->nightShiftWithoutPause);
+            $nightShiftWithoutPause = is_array($timeEntry)
+                ? ($timeEntry['nightShiftWithoutPause'] ?? null)
+                : ($timeEntry->nightShiftWithoutPause ?? null);
+
+            if ($nightShiftWithoutPause !== null) {
+                list($hours, $minutes) = explode(":", $nightShiftWithoutPause);
                 $totalNightShiftWithoutPause += ((int)$hours * 60) + (int)$minutes;
             }
         }
+
+        // Gesetzliche Mindestpausen nach Gesamtarbeitszeit
+        // > 6 bis 9 Stunden: mindestens 30 Minuten
+        // > 9 Stunden: mindestens 45 Minuten
+        $requiredPauseMinutes = 0;
+        if ($totalShiftDuration > 9 * 60) {
+            $requiredPauseMinutes = 45;
+        } elseif ($totalShiftDuration > 6 * 60) {
+            $requiredPauseMinutes = 30;
+        }
+
+        $pauseDeficitMinutes = $totalPauseMinutes - $requiredPauseMinutes;
+        $pauseDeficitSign = $pauseDeficitMinutes >= 0 ? '+' : '-';
+        $pauseDeficitFormatted = $pauseDeficitSign . $this->formatMinutesToTime(abs($pauseDeficitMinutes));
 
         return [
             'totalWorkingMinutes' => $this->formatMinutesToTime($totalWorkingMinutes),
@@ -459,6 +653,10 @@ readonly class TimeTrackerService
             'totalNightShiftPause' => $this->formatMinutesToTime($totalNightShiftPause),
             'totalNightShiftWorkingTime' => $this->formatMinutesToTime($totalNightShiftWorkingTime),
             'totalNightShiftWithoutPause' => $this->formatMinutesToTime($totalNightShiftWithoutPause),
+            'requiredPause' => $this->formatMinutesToTime($requiredPauseMinutes),
+            'requiredPauseMinutes' => $requiredPauseMinutes,
+            'pauseDeficit' => $pauseDeficitFormatted,
+            'pauseDeficitMinutes' => $pauseDeficitMinutes,
         ];
 
     }
@@ -959,6 +1157,9 @@ readonly class TimeTrackerService
         return $employeeHours;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getYearlyWorkingHoursByEmployeeMonthly(float|bool|int|string $year)
     {
         $monthlyData = [];
@@ -1005,5 +1206,112 @@ readonly class TimeTrackerService
         }
 
         return $monthlyData;
+    }
+
+    /**
+     * Berechnet die Soll-Zeiten aus vergebenen Schichten für einen Mitarbeiter im angegebenen Zeitraum.
+     * $dateFrom / $dateTo können Strings (\"Y-m-d\"), DateTime oder DateTimeImmutable sein.
+     */
+    public function calculatePlannedHoursFromShifts($dateFrom, $dateTo, ?int $userId = null): string
+    {
+        // Normalisiere Datumswerte
+        if ($dateFrom === null || $dateTo === null) {
+            return $this->formatMinutesToTime(0);
+        }
+
+        if (is_string($dateFrom)) {
+            $dateFrom = new \DateTimeImmutable($dateFrom);
+        } elseif ($dateFrom instanceof \DateTime) {
+            $dateFrom = \DateTimeImmutable::createFromMutable($dateFrom);
+        }
+
+        if (is_string($dateTo)) {
+            $dateTo = new \DateTimeImmutable($dateTo);
+        } elseif ($dateTo instanceof \DateTime) {
+            $dateTo = \DateTimeImmutable::createFromMutable($dateTo);
+        }
+
+        // Wenn userId nicht gesetzt ist, können wir keine Soll-Zeiten berechnen
+        if ($userId === null) {
+            return $this->formatMinutesToTime(0);
+        }
+
+        // Finde den Employee anhand der userId
+        $user = $this->em->getRepository(User::class)->find($userId);
+        if (!$user || !$user->getEmployee()) {
+            return $this->formatMinutesToTime(0);
+        }
+
+        $employee = $user->getEmployee();
+
+        // Konvertiere DateTimeImmutable zu DateTime für das Repository
+        $dateFromDateTime = \DateTime::createFromImmutable($dateFrom);
+        $dateToDateTime = \DateTime::createFromImmutable($dateTo);
+
+        // Hole alle vergebenen Schichten für diesen Mitarbeiter im Zeitraum
+        $shifts = $this->shiftRepository->getAllAssignedShiftsInRange(
+            $employee,
+            $dateFromDateTime->format('Y-m-d'),
+            $dateToDateTime->format('Y-m-d')
+        );
+
+        $totalMinutes = 0;
+
+        foreach ($shifts as $shift) {
+            $demandShift = $shift->getDemandShift();
+            if ($demandShift === null) {
+                continue;
+            }
+
+            $timeFrom = $demandShift->getTimeFrom();
+            $timeTo = $demandShift->getTimeTo();
+
+            if ($timeFrom === null || $timeTo === null) {
+                continue;
+            }
+
+            // Berechne die Dauer zwischen timeFrom und timeTo
+            $fromHour = (int)$timeFrom->format('H');
+            $fromMinute = (int)$timeFrom->format('i');
+            $toHour = (int)$timeTo->format('H');
+            $toMinute = (int)$timeTo->format('i');
+
+            // Berechne die Minuten seit Mitternacht
+            $fromMinutes = ($fromHour * 60) + $fromMinute;
+            $toMinutes = ($toHour * 60) + $toMinute;
+
+            // Wenn timeTo vor timeFrom liegt, geht die Schicht über Mitternacht
+            if ($toMinutes < $fromMinutes) {
+                // Schicht geht über Mitternacht: (24*60 - fromMinutes) + toMinutes
+                $shiftMinutes = (24 * 60 - $fromMinutes) + $toMinutes;
+            } else {
+                // Normale Schicht: toMinutes - fromMinutes
+                $shiftMinutes = $toMinutes - $fromMinutes;
+            }
+
+            $totalMinutes += $shiftMinutes;
+        }
+
+        return $this->formatMinutesToTime($totalMinutes);
+    }
+
+    /**
+     * Konvertiert einen Zeitstring (HH:MM) in Minuten
+     */
+    private function timeStringToMinutes(string $timeString): int
+    {
+        if (empty($timeString) || $timeString === '00:00') {
+            return 0;
+        }
+
+        $parts = explode(':', $timeString);
+        if (count($parts) !== 2) {
+            return 0;
+        }
+
+        $hours = (int)$parts[0];
+        $minutes = (int)$parts[1];
+
+        return ($hours * 60) + $minutes;
     }
 }

@@ -30,7 +30,14 @@ class TimeTrackerFrontendController extends AbstractController
     {
         $trackedTimes = json_decode($request->getContent());
 
-        return $this->render('pages/time_tracker/tracked_times_table.html.twig', ['trackedTimes' => $trackedTimes]);
+        // Berechne dieselben Summen wie in der rechten Übersicht (inkl. Soll-Zeiten)
+        $summaryArray = $this->timeTrackerService->calculateUserTotals($trackedTimes);
+        $timeTrackingSummary = (object)$summaryArray;
+
+        return $this->render('pages/time_tracker/tracked_times_table.html.twig', [
+            'trackedTimes' => $trackedTimes,
+            'timeTrackingSummary' => $timeTrackingSummary,
+        ]);
     }
 
     #[Route('/time_tracking_overview/lastUserTimeTrackingInformationTable', name: 'lastUserTimeTrackingInformationTable')]

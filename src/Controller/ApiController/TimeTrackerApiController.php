@@ -2,6 +2,8 @@
 
 namespace App\Controller\ApiController;
 
+use App\Repository\EmployeeRepository;
+use App\Repository\ShiftRepository;
 use App\Service\TimeTracker\TimeTrackerService;
 use Dompdf\Dompdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,8 +17,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class TimeTrackerApiController extends AbstractController
 {
 
-    public function __construct(readonly TimeTrackerService $timeTrackerService)
-    {
+    public function __construct(
+        readonly TimeTrackerService $timeTrackerService,
+        readonly ShiftRepository $shiftRepository,
+        readonly EmployeeRepository $employeeRepository,
+    ) {
 
     }
 
@@ -156,8 +161,11 @@ class TimeTrackerApiController extends AbstractController
         $totals = $this->timeTrackerService->calculateUserTotals($trackedTimes);
         $totals = (object)$totals;
 
+        // Füge Objekt-Informationen zu jedem Zeiteintrag hinzu
+        $trackedTimesWithFacilities = $this->enrichTrackedTimesWithFacilities($trackedTimes);
+
         $html = $this->renderView('pdf/timetracking.html.twig', [
-            'trackedTimes' => $trackedTimes,
+            'trackedTimes' => $trackedTimesWithFacilities,
             'totals' => $totals,
         ]);
 
@@ -254,6 +262,42 @@ class TimeTrackerApiController extends AbstractController
         }
     }
 
+    /**
+     * Fügt Objekt-Informationen zu den Zeiteinträgen hinzu
+     */
+    private function enrichTrackedTimesWithFacilities(array $trackedTimes): array
+    {
+        foreach ($trackedTimes as $trackedTime) {
+            $trackedTime->facilityName = '-';
 
+            // Extrahiere Datum und Username
+            if (!isset($trackedTime->shiftStart) || !isset($trackedTime->username)) {
+                continue;
+            }
+
+            $shiftDate = new \DateTime($trackedTime->shiftStart->date);
+            $username = $trackedTime->username;
+
+            // Finde Employee über Username
+            $employee = $this->employeeRepository->findOneByUsername($username);
+            if (!$employee) {
+                continue;
+            }
+
+            // Finde Shifts für diesen Mitarbeiter an diesem Tag
+            $shifts = $this->shiftRepository->findByEmployeeAndDate($employee, $shiftDate);
+
+            // Nimm das erste Objekt (falls mehrere Shifts am selben Tag)
+            if (!empty($shifts)) {
+                $shift = $shifts[0];
+                $demandShift = $shift->getDemandShift();
+                if ($demandShift && $demandShift->getFacility()) {
+                    $trackedTime->facilityName = $demandShift->getFacility()->getTitle();
+                }
+            }
+        }
+
+        return $trackedTimes;
+    }
 
 }

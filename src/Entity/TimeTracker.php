@@ -37,6 +37,12 @@ class TimeTracker
     #[ORM\ManyToOne(targetEntity: self::class)]
     private ?self $parent = null;
 
+    #[ORM\ManyToOne]
+    private ?Facility $facility = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $timeDeviation = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,6 +128,30 @@ class TimeTracker
     public function setParent(?self $parent): static
     {
         $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function getFacility(): ?Facility
+    {
+        return $this->facility;
+    }
+
+    public function setFacility(?Facility $facility): static
+    {
+        $this->facility = $facility;
+
+        return $this;
+    }
+
+    public function getTimeDeviation(): ?int
+    {
+        return $this->timeDeviation;
+    }
+
+    public function setTimeDeviation(?int $timeDeviation): static
+    {
+        $this->timeDeviation = $timeDeviation;
 
         return $this;
     }

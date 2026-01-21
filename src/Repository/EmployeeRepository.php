@@ -58,4 +58,15 @@ class EmployeeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findOneByUsername(string $username): ?Employee
+    {
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.user', 'u')
+            ->andWhere('u.username = :username')
+            ->setParameter('username', $username)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
 }

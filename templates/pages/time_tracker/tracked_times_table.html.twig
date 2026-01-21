@@ -100,4 +100,35 @@
             </tbody>
         </table>
     </div>
+
+    {% if timeTrackingSummary is defined %}
+        <div class="px-4 py-3 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/60 dark:bg-gray-800/60">
+            <div class="flex flex-wrap justify-end gap-4 text-[11px]">
+                <div class="flex items-center gap-1">
+                    <span class="text-gray-600 dark:text-gray-400">Ist:</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ timeTrackingSummary.totalWorkingTime }} h</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="text-gray-600 dark:text-gray-400">Soll:</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ timeTrackingSummary.plannedHours|default('00:00') }} h</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="text-gray-600 dark:text-gray-400">Gesetzl. Pause:</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ timeTrackingSummary.requiredPause|default('00:00') }} h</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="text-gray-600 dark:text-gray-400">Pause Δ:</span>
+                    <span class="font-semibold {% if timeTrackingSummary.pauseDeficitMinutes|default(0) >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                        {{ timeTrackingSummary.pauseDeficit|default('+00:00') }} h
+                    </span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="text-gray-600 dark:text-gray-400">Differenz:</span>
+                    <span class="font-semibold {% if timeTrackingSummary.differenceMinutes|default(0) >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                        {{ timeTrackingSummary.differenceHours|default('+00:00') }} h
+                    </span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>
