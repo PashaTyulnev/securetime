@@ -48,7 +48,7 @@ class ScheduleWeekPdfProvider implements ProviderInterface
             [
                 'Content-Type' => 'application/pdf',
                 // 'attachment' sorgt für direkten Download, optional 'inline' für im Browser öffnen
-                'Content-Disposition' => 'attachment; filename="schedule_' . $week . '_' . $year . '.pdf"',
+                'Content-Disposition' => 'attachment; filename="dienstplan_woche_' . $week . '_' . $year . '.pdf"',
                 'Content-Length' => strlen($pdfContent),
             ]
         );

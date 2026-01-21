@@ -34,6 +34,22 @@ class EmployeeService
         return json_decode($allEmployees, true);
     }
 
+    public function getInactiveEmployees()
+    {
+        $currentUser = $this->security->getUser();
+        $partnerCompany = $currentUser->getEmployee()->getPartnerCompany();
+
+        $inactiveEmployees = $this->employeeRepository->findInactive($partnerCompany);
+
+        $inactiveEmployees = $this->serializer->serialize(
+            $inactiveEmployees,
+            'jsonld',
+            ['groups' => ['employee:read']]
+        );
+
+        return json_decode($inactiveEmployees, true);
+    }
+
     public function getAllEmployeeEntities(bool $withInactive = false): array
     {
         $currentUser = $this->security->getUser();

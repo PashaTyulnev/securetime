@@ -19,6 +19,23 @@ export default class extends BaseEntityController {
         return 'Möchten Sie dieses Objekt wirklich löschen?';
     }
 
+    toggleStatus(event) {
+        const facilityId = event.params.id;
+
+        fetch(`/api/facilities/toggle-status/${facilityId}`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            }
+        }).catch(error => {
+            alert(error);
+        });
+    }
+
     saveNew(event) {
         event.preventDefault();
         this.resetErrors();

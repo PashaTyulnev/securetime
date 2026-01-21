@@ -111,7 +111,18 @@
                     with { route:'app_partner_company', icon:'lucide:handshake', title:'Geschäftspartner' } %}
             {% endif %}
 
-
+            {# Archiv-Menü mit Unterpunkten #}
+            <li class="mt-2">
+                <div class="px-5 py-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    Archiv
+                </div>
+            </li>
+            {% include 'navigation/navigation_submenu.html.twig'
+                with { route:'app_archive_employees', icon:'lucide:users', title:'Mitarbeiter' } %}
+            {% if is_granted('ROLE_ADMIN') %}
+                {% include 'navigation/navigation_submenu.html.twig'
+                    with { route:'app_archive_facilities', icon:'lucide:building-2', title:'Objekte' } %}
+            {% endif %}
 
         </ul>
 

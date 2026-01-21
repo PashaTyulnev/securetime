@@ -47,7 +47,7 @@ class ScheduleMonthPdfProvider implements ProviderInterface
             [
                 'Content-Type' => 'application/pdf',
                 // 'attachment' sorgt für direkten Download, optional 'inline' für im Browser öffnen
-                'Content-Disposition' => 'attachment; filename="schedule_' . $month . '_' . $year . '.pdf"',
+                'Content-Disposition' => 'attachment; filename="dienstplan_monat_' . $month . '_' . $year . '.pdf"',
                 'Content-Length' => strlen($pdfContent),
             ]
         );

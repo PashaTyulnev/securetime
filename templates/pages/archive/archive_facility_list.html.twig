@@ -1,0 +1,158 @@
+<turbo-frame id="facilities-table">
+    <div
+        class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+        {# Suchfilter-Bereich #}
+        <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
+            <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-white"></h2>
+                <div class="relative">
+                    <input type="text" placeholder="Suchen..."
+                           class="w-64 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800/80 transition-all duration-200">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        {{ ux_icon('lucide:search', { class: 'h-5 w-5 text-gray-400 dark:text-gray-500' }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Tabelle #}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50/80 dark:bg-gray-800/80">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Objekt
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Kürzel
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Anfahrt
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Auftraggeber
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Beschreibung
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Status
+                    </th>
+                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Aktionen
+                    </th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+
+                {% for facility in facilities %}
+                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-200">
+                        <td class="px-6 py-4 align-top">
+                            <div class="flex items-center space-x-4">
+                                {% set colors = ['blue', 'green', 'purple', 'indigo', 'red', 'orange', 'yellow', 'teal'] %}
+                                {% set randomIndex = facility.id % colors|length %}
+                                {% set randomColor = colors[randomIndex] %}
+
+                                <div
+                                    class="h-10 w-10 bg-gradient-to-br from-{{ randomColor }}-200 to-{{ randomColor }}-300 dark:from-{{ randomColor }}-600 dark:to-{{ randomColor }}-700 rounded-full flex items-center justify-center shadow-inner overflow-hidden flex-shrink-0">
+                                    {{ ux_icon('lucide:building', { class: 'h-5 w-5 text-gray-600 dark:text-gray-300' }) }}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ facility.title }}</div>
+                                    {% if facility.address is defined and facility.address %}
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ facility.address.street }}, {{ facility.address.zip }}, {{ facility.address.city }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">{{ facility.shortTitle }}</td>
+
+                        <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                            {% if facility.approach is defined and facility.approach %}
+                                {{ facility.approach }}
+                            {% else %}
+                                <span class="text-sm text-gray-500 dark:text-gray-400 italic">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="px-6 py-4 align-top">
+                            {% if facility.company is defined and facility.company %}
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ facility.company.company }}</div>
+                            {% endif %}
+                        </td>
+
+                        <td class="px-6 py-4 align-top">
+                            <div class="max-w-xs text-sm text-gray-700 dark:text-gray-300 line-clamp-3">
+                                {% if facility.description is defined and facility.description %}
+                                    {{ facility.description }}
+                                {% else %}
+                                    <span class="text-gray-500 dark:text-gray-400 italic">Keine Beschreibung</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4 align-top whitespace-nowrap"
+                            data-action="click->facility#toggleStatus"
+                            data-facility-id-param="{{ facility.id }}">
+                            {% if facility.active %}
+                                <span
+                                    class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 cursor-pointer hover:brightness-90 transition">
+                                    Aktiv
+                                </span>
+                            {% else %}
+                                <span
+                                    class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 cursor-pointer hover:brightness-90 transition">
+                                    Inaktiv
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="px-6 py-4 align-top whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex justify-end space-x-2">
+                                {% if is_granted("ROLE_ADMIN") or is_granted("EDIT", facility) %}
+                                    <button data-action="click->facility#openEditModal"
+                                            data-facility-id-param="{{ facility.id }}"
+                                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                        {{ ux_icon('lucide:edit', { class: 'h-5 w-5' }) }}
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400 italic">
+                            Keine archivierten Objekte gefunden.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Pagination (optional statisch) #}
+        <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+                Zeige <span class="font-medium">1</span> bis <span
+                    class="font-medium">{{ facilities | length }}</span> von
+                <span class="font-medium">{{ facilities | length }}</span> Einträgen
+            </div>
+            <div class="flex space-x-2">
+                <button
+                    class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                    disabled>
+                    {{ ux_icon('lucide:chevron-left', { class: 'h-4 w-4' }) }}
+                </button>
+                <button
+                    class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                    disabled>
+                    {{ ux_icon('lucide:chevron-right', { class: 'h-4 w-4' }) }}
+                </button>
+            </div>
+        </div>
+    </div>
+</turbo-frame>
+

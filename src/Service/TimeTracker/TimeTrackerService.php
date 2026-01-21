@@ -603,40 +603,72 @@ readonly class TimeTrackerService
      * @return void
      * @throws \DateMalformedStringException
      */
-    public function validateInputDates(User $user, mixed $timeTrackerId, \DateTimeImmutable $shiftStart, \DateTimeImmutable $shiftEnd, $timeTrackerEntryCheckin, $timeTrackerEntryCheckout): void
-    {
+    public function validateInputDates(
+        User $user,
+        mixed $timeTrackerId,
+        \DateTimeImmutable $shiftStart,
+        \DateTimeImmutable $shiftEnd,
+        $timeTrackerEntryCheckin,
+        $timeTrackerEntryCheckout
+    ): void {
 
-        //Vorheriger und nächster Main Checkin Eintrag
-        $previousTimeTrackerMainCheckinEntry = $this->timeTrackerRepository->findPreviousMainCheckinEntry($user, $timeTrackerId);
-        $previousTimeTrackerMainCheckoutEntry = $this->timeTrackerRepository->findOneBy(['parent' => $previousTimeTrackerMainCheckinEntry->getId(), 'type' => 'checkout']);
+        // ==============================
+        // Vorheriger Main-Checkin
+        // ==============================
+        $previousTimeTrackerMainCheckinEntry =
+            $this->timeTrackerRepository->findPreviousMainCheckinEntry($user, $timeTrackerId);
 
+        if ($previousTimeTrackerMainCheckinEntry !== null) {
 
-        if ($previousTimeTrackerMainCheckoutEntry !== null) {
-            $previousCheckoutDateTime = $previousTimeTrackerMainCheckoutEntry->getTimestamp();
-            if ($shiftStart < $previousCheckoutDateTime) {
-                throw new \DateMalformedStringException('Schichtanfang darf nicht vor dem letzten Schichtende liegen');
+            $previousTimeTrackerMainCheckoutEntry =
+                $this->timeTrackerRepository->findOneBy([
+                    'parent' => $previousTimeTrackerMainCheckinEntry->getId(),
+                    'type'   => 'checkout'
+                ]);
+
+            if ($previousTimeTrackerMainCheckoutEntry !== null) {
+                $previousCheckoutDateTime = $previousTimeTrackerMainCheckoutEntry->getTimestamp();
+
+                if ($shiftStart < $previousCheckoutDateTime) {
+                    throw new \DateMalformedStringException(
+                        'Schichtanfang darf nicht vor dem letzten Schichtende liegen'
+                    );
+                }
             }
         }
 
-
-        $nextTimeTrackerMainCheckinEntry = $this->timeTrackerRepository->findNextMainCheckinEntry($user, $timeTrackerId);
+        // ==============================
+        // Nächster Main-Checkin
+        // ==============================
+        $nextTimeTrackerMainCheckinEntry =
+            $this->timeTrackerRepository->findNextMainCheckinEntry($user, $timeTrackerId);
 
         if ($nextTimeTrackerMainCheckinEntry !== null) {
             $nextTimeTrackerMainCheckinEntryDate = $nextTimeTrackerMainCheckinEntry->getTimestamp();
 
             if ($shiftEnd > $nextTimeTrackerMainCheckinEntryDate) {
-                throw new \DateMalformedStringException('Schichtende darf nicht nach dem nächsten Schichtanfang liegen');
+                throw new \DateMalformedStringException(
+                    'Schichtende darf nicht nach dem nächsten Schichtanfang liegen'
+                );
             }
         }
 
+        // ==============================
+        // Grundvalidierung
+        // ==============================
+        if ($shiftEnd < $shiftStart) {
+            throw new \DateMalformedStringException(
+                'Ende der Schicht darf nicht vor dem Start sein'
+            );
+        }
+
+        // ==============================
+        // Persistieren
+        // ==============================
         $timeTrackerEntryCheckin->setTimestamp($shiftStart);
         $timeTrackerEntryCheckout->setTimestamp($shiftEnd);
-
-        //shift end darf nicht vor shift start sein
-        if ($shiftEnd < $shiftStart) {
-            throw new \DateMalformedStringException('Ende der Schicht darf nicht vor dem Start sein');
-        }
     }
+
 
     /**
      * Zählt wie viele Minuten in der Nacht gearbeitet wurden ( 23:00 - 06:00)

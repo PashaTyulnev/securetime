@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Archiv - Objekte{% endblock %}
+
+{% block body %}
+
+    <div data-controller="facility">
+
+        <div data-facility-target="modalContainer"></div>
+
+        {# ================= HEADER ================= #}
+        <header class="relative
+                   -mx-6 px-6
+                   backdrop-blur-xl bg-white/70 dark:bg-gray-900/70
+                   border-b border-gray-200/50 dark:border-gray-800/50">
+
+            <div class="px-6 py-4 flex items-center justify-between">
+                <h1 class="text-3xl font-light tracking-tight
+                       bg-gradient-to-r from-slate-900 to-slate-600
+                       dark:from-white dark:to-gray-400
+                       bg-clip-text text-transparent">
+                    Archiv - Objekte
+                </h1>
+            </div>
+        </header>
+
+        {# ================= CONTENT ================= #}
+        <div class="p-5">
+            <turbo-frame id="facilities-table" src="{{ path('archive_facility_list_component') }}">
+                <div class="py-12 flex justify-center">
+                    <twig:Loader/>
+                </div>
+            </turbo-frame>
+        </div>
+
+    </div>
+
+{% endblock %}
+

@@ -23,12 +23,14 @@ class FacilityService
     }
 
 
-    public function getAllFacilities()
+    public function getAllFacilities(bool $withInactive = false)
     {
         $currentRoles = $this->security->getUser()?->getRoles();
 
         if(in_array('ROLE_ADMIN', $currentRoles, true)) {
-            $facilities = $this->facilityRepository->findAll();
+            $facilities = $this->facilityRepository->findAllWithActiveFilter(
+                $withInactive ? null : true
+            );
         }else{
             $contextEmployees = $this->employeeService->getAllEmployees();
 
@@ -38,6 +40,26 @@ class FacilityService
         }
 
 
+
+        $facilities = $this->serializer->serialize(
+            $facilities,
+            'jsonld',
+            ['groups' => ['facility:read']]
+        );
+
+        return json_decode($facilities, true);
+    }
+
+    public function getInactiveFacilities(): array
+    {
+        $currentRoles = $this->security->getUser()?->getRoles();
+
+        if (!in_array('ROLE_ADMIN', $currentRoles, true)) {
+            // Nur Admins sehen das Facility-Archiv
+            return [];
+        }
+
+        $facilities = $this->facilityRepository->findAllWithActiveFilter(false);
 
         $facilities = $this->serializer->serialize(
             $facilities,

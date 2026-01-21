@@ -30,8 +30,8 @@ class EmployeeComponentController extends AbstractController
     #[Route(path: '/list', name: 'all_employee_list_component', methods: ['GET'])]
     public function getEmployeeListComponent(): Response
     {
-        //call function from other controller
-        $allEmployees = $this->employeeService->getAllEmployees(true);
+        //call function from other controller - nur aktive Mitarbeiter
+        $allEmployees = $this->employeeService->getAllEmployees(false);
 
         return $this->render('pages/employee/employee_list.html.twig', [
             'employees' => $allEmployees

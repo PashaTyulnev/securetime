@@ -39,5 +39,23 @@ class EmployeeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findInactive(?PartnerCompany $partnerCompany = null): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->leftJoin('e.qualification', 'q')
+            ->leftJoin('e.user', 'u')
+            ->addSelect('q', 'u')
+            ->where('u.active = :active')
+            ->setParameter('active', false)
+            ->orderBy('q.rank', 'DESC')
+            ->addOrderBy('e.lastName', 'ASC');
+
+        if ($partnerCompany) {
+            $qb->andWhere('e.partnerCompany = :partner')
+                ->setParameter('partner', $partnerCompany);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 
 }

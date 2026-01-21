@@ -28,4 +28,19 @@ class FacilityRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findAllWithActiveFilter(?bool $active = true): array
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->leftJoin('f.company', 'c')
+            ->addSelect('c')
+            ->orderBy('f.shortTitle', 'ASC');
+
+        if ($active !== null) {
+            $qb->andWhere('f.active = :active')
+                ->setParameter('active', $active);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

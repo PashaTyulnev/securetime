@@ -18,6 +18,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use App\Controller\ApiController\FacilityStatusController;
+
 #[NoDemandShiftsConstraint]
 #[ORM\Entity(repositoryClass: FacilityRepository::class)]
 #[Assert\Expression(
@@ -30,6 +32,10 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(),
         new Post(),
         new Put(),
+        new Put(
+            uriTemplate: '/facilities/toggle-status/{facilityId}',
+            controller: FacilityStatusController::class,
+        ),
         new Delete(processor: FacilityDeleteProcessor::class),
     ],
     normalizationContext: ['groups' => ['facility:read']],
@@ -67,6 +73,10 @@ class Facility
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['facility:read', 'facility:write'])]
     private ?string $approach = null;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    #[Groups(['facility:read', 'facility:write'])]
+    private bool $active = true;
 
     /**
      * @var Collection<int, Contact>
@@ -176,6 +186,18 @@ class Facility
     public function setApproach(?string $approach): static
     {
         $this->approach = $approach;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }

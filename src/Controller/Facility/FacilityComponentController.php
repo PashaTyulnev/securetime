@@ -20,8 +20,8 @@ class FacilityComponentController extends AbstractController
     #[Route(path: '/list', name: 'all_facility_list_component', methods: ['GET'])]
     public function getFacilityListComponent(): Response
     {
-        //call function from other controller
-        $allFacilities = $this->facilityService->getAllFacilities();
+        // Nur aktive Objekte anzeigen
+        $allFacilities = $this->facilityService->getAllFacilities(false);
         return $this->render('pages/facility/facility_list.html.twig', [
             'facilities' => $allFacilities
         ]);
