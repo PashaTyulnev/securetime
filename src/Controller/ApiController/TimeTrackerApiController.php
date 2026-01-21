@@ -4,6 +4,7 @@ namespace App\Controller\ApiController;
 
 use App\Repository\EmployeeRepository;
 use App\Repository\ShiftRepository;
+use App\Repository\TimeTrackerRepository;
 use App\Service\TimeTracker\TimeTrackerService;
 use Dompdf\Dompdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 #[IsGranted('ROLE_USER')]
 class TimeTrackerApiController extends AbstractController
@@ -21,6 +23,8 @@ class TimeTrackerApiController extends AbstractController
         readonly TimeTrackerService $timeTrackerService,
         readonly ShiftRepository $shiftRepository,
         readonly EmployeeRepository $employeeRepository,
+        readonly TimeTrackerRepository $timeTrackerRepository,
+        readonly KernelInterface $kernel,
     ) {
 
     }
@@ -164,9 +168,18 @@ class TimeTrackerApiController extends AbstractController
         // Füge Objekt-Informationen zu jedem Zeiteintrag hinzu
         $trackedTimesWithFacilities = $this->enrichTrackedTimesWithFacilities($trackedTimes);
 
+        // Logo als base64 für Dompdf (zuverlässiger als Dateipfad)
+        $logoPath = $this->kernel->getProjectDir() . '/public/logo.png';
+        $logoBase64 = null;
+        if (file_exists($logoPath)) {
+            $imageData = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/png;base64,' . base64_encode($imageData);
+        }
+
         $html = $this->renderView('pdf/timetracking.html.twig', [
             'trackedTimes' => $trackedTimesWithFacilities,
             'totals' => $totals,
+            'logoBase64' => $logoBase64,
         ]);
 
         $dompdf = new Dompdf();
@@ -264,13 +277,24 @@ class TimeTrackerApiController extends AbstractController
 
     /**
      * Fügt Objekt-Informationen zu den Zeiteinträgen hinzu
+     * Holt die Facility direkt aus dem TimeTracker-Eintrag (beim Checkin gespeichert)
      */
     private function enrichTrackedTimesWithFacilities(array $trackedTimes): array
     {
         foreach ($trackedTimes as $trackedTime) {
             $trackedTime->facilityName = '-';
 
-            // Extrahiere Datum und Username
+            // Prüfe ob timeTrackerId vorhanden ist (für direkten Zugriff auf TimeTracker)
+            if (isset($trackedTime->timeTrackerId)) {
+                $timeTracker = $this->timeTrackerRepository->find($trackedTime->timeTrackerId);
+                if ($timeTracker && $timeTracker->getFacility()) {
+                    // Facility direkt aus dem TimeTracker-Eintrag holen
+                    $trackedTime->facilityName = $timeTracker->getFacility()->getTitle();
+                    continue;
+                }
+            }
+
+            // Fallback: Alte Methode über Schicht (für alte Einträge ohne Facility)
             if (!isset($trackedTime->shiftStart) || !isset($trackedTime->username)) {
                 continue;
             }
