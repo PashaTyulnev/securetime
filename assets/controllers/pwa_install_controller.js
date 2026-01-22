@@ -10,6 +10,11 @@ export default class extends Controller {
     }
 
     connect() {
+        // Prüfe ob es ein mobiles Gerät ist
+        if (!this.isMobileDevice()) {
+            return;
+        }
+
         // Prüfe ob PWA installierbar ist und ob bereits installiert
         if (!this.isPWAInstallable()) {
             return;
@@ -30,6 +35,21 @@ export default class extends Controller {
         setTimeout(() => {
             this.showBanner();
         }, 3000); // 3 Sekunden Verzögerung
+    }
+
+    isMobileDevice() {
+        // Prüfe ob es ein mobiles Gerät ist
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        
+        // Prüfe auf mobile Geräte
+        const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+        const isMobile = mobileRegex.test(userAgent);
+        
+        // Zusätzliche Prüfung: Touch-Screen und Bildschirmbreite
+        const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const isSmallScreen = window.innerWidth <= 768;
+        
+        return isMobile || (hasTouchScreen && isSmallScreen);
     }
 
     isPWAInstallable() {
