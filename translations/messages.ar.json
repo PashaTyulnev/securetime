@@ -165,6 +165,8 @@
   "time_tracker.working_since": "أنت تعمل منذ:",
   "time_tracker.pause_since": "أنت في استراحة منذ:",
   "time_tracker.checked_out_at": "تم تسجيل خروجك في",
+  "time_tracker.auto_checkout": "تسجيل خروج تلقائي",
+  "time_tracker.auto_checkout_short": "تلقائي",
   "schedule.week_view": "عرض الأسبوع",
   "schedule.two_week_view": "عرض أسبوعين",
   "schedule.month_view": "عرض الشهر",

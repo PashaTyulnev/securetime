@@ -331,7 +331,7 @@ readonly class TimeTrackerService
         if ($entity->isShiftStart()) {
             $this->handleShiftStart($output, $id, $user->getEmployee()->getFullName(), $timestamp, $userId);
         } elseif (isset($output[$parent]) && $type === 'checkout') {
-            $this->handleShiftEnd($output[$parent], $timestamp);
+            $this->handleShiftEnd($output[$parent], $timestamp, $entity);
         } elseif (isset($output[$parent]) && $type === 'pause') {
             $this->handlePause($output[$parent], $timestamp);
         } elseif (isset($output[$parent]) && $type === 'checkin') {
@@ -353,13 +353,20 @@ readonly class TimeTrackerService
             'pauseDuration' => new \DateInterval('PT0S'),
             'pausePeriods' => [],
             'userId' => $userId,
+            'autoCheckOut' => false,
         ];
     }
 
-    private function handleShiftEnd(array &$entry, $timestamp): void
+    private function handleShiftEnd(array &$entry, $timestamp, $checkoutEntity): void
     {
         $entry['shiftEnd'] = $timestamp;
         $entry['shiftDuration'] = $entry['shiftStart']->diff($timestamp);
+        // Füge autoCheckOut Flag hinzu, falls vorhanden
+        if ($checkoutEntity instanceof TimeTracker) {
+            $entry['autoCheckOut'] = $checkoutEntity->isAutoCheckOut();
+        } else {
+            $entry['autoCheckOut'] = false;
+        }
     }
 
     private function handleCheckIn(array &$entry, $timestamp): void

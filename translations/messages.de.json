@@ -165,6 +165,8 @@
   "time_tracker.working_since": "Du arbeitest seit:",
   "time_tracker.pause_since": "Du hast pause seit:",
   "time_tracker.checked_out_at": "Du hast dich ausgecheckt am",
+  "time_tracker.auto_checkout": "Automatisch ausgecheckt",
+  "time_tracker.auto_checkout_short": "Auto",
   "schedule.week_view": "Wochenansicht",
   "schedule.two_week_view": "2-Wochenansicht",
   "schedule.month_view": "Monatsansicht",

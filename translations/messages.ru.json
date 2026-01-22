@@ -165,6 +165,8 @@
   "time_tracker.working_since": "Вы работаете с:",
   "time_tracker.pause_since": "У вас перерыв с:",
   "time_tracker.checked_out_at": "Вы вышли в",
+  "time_tracker.auto_checkout": "Автоматический выход",
+  "time_tracker.auto_checkout_short": "Авто",
   "schedule.week_view": "Недельный вид",
   "schedule.two_week_view": "2-недельный вид",
   "schedule.month_view": "Месячный вид",
