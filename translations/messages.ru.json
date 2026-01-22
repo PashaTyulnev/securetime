@@ -209,5 +209,9 @@
   "facility_shift.personnel": "Перс.",
   "facility_shift.shifts": "Смены",
   "facility_shift.no_shifts": "Нет смен",
-  "facility_shift.add_new_shift": "Добавить новую смену"
+  "facility_shift.add_new_shift": "Добавить новую смену",
+  "pwa.install_title": "Установить приложение",
+  "pwa.install_description": "Установите это приложение для быстрого доступа и использования в автономном режиме.",
+  "pwa.install": "Установить",
+  "pwa.dismiss": "Позже"
 }

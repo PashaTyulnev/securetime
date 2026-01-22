@@ -209,5 +209,9 @@
   "facility_shift.personnel": "Pers.",
   "facility_shift.shifts": "Schichten",
   "facility_shift.no_shifts": "Keine Schichten",
-  "facility_shift.add_new_shift": "Neue Schicht hinzufügen"
+  "facility_shift.add_new_shift": "Neue Schicht hinzufügen",
+  "pwa.install_title": "App installieren",
+  "pwa.install_description": "Installieren Sie diese App für schnelleren Zugriff und Offline-Nutzung.",
+  "pwa.install": "Installieren",
+  "pwa.dismiss": "Später"
 }

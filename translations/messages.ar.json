@@ -209,5 +209,9 @@
   "facility_shift.personnel": "الموظفون",
   "facility_shift.shifts": "المناوبات",
   "facility_shift.no_shifts": "لا توجد مناوبات",
-  "facility_shift.add_new_shift": "إضافة مناوبة جديدة"
+  "facility_shift.add_new_shift": "إضافة مناوبة جديدة",
+  "pwa.install_title": "تثبيت التطبيق",
+  "pwa.install_description": "قم بتثبيت هذا التطبيق للوصول السريع والاستخدام في وضع عدم الاتصال.",
+  "pwa.install": "تثبيت",
+  "pwa.dismiss": "لاحقاً"
 }
