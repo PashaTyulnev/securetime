@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de" class="light">
+<html lang="{{ app.request.locale }}" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Objektsicherheit - Dashboard</title>
+    <title>{{ 'base.title'|trans }}</title>
     <link rel="icon" type="image/svg+xml" href="/logo_white.svg">
 
     {% block importmap %}{{ importmap('app') }}{% endblock %}

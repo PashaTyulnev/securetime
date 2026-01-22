@@ -6,7 +6,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white"></h2>
                 <div class="relative">
-                    <input type="text" placeholder="Suchen..."
+                    <input type="text" placeholder="{{ 'common.search'|trans }}..."
                            class="w-64 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800/80 transition-all duration-200">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         {{ ux_icon('lucide:search', { class: 'h-5 w-5 text-gray-400 dark:text-gray-500' }) }}
@@ -21,16 +21,16 @@
                 <thead class="bg-gray-50/80 dark:bg-gray-800/80">
                 <tr>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Geschäftspartner
+                        {{ 'navigation.partners'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Kontakt
+                        {{ 'common.contact'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Mitarbeiter
+                        {{ 'navigation.employees'|trans }}
                     </th>
                     <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Aktionen
+                        {{ 'common.actions'|trans }}
                     </th>
                 </tr>
                 </thead>
@@ -89,9 +89,9 @@
                         <td class="px-6 py-4 align-top">
                             <div class="text-sm text-gray-900 dark:text-white">
                                 {% if partnerCompany.employees is defined and partnerCompany.employees|length > 0 %}
-                                    {{ partnerCompany.employees|length }} Mitarbeiter
+                                    {{ partnerCompany.employees|length }} {{ 'navigation.employees'|trans }}
                                 {% else %}
-                                    <span class="text-gray-500 dark:text-gray-400 italic">Keine</span>
+                                    <span class="text-gray-500 dark:text-gray-400 italic">{{ 'common.none'|trans }}</span>
                                 {% endif %}
                             </div>
                         </td>
@@ -121,8 +121,8 @@
         {# Pagination #}
         <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
             <div class="text-sm text-gray-600 dark:text-gray-400">
-                Zeige <span class="font-medium">1</span> bis <span class="font-medium">{{ partnerCompanies|length }}</span> von
-                <span class="font-medium">{{ partnerCompanies|length }}</span> Einträgen
+                {{ 'common.showing'|trans }} <span class="font-medium">1</span> {{ 'common.to'|trans }} <span class="font-medium">{{ partnerCompanies|length }}</span> {{ 'common.of'|trans }}
+                <span class="font-medium">{{ partnerCompanies|length }}</span> {{ 'common.entries'|trans }}
             </div>
             <div class="flex space-x-2">
                 <button

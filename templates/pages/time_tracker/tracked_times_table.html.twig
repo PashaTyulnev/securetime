@@ -4,22 +4,22 @@
             <thead class="bg-gray-50/80 dark:bg-gray-800/80">
             <tr>
                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Mitarbeiter
+                    {{ 'navigation.employees'|trans }}
                 </th>
                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Beginn
+                    {{ 'common.start'|trans }}
                 </th>
                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Ende
+                    {{ 'common.end'|trans }}
                 </th>
                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Dauer
+                    {{ 'common.duration'|trans }}
                 </th>
                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Pause
+                    {{ 'common.pause'|trans }}
                 </th>
                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Arbeitszeit
+                    {{ 'common.working_time'|trans }}
                 </th>
                 <th class="px-3 py-2 w-10"></th>
             </tr>
@@ -105,25 +105,25 @@
         <div class="px-4 py-3 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/60 dark:bg-gray-800/60">
             <div class="flex flex-wrap justify-end gap-4 text-[11px]">
                 <div class="flex items-center gap-1">
-                    <span class="text-gray-600 dark:text-gray-400">Ist:</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ 'common.actual_hours'|trans }}:</span>
                     <span class="font-semibold text-gray-900 dark:text-white">{{ timeTrackingSummary.totalWorkingTime }} h</span>
                 </div>
                 <div class="flex items-center gap-1">
-                    <span class="text-gray-600 dark:text-gray-400">Soll:</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ 'common.planned_hours'|trans }}:</span>
                     <span class="font-semibold text-gray-900 dark:text-white">{{ timeTrackingSummary.plannedHours|default('00:00') }} h</span>
                 </div>
                 <div class="flex items-center gap-1">
-                    <span class="text-gray-600 dark:text-gray-400">Gesetzl. Pause:</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ 'common.required_break'|trans }}:</span>
                     <span class="font-semibold text-gray-900 dark:text-white">{{ timeTrackingSummary.requiredPause|default('00:00') }} h</span>
                 </div>
                 <div class="flex items-center gap-1">
-                    <span class="text-gray-600 dark:text-gray-400">Pause Δ:</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ 'common.break_difference'|trans }}:</span>
                     <span class="font-semibold {% if timeTrackingSummary.pauseDeficitMinutes|default(0) >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
                         {{ timeTrackingSummary.pauseDeficit|default('+00:00') }} h
                     </span>
                 </div>
                 <div class="flex items-center gap-1">
-                    <span class="text-gray-600 dark:text-gray-400">Differenz:</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ 'common.difference'|trans }}:</span>
                     <span class="font-semibold {% if timeTrackingSummary.differenceMinutes|default(0) >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
                         {{ timeTrackingSummary.differenceHours|default('+00:00') }} h
                     </span>

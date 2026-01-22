@@ -19,7 +19,7 @@
                 <div class="col-span-3">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
-                        Schicht
+                        {{ 'facility_shift.shift'|trans }}
                     </label>
                     <div class="flex items-center gap-2">
                         {% set shiftName = demandShift.name|default('')|lower %}
@@ -32,7 +32,7 @@
                             data-facility-shift-behavior-target="colorInput"
                             data-action="change->facility-shift-behavior#changeColor {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
                             class="appearance-none w-7 h-7 rounded-lg border border-white/40 cursor-pointer hover:shadow-md hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/60 focus:scale-[1.05] transition-all duration-150"
-                            title="Farbe wählen"
+                            title="{{ 'facility_shift.select_color'|trans }}"
                             value="{{ demandShift.color|default('#3b82f6') }}"/>
 
 
@@ -43,7 +43,7 @@
                                 required
                                 data-action="change->facility-shift-behavior#shiftChanged {% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
                                 data-facility-shift-behavior-target="shiftSelect">
-                            <option>Schicht...</option>
+                            <option>{{ 'facility_shift.shift_select'|trans }}</option>
                             {% for preset in presetsArray %}
                                 <option value="{{ preset.name }}"
                                         {% if shiftName == preset.name|lower %}selected{% endif %}>
@@ -58,7 +58,7 @@
                 <div class="col-span-2">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
-                        Qualifikation
+                        {{ 'facility_shift.qualification'|trans }}
                     </label>
                     <select name="requiredQualification"
                             data-action="{% if demandShift.id|default(false) %}change->facility-shift#update{% endif %}"
@@ -66,7 +66,7 @@
                             data-facility-shift-behavior-target="qualificationSelect"
                             class="w-full bg-white dark:bg-gray-800 font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm"
                             required>
-                        <option value="">Wählen...</option>
+                        <option value="">{{ 'facility_shift.select'|trans }}</option>
                         {% for qualification in qualifications %}
                             <option value="{{ qualification['@id'] }}"
                                     {% if demandShift.requiredQualification.id|default('') == qualification.id %}selected{% endif %}>
@@ -80,7 +80,7 @@
                 <div class="col-span-2">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
-                        Zeit
+                        {{ 'common.time'|trans }}
                     </label>
                     <div class="flex items-center gap-1.5">
                         <input type="time" name="timeFrom"
@@ -105,7 +105,7 @@
                 <div class="col-span-1">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
-                        Pers.
+                        {{ 'facility_shift.personnel'|trans }}
                     </label>
                     <input type="number" name="amountEmployees"
                            form="shift-form-{{ demandShift.id|default('new') }}"
@@ -120,12 +120,12 @@
                 <div class="col-span-3">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
-                        Wochentage
+                        {{ 'schedule.weekdays'|trans }}
                     </label>
                     <div class="flex gap-1 flex-wrap">
                         {% set days = {
-                            'Monday': 'Mo', 'Tuesday': 'Di', 'Wednesday': 'Mi', 'Thursday': 'Do',
-                            'Friday': 'Fr', 'Saturday': 'Sa', 'Sunday': 'So'
+                            'Monday': ('schedule.day.monday'|trans), 'Tuesday': ('schedule.day.tuesday'|trans), 'Wednesday': ('schedule.day.wednesday'|trans), 'Thursday': ('schedule.day.thursday'|trans),
+                            'Friday': ('schedule.day.friday'|trans), 'Saturday': ('schedule.day.saturday'|trans), 'Sunday': ('schedule.day.sunday'|trans)
                         } %}
                         {% for key, label in days %}
                             <input type="checkbox" name="on{{ key }}" value="1"
@@ -155,19 +155,19 @@
                                     data-action="facility-shift#delete"
                                     data-facility-shift-uri-param="{{ demandShift['@id'] }}"
                                     class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                                    title="Löschen">
+                                    title="{{ 'common.delete'|trans }}">
                                 {{ ux_icon('lucide:trash-2', { class: 'h-4 w-4 text-gray-500 hover:text-red-600' }) }}
                             </button>
                         {% else %}
                             <button type="submit" form="shift-form-{{ demandShift.id|default('new') }}"
                                     class="p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
-                                    title="Speichern">
+                                    title="{{ 'common.save'|trans }}">
                                 {{ ux_icon('lucide:save', { class: 'h-4 w-4 text-blue-600 hover:text-blue-700' }) }}
                             </button>
                             <button type="button"
                                     data-action="facility-shift-behavior#removeRow"
                                     class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors remove-new-row"
-                                    title="Abbrechen">
+                                    title="{{ 'common.cancel'|trans }}">
                                 {{ ux_icon('lucide:x', { class: 'h-4 w-4 text-gray-500 hover:text-red-600' }) }}
                             </button>
                         {% endif %}
@@ -182,8 +182,8 @@
             <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
                 {% include 'elements/multi_select.html.twig' with {
                     'systemName': 'requiredPositions',
-                    'title': 'Erforderliche Positionen',
-                    'defaultOption': 'Positionen wählen',
+                    'title': ('facility_shift.required_positions'|trans),
+                    'defaultOption': ('facility_shift.select_positions'|trans),
                     'options': facility.positions | map(p => {
                         'value': p['@id'],
                         'label': p.title
@@ -200,8 +200,8 @@
         <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
             {% include 'elements/multi_select.html.twig' with {
                 'systemName': 'partnerVisibility',
-                'title': 'Partnerfirma Sichtbarkeit',
-                'defaultOption': 'Partnerfirmen wählen',
+                'title': ('facility_shift.partner_visibility'|trans),
+                'defaultOption': ('facility_shift.select_partners'|trans),
                 'options': partners | map(p => {
                     'value': p['@id'],
                     'label': p.title

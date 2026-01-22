@@ -15,7 +15,7 @@
             <span
                 class="text-[10px] font-semibold uppercase tracking-wider
                        text-gray-500 dark:text-gray-400">
-                Mitarbeiter
+                {{ 'schedule.employee'|trans }}
             </span>
         </div>
 
@@ -79,15 +79,15 @@
                                        text-[9px] leading-[10px]
                                        text-gray-500 dark:text-gray-400">
                                 <div>
-                                    <div class="font-medium">Plan</div>
+                                    <div class="font-medium">{{ 'schedule.planned'|trans }}</div>
                                     <div>{{ employee.plannedHours.regular }}h</div>
                                 </div>
                                 <div>
-                                    <div class="font-medium">Bereit</div>
+                                    <div class="font-medium">{{ 'schedule.on_call'|trans }}</div>
                                     <div>{{ employee.plannedHours.onCall }}h</div>
                                 </div>
                                 <div>
-                                    <div class="font-semibold">Total</div>
+                                    <div class="font-semibold">{{ 'schedule.total'|trans }}</div>
                                     <div class="font-semibold">{{ employee.plannedHours.total }}h</div>
                                 </div>
                             </div>

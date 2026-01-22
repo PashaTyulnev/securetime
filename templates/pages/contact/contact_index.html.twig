@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Auftraggeber – Firmen{% endblock %}
+{% block title %}{{ 'contact.management'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -19,14 +19,14 @@
                        bg-gradient-to-r from-slate-900 to-slate-600
                        dark:from-white dark:to-gray-400
                        bg-clip-text text-transparent">
-                    Kontaktverwaltung
+                    {{ 'contact.management'|trans }}
                 </h1>
 
                 <button
                     data-action="click->contact#openCreationModal"
                     class="app-button">
                     {{ ux_icon('lucide:contact', { class: 'w-5 h-5' }) }}
-                    <span>Kontakt anlegen</span>
+                    <span>{{ 'contact.new'|trans }}</span>
                 </button>
             </div>
         </header>

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Geschäftspartner{% endblock %}
+{% block title %}{{ 'navigation.partners'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -19,7 +19,7 @@
                        bg-gradient-to-r from-slate-900 to-slate-600
                        dark:from-white dark:to-gray-400
                        bg-clip-text text-transparent">
-                    Geschäftspartner
+                    {{ 'navigation.partners'|trans }}
                 </h1>
 
                 {% if is_granted('ROLE_ADMIN') %}
@@ -27,7 +27,7 @@
                         data-action="click->partner-company#openCreationModal"
                         class="app-button">
                         {{ ux_icon('lucide:handshake', { class: 'w-5 h-5' }) }}
-                        <span>Geschäftspartner anlegen</span>
+                        <span>{{ 'partner.new'|trans }}</span>
                     </button>
                 {% endif %}
             </div>

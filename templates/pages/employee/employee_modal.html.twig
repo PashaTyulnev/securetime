@@ -12,7 +12,7 @@
         </div>
 
         <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-6 text-center">
-            Mitarbeiter {% if employee is defined %}bearbeiten{% else %}hinzufügen{% endif %}
+            {{ 'navigation.employees'|trans }} {% if employee is defined %}{{ 'employee.edit'|trans }}{% else %}{{ 'employee.add'|trans }}{% endif %}
         </h2>
 
         {% include 'elements/modal_error.html.twig' with {'dataTargetName' : 'data-employee-target'} %}
@@ -25,7 +25,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
 
                     {% include 'elements/input.html.twig' with {
-                        'title': 'Vorname',
+                        'title': ('employee.first_name'|trans),
                         'type': 'text',
                         'systemName': 'firstName',
                         'placeholder': 'Alexander',
@@ -36,7 +36,7 @@
                     } %}
 
                     {% include 'elements/input.html.twig' with {
-                        'title': 'Nachname',
+                        'title': ('employee.last_name'|trans),
                         'type': 'text',
                         'systemName': 'lastName',
                         'placeholder': 'Schmidt',
@@ -47,7 +47,7 @@
                     } %}
 
                     {% include 'elements/input.html.twig' with {
-                        'title': 'Geburtsdatum',
+                        'title': ('common.birth_date'|trans),
                         'type': 'date',
                         'systemName': 'birthDate',
                         'placeholder': '25.06.1990',
@@ -68,12 +68,12 @@
 
                     {% include 'elements/select.html.twig' with {
                         'systemName': 'department',
-                        'title': 'Abteilung',
+                        'title': ('employee.department'|trans),
                         'options': departments | map(d => {
                             'value': d['@id'],
                             'label': d.title
                         }),
-                        'defaultOption': 'Bitte wählen...',
+                        'defaultOption': ('employee.please_select'|trans),
                         'required': 'required',
                         'devValue': definedEmployee.department is defined and definedEmployee.department is not null
                         ? definedEmployee.department['@id']
@@ -83,7 +83,7 @@
                     {% if is_granted('ROLE_ADMIN') %}
                         {% include 'elements/select.html.twig' with {
                             'systemName': 'partnerCompany',
-                            'title': 'Partnerfirma',
+                            'title': ('employee.partner_company'|trans),
                             'options': partners | map(p => {
                                 'value': p['@id'],
                                 'label': p.title
@@ -98,7 +98,7 @@
 
                     {% include 'elements/multi_select.html.twig' with {
                         'systemName': 'roles',
-                        'title': 'Rollen',
+                        'title': ('employee.roles'|trans),
                         'defaultOption': 'Rollen',
                         'options': roles | map(r => {
                             'value': r['@id'],
@@ -113,12 +113,12 @@
 
                     {% include 'elements/select.html.twig' with {
                         'systemName': 'qualification',
-                        'title': 'Qualifikation',
+                        'title': ('employee.qualification'|trans),
                         'options': qualifications | map(q => {
                             'value': q['@id'],
                             'label': q.title
                         }),
-                        'defaultOption': 'Bitte wählen...',
+                        'defaultOption': ('employee.please_select'|trans),
                         'required': 'required',
                         'devValue': definedEmployee.qualification is defined and definedEmployee.qualification is not null
                         ? definedEmployee.qualification['@id']
@@ -126,7 +126,7 @@
                     } %}
 
                     {% include 'elements/input.html.twig' with {
-                        'title': 'Personalnummer',
+                        'title': ('employee.employee_number'|trans),
                         'type': 'text',
                         'systemName': 'number',
                         'placeholder': '123456',
@@ -136,7 +136,7 @@
 
 
                     {% include 'elements/input.html.twig' with {
-                        'title': 'Telefon',
+                        'title': ('common.phone'|trans),
                         'type': 'text',
                         'systemName': 'phone',
                         'placeholder': '017685412456',
@@ -145,7 +145,7 @@
                     } %}
 
                     {% include 'elements/input.html.twig' with {
-                        'title': 'E-Mail',
+                        'title': ('common.email'|trans),
                         'type': 'email',
                         'systemName': 'user[email]',
                         'placeholder': 'max@gmail.com',
@@ -154,7 +154,7 @@
                     } %}
 
                     {% include 'elements/input.html.twig' with {
-                        'title': 'Bewacher ID',
+                        'title': ('employee.guardian_id'|trans),
                         'type': 'text',
                         'systemName': 'guardianId',
                         'placeholder': '',
@@ -163,19 +163,19 @@
 
                     {% include 'elements/select.html.twig' with {
                         'systemName': 'contracts[type]',
-                        'title': 'Beschäftigungsverhältnis',
+                        'title': ('employee.employment'|trans),
                         'options': [
-                            {'value': 'geringfuegig', 'label': 'Geringfügig'},
-                            {'value': 'teilzeit', 'label': 'Teilzeit'},
-                            {'value': 'vollzeit', 'label': 'Vollzeit'}
+                            {'value': 'geringfuegig', 'label': ('employment.minimal'|trans)},
+                            {'value': 'teilzeit', 'label': ('employment.part_time'|trans)},
+                            {'value': 'vollzeit', 'label': ('employment.full_time'|trans)}
                         ],
-                        'defaultOption': 'Bitte wählen...',
+                        'defaultOption': ('employee.please_select'|trans),
                         'required': 'required',
                         'devValue': definedEmployee.contracts[0].type|default('')
                     } %}
 
                     {% include 'elements/input.html.twig' with {
-                        'title': 'Stunden im Monat',
+                        'title': ('employee.hours_per_month'|trans),
                         'type': 'number',
                         'systemName': 'contracts[maxMonthHours]',
                         'placeholder': '160',
@@ -197,11 +197,11 @@
                 <div class="flex justify-end space-x-4">
                     <button type="button" data-action="click->modal#hide"
                             class="px-6 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">
-                        Abbrechen
+                        {{ 'common.cancel'|trans }}
                     </button>
                     <button type="submit"
                             class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-gray-100 text-white dark:text-gray-900 font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
-                        Speichern
+                        {{ 'common.save'|trans }}
                     </button>
                 </div>
             </form>

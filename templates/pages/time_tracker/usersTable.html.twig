@@ -3,7 +3,7 @@
     <div class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 cursor-pointer transition-all"
          data-action="click->timetracker--admin#displayAllUserTimes"
          id="displayAllButton">
-        <p class="text-center text-white font-medium py-3 px-4">Alle Anzeigen</p>
+        <p class="text-center text-white font-medium py-3 px-4">{{ 'time_tracker.show_all'|trans }}</p>
     </div>
 
     {# User Liste #}
@@ -30,7 +30,12 @@
 
                         <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg {{ bgColors[singleUserData.type] }}">
                             {{ ux_icon(icons[singleUserData.type], { class: 'h-4 w-4 ' ~ colors[singleUserData.type] }) }}
-                            <span class="text-xs font-medium {{ colors[singleUserData.type] }}">{{ singleUserData.type }}</span>
+                            <span class="text-xs font-medium {{ colors[singleUserData.type] }}">
+                                {% if singleUserData.type == 'checkin' %}{{ 'time_tracker.checkin'|trans }}
+                                {% elseif singleUserData.type == 'checkout' %}{{ 'time_tracker.checkout'|trans }}
+                                {% elseif singleUserData.type == 'pause' %}{{ 'common.pause'|trans }}
+                                {% else %}{{ singleUserData.type }}{% endif %}
+                            </span>
                         </div>
 
                         {# Zeit #}

@@ -231,9 +231,9 @@
 <div class="header">
     <div class="header-top">
         <div class="header-left">
-            <h1>Zeiterfassung</h1>
+            <h1>{{ 'navigation.working_hours'|trans }}</h1>
             <div class="company-info">
-                <strong>Zeitraum:</strong> {{ totals.dateFrom|date('d.m.Y') }} - {{ totals.dateTo|date('d.m.Y') }}
+                <strong>{{ 'common.date'|trans }}:</strong> {{ totals.dateFrom|date('d.m.Y') }} - {{ totals.dateTo|date('d.m.Y') }}
             </div>
         </div>
         <div class="header-right">
@@ -245,15 +245,15 @@
 
     <div class="summary-top">
         <div class="summary-top-item">
-            <strong>Ist-Stunden:</strong>
+            <strong>{{ 'common.actual_hours'|trans }}:</strong>
             <span>{{ totals.totalWorkingTime }} h</span>
         </div>
         <div class="summary-top-item">
-            <strong>Soll-Stunden:</strong>
+            <strong>{{ 'common.planned_hours'|trans }}:</strong>
             <span>{{ totals.plannedHours|default('00:00') }} h</span>
         </div>
         <div class="summary-top-item">
-            <strong>Differenz:</strong>
+            <strong>{{ 'common.difference'|trans }}:</strong>
             <span>{{ totals.differenceHours|default('+00:00') }} h</span>
         </div>
     </div>
@@ -262,12 +262,12 @@
 <table>
     <thead>
     <tr>
-        <th>Datum</th>
-        <th>Objekt</th>
-        <th>Beginn<br>Uhrzeit</th>
-        <th>Ende<br>Uhrzeit</th>
-        <th>Pause</th>
-        <th>Arbeitszeit</th>
+        <th>{{ 'common.date'|trans }}</th>
+        <th>{{ 'common.facility'|trans }}</th>
+        <th>{{ 'common.start'|trans }}<br>{{ 'common.time'|trans }}</th>
+        <th>{{ 'common.end'|trans }}<br>{{ 'common.time'|trans }}</th>
+        <th>{{ 'common.pause'|trans }}</th>
+        <th>{{ 'common.working_time'|trans }}</th>
     </tr>
     </thead>
     <tbody>
@@ -299,23 +299,23 @@
 </table>
 
 <div class="summary-section">
-    <h3>Zusammenfassung</h3>
+    <h3>{{ 'common.summary'|trans }}</h3>
     <table class="summary-table">
         <tr>
-            <td><strong>Gesamtarbeitszeit (ohne Pause):</strong></td>
+            <td><strong>{{ 'common.total_working_time_without_break'|trans }}:</strong></td>
             <td class="summary-value">{{ totals.totalWorkingTime }}</td>
         </tr>
         <tr>
-            <td><strong>Gesamtarbeitszeit (mit Pause):</strong></td>
+            <td><strong>{{ 'common.total_working_time_with_break'|trans }}:</strong></td>
             <td class="summary-value">{{ totals.totalShiftDuration }}</td>
         </tr>
         <tr>
-            <td><strong>Gesamtpause:</strong></td>
+            <td><strong>{{ 'common.total_break'|trans }}:</strong></td>
             <td class="summary-value">{{ totals.totalPause }}</td>
         </tr>
         {% if totals.totalNightShiftWorkingTime != "00:00" %}
             <tr>
-                <td><strong>Nachtschichtzuschlag (ohne Pause):</strong></td>
+                <td><strong>{{ 'common.night_shift_surcharge'|trans }}:</strong></td>
                 <td class="summary-value">{{ totals.totalNightShiftWorkingTime }}</td>
             </tr>
         {% endif %}
@@ -325,11 +325,11 @@
 <div class="signature-section">
     <div class="signature-field">
         <div class="signature-line"></div>
-        <div class="signature-label">Unterschrift Mitarbeiter</div>
+        <div class="signature-label">{{ 'common.signature_employee'|trans }}</div>
     </div>
     <div class="signature-field">
         <div class="signature-line"></div>
-        <div class="signature-label">Unterschrift Vorgesetzter</div>
+        <div class="signature-label">{{ 'common.signature_supervisor'|trans }}</div>
     </div>
 </div>
 </body>

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Objektverwaltung{% endblock %}
+{% block title %}{{ 'facility.management'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -19,14 +19,14 @@
                        bg-gradient-to-r from-slate-900 to-slate-600
                        dark:from-white dark:to-gray-400
                        bg-clip-text text-transparent">
-                    Objektverwaltung
+                    {{ 'facility.management'|trans }}
                 </h1>
 
                 <button
                     data-action="click->facility#openCreationModal"
                     class="app-button">
                     {{ ux_icon('lucide:building-2', { class: 'w-5 h-5' }) }}
-                    <span>Neues Objekt</span>
+                    <span>{{ 'facility.new'|trans }}</span>
                 </button>
             </div>
         </header>

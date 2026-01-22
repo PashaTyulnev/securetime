@@ -70,4 +70,24 @@ class TimeTrackerRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Findet alle Benutzer, die aktuell eingecheckt sind (letzter Eintrag ist 'checkin').
+     * Gibt für jeden Benutzer den letzten Checkin-Eintrag zurück.
+     */
+    public function findCheckedInUsers(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.user', 'u')
+            ->where('t.timestamp = (
+                SELECT MAX(t2.timestamp)
+                FROM App\Entity\TimeTracker t2
+                WHERE t2.user = t.user
+            )')
+            ->andWhere('t.type = :checkinType')
+            ->setParameter('checkinType', 'checkin')
+            ->orderBy('t.timestamp', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

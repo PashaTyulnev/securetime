@@ -6,7 +6,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white"></h2>
                 <div class="relative">
-                    <input type="text" placeholder="Suchen..."
+                    <input type="text" placeholder="{{ 'common.search'|trans }}..."
                            class="w-64 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800/80 transition-all duration-200">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         {{ ux_icon('lucide:search', { class: 'h-5 w-5 text-gray-400 dark:text-gray-500' }) }}
@@ -21,25 +21,25 @@
                 <thead class="bg-gray-50/80 dark:bg-gray-800/80">
                 <tr>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Objekt
+                        {{ 'common.facility'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Kürzel
+                        {{ 'common.short_title'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Anfahrt
+                        {{ 'common.approach'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Auftraggeber
+                        {{ 'navigation.client'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Beschreibung
+                        {{ 'common.description'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Status
+                        {{ 'common.status'|trans }}
                     </th>
                     <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Aktionen
+                        {{ 'common.actions'|trans }}
                     </th>
                 </tr>
                 </thead>
@@ -89,7 +89,7 @@
                                 {% if facility.description is defined and facility.description %}
                                     {{ facility.description }}
                                 {% else %}
-                                    <span class="text-gray-500 dark:text-gray-400 italic">Keine Beschreibung</span>
+                                    <span class="text-gray-500 dark:text-gray-400 italic">{{ 'common.no_description'|trans }}</span>
                                 {% endif %}
                             </div>
                         </td>
@@ -100,12 +100,12 @@
                             {% if facility.active %}
                                 <span
                                     class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 cursor-pointer hover:brightness-90 transition">
-                                    Aktiv
+                                    {{ 'common.active'|trans }}
                                 </span>
                             {% else %}
                                 <span
                                     class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 cursor-pointer hover:brightness-90 transition">
-                                    Inaktiv
+                                    {{ 'common.inactive'|trans }}
                                 </span>
                             {% endif %}
                         </td>
@@ -125,7 +125,7 @@
                 {% else %}
                     <tr>
                         <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400 italic">
-                            Keine archivierten Objekte gefunden.
+                            {{ 'facility.archive.not_found'|trans }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -136,9 +136,9 @@
         {# Pagination (optional statisch) #}
         <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
             <div class="text-sm text-gray-600 dark:text-gray-400">
-                Zeige <span class="font-medium">1</span> bis <span
-                    class="font-medium">{{ facilities | length }}</span> von
-                <span class="font-medium">{{ facilities | length }}</span> Einträgen
+                {{ 'common.showing'|trans }} <span class="font-medium">1</span> {{ 'common.to'|trans }} <span
+                    class="font-medium">{{ facilities | length }}</span> {{ 'common.of'|trans }}
+                <span class="font-medium">{{ facilities | length }}</span> {{ 'common.entries'|trans }}
             </div>
             <div class="flex space-x-2">
                 <button

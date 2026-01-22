@@ -17,7 +17,7 @@
                     data-action="click->schedule-week#convertOnCallShift"
                     data-schedule-week-shift-id-param="{{ shift['id'] }}"
                     class="bell-shake flex items-center justify-center text-yellow-300 hover:text-yellow-200 transition cursor-pointer shrink-0"
-                    title="Bereitschaftsdienst – Klick zum Umwandeln"
+                    title="{{ 'schedule.on_call_convert'|trans }}"
                 >
                     {{ ux_icon('lucide:bell', { class: 'h-3.5 w-3.5 sm:h-4 sm:w-4 drop-shadow-sm' }) }}
                 </button>

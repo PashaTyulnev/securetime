@@ -43,6 +43,9 @@ class TimeTracker
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $timeDeviation = null;
 
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
+    private bool $autoCheckOut = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -152,6 +155,18 @@ class TimeTracker
     public function setTimeDeviation(?int $timeDeviation): static
     {
         $this->timeDeviation = $timeDeviation;
+
+        return $this;
+    }
+
+    public function isAutoCheckOut(): bool
+    {
+        return $this->autoCheckOut;
+    }
+
+    public function setAutoCheckOut(bool $autoCheckOut): static
+    {
+        $this->autoCheckOut = $autoCheckOut;
 
         return $this;
     }

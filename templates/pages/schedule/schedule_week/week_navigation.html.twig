@@ -10,7 +10,7 @@
             <input type="hidden" data-schedule-week-target="currentWeekInput">
             <div class="text-sm font-medium text-gray-900 dark:text-white"
                  data-schedule-week-target="currentWeekText">
-                Woche wird geladen…
+                {{ 'schedule.week_loading'|trans }}
             </div>
             <div class="text-xs text-gray-500 dark:text-gray-400"
                  data-schedule-week-target="currentDateRangeText">
@@ -28,6 +28,6 @@
                    text-white dark:text-gray-900 rounded-2xl font-medium hover:shadow-xl transform hover:scale-[1.02]
                    transition-all duration-200"
             data-action="click->schedule-week#today">
-        Heute
+        {{ 'schedule.today'|trans }}
     </button>
 </div>

@@ -90,31 +90,31 @@
     {# Tages-Status mit Personen-Count #}
     <div class="flex justify-between gap-1 pt-1 border-t border-white/15">
         {% set days = {
-            'Mo': {
+            (('schedule.day.monday'|trans)): {
                 'active': demandShift.onMonday,
                 'assigned': demandShift.mondayAssignedCount|default(0)
             },
-            'Di': {
+            (('schedule.day.tuesday'|trans)): {
                 'active': demandShift.onTuesday,
                 'assigned': demandShift.tuesdayAssignedCount|default(0)
             },
-            'Mi': {
+            (('schedule.day.wednesday'|trans)): {
                 'active': demandShift.onWednesday,
                 'assigned': demandShift.wednesdayAssignedCount|default(0)
             },
-            'Do': {
+            (('schedule.day.thursday'|trans)): {
                 'active': demandShift.onThursday,
                 'assigned': demandShift.thursdayAssignedCount|default(0)
             },
-            'Fr': {
+            (('schedule.day.friday'|trans)): {
                 'active': demandShift.onFriday,
                 'assigned': demandShift.fridayAssignedCount|default(0)
             },
-            'Sa': {
+            (('schedule.day.saturday'|trans)): {
                 'active': demandShift.onSaturday,
                 'assigned': demandShift.saturdayAssignedCount|default(0)
             },
-            'So': {
+            (('schedule.day.sunday'|trans)): {
                 'active': demandShift.onSunday,
                 'assigned': demandShift.sundayAssignedCount|default(0)
             }

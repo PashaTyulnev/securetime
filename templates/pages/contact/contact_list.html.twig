@@ -6,7 +6,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white"></h2>
                 <div class="relative">
-                    <input type="text" placeholder="Suchen..."
+                    <input type="text" placeholder="{{ 'common.search'|trans }}..."
                            class="w-64 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800/80 transition-all duration-200">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         {{ ux_icon('lucide:search', { class: 'h-5 w-5 text-gray-400 dark:text-gray-500' }) }}
@@ -21,19 +21,19 @@
                 <thead class="bg-gray-50/80 dark:bg-gray-800/80">
                 <tr>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Kontakt
+                        {{ 'common.contact'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Firma
+                        {{ 'common.company'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Objekt
+                        {{ 'common.facility'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Kommunikation
+                        {{ 'common.communication'|trans }}
                     </th>
                     <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Aktionen
+                        {{ 'common.actions'|trans }}
                     </th>
                 </tr>
                 </thead>
@@ -71,7 +71,7 @@
                                     class="text-sm font-medium text-gray-900 dark:text-white">{{ contact.company.company }}</div>
                             {% else %}
                                 <span
-                                    class="text-sm text-gray-500 dark:text-gray-400 italic">Keine Firma angegeben</span>
+                                    class="text-sm text-gray-500 dark:text-gray-400 italic">{{ 'common.no_company'|trans }}</span>
                             {% endif %}
                         </td>
 
@@ -133,7 +133,7 @@
                 {% else %}
                     <tr>
                         <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400 italic">
-                            Keine Kontakte gefunden. Erstellen Sie einen neuen Kontakt mit dem Button oben rechts.
+                            {{ 'contact.not_found'|trans }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -145,11 +145,11 @@
         <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
             <div class="text-sm text-gray-600 dark:text-gray-400">
                 {% if contacts|length > 0 %}
-                    Zeige <span class="font-medium">{{ pagination.firstItem|default(1) }}</span> bis <span
-                    class="font-medium">{{ pagination.lastItem|default(contacts|length) }}</span> von <span
-                    class="font-medium">{{ pagination.total|default(contacts|length) }}</span> Einträgen
+                    {{ 'common.showing'|trans }} <span class="font-medium">{{ pagination.firstItem|default(1) }}</span> {{ 'common.to'|trans }} <span
+                    class="font-medium">{{ pagination.lastItem|default(contacts|length) }}</span> {{ 'common.of'|trans }} <span
+                    class="font-medium">{{ pagination.total|default(contacts|length) }}</span> {{ 'common.entries'|trans }}
                 {% else %}
-                    Keine Einträge gefunden
+                    {{ 'common.no_entries'|trans }}
                 {% endif %}
             </div>
             <div class="flex space-x-2">

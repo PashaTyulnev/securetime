@@ -4,7 +4,7 @@
     </div>
 
     <div class="flex flex-col justify-center cursor-pointer">
-        <a data-action="click->schedule-month#exportPdf" title="Monat als PDF exportieren">
+        <a data-action="click->schedule-month#exportPdf" title="{{ 'schedule.export_month_pdf'|trans }}">
             {{ ux_icon('lucide:file-text', { class: 'h-5 w-5 text-slate-700 dark:text-gray-300' }) }}
         </a>
     </div>
@@ -18,7 +18,7 @@
         <!-- Header: Mitarbeiter Label -->
         <div
             class="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-xl p-2 border-b-2 border-r border-gray-200/50 dark:border-gray-700/50 sticky left-0 z-10">
-            <span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">MA</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ 'schedule.employee_short'|trans }}</span>
         </div>
 
         <!-- Header: Alle Tage des Monats -->
@@ -44,17 +44,17 @@
                     </div>
                     <div class="mt-0.5 grid grid-cols-3 gap-x-2 text-[8px] leading-[9px] text-gray-500 dark:text-gray-400">
                         <div>
-                            <div class="font-medium" title="Reguläre Arbeitszeit">Plan</div>
+                            <div class="font-medium" title="{{ 'schedule.regular_work_time'|trans }}">{{ 'schedule.planned'|trans }}</div>
                             <div>{{ employee.plannedHours.regular }}h</div>
                         </div>
 
                         <div>
-                            <div class="font-medium" title="Bereitschaftsdienst">Bereit</div>
+                            <div class="font-medium" title="{{ 'schedule.on_call_service'|trans }}">{{ 'schedule.on_call'|trans }}</div>
                             <div>{{ employee.plannedHours.onCall }}h</div>
                         </div>
 
                         <div>
-                            <div class="font-semibold" title="Gesamt (inkl. Bereitschaft)">Total</div>
+                            <div class="font-semibold" title="{{ 'schedule.total_incl_on_call'|trans }}">{{ 'schedule.total'|trans }}</div>
                             <div class="font-semibold">{{ employee.plannedHours.total }}h</div>
                         </div>
                     </div>

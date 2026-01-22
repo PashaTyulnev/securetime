@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Auftraggeber - Firmen{% endblock %}
+{% block title %}{{ 'company.title'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -16,14 +16,14 @@
 
             <div class="px-6 py-4 flex items-center justify-between">
                 <h1>
-                    Auftraggeber
+                    {{ 'company.title'|trans }}
                 </h1>
 
                 <button
                     data-action="click->company#openCreationModal"
                     class="app-button">
                     {{ ux_icon('lucide:building-2', { class: 'w-5 h-5' }) }}
-                    <span>Firma anlegen</span>
+                    <span>{{ 'company.new'|trans }}</span>
                 </button>
             </div>
         </header>

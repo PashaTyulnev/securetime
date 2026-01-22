@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mitarbeiterverwaltung{% endblock %}
+{% block title %}{{ 'employee.management'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -19,14 +19,14 @@
                        bg-gradient-to-r from-slate-900 to-slate-600
                        dark:from-white dark:to-gray-400
                        bg-clip-text text-transparent">
-                    Mitarbeiterverwaltung
+                    {{ 'employee.management'|trans }}
                 </h1>
 
                 <button
                     data-action="click->employee#openCreationModal"
                     class="app-button">
                     {{ ux_icon('lucide:user-plus', { class: 'w-5 h-5' }) }}
-                    <span>Neuer Mitarbeiter</span>
+                    <span>{{ 'employee.new'|trans }}</span>
                 </button>
             </div>
         </header>

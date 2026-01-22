@@ -3,6 +3,18 @@ import {Controller} from '@hotwired/stimulus';
 export default class extends Controller {
 
     static targets = ["checkinButton", "checkoutButton", "pauseinButton", "workingSince"];
+    
+    static values = {
+        errorCheckin: String,
+        errorCheckout: String,
+        errorPause: String,
+        successCheckin: String,
+        successCheckout: String,
+        successPause: String,
+        workingSince: String,
+        pauseSince: String,
+        checkedOutAt: String
+    };
 
     connect() {
         this.getCurrentWorkStatus();
@@ -16,11 +28,11 @@ export default class extends Controller {
             return response.json().then(data => {
                 if (!response.ok) {
                     // Fehler anzeigen
-                    this.showError(data.message || 'Fehler beim Checkin');
-                    throw new Error(data.message || 'Fehler beim Checkin');
+                    this.showError(data.message || this.errorCheckinValue || 'Fehler beim Checkin');
+                    throw new Error(data.message || this.errorCheckinValue || 'Fehler beim Checkin');
                 }
                 // Erfolg
-                this.showSuccess(data.message || 'Erfolgreich eingecheckt');
+                this.showSuccess(data.message || this.successCheckinValue || 'Erfolgreich eingecheckt');
                 this.getCurrentWorkStatus();
                 document.dispatchEvent(new Event("timetracker:updated"));
             });
@@ -39,11 +51,11 @@ export default class extends Controller {
             return response.json().then(data => {
                 if (!response.ok) {
                     // Fehler anzeigen
-                    this.showError(data.message || 'Fehler beim Checkout');
-                    throw new Error(data.message || 'Fehler beim Checkout');
+                    this.showError(data.message || this.errorCheckoutValue || 'Fehler beim Checkout');
+                    throw new Error(data.message || this.errorCheckoutValue || 'Fehler beim Checkout');
                 }
                 // Erfolg
-                this.showSuccess(data.message || 'Erfolgreich ausgecheckt');
+                this.showSuccess(data.message || this.successCheckoutValue || 'Erfolgreich ausgecheckt');
                 this.getCurrentWorkStatus();
                 document.dispatchEvent(new Event("timetracker:updated"));
             });
@@ -62,11 +74,11 @@ export default class extends Controller {
             return response.json().then(data => {
                 if (!response.ok) {
                     // Fehler anzeigen
-                    this.showError(data.message || 'Fehler beim Pause starten');
-                    throw new Error(data.message || 'Fehler beim Pause starten');
+                    this.showError(data.message || this.errorPauseValue || 'Fehler beim Pause starten');
+                    throw new Error(data.message || this.errorPauseValue || 'Fehler beim Pause starten');
                 }
                 // Erfolg
-                this.showSuccess(data.message || 'Pause gestartet');
+                this.showSuccess(data.message || this.successPauseValue || 'Pause gestartet');
                 this.getCurrentWorkStatus();
                 document.dispatchEvent(new Event("timetracker:updated"));
             });
@@ -153,20 +165,20 @@ export default class extends Controller {
                 this.checkinButtonTarget.classList.add('hidden');
                 this.checkoutButtonTarget.classList.remove('hidden');
                 this.pauseinButtonTarget.classList.remove('hidden');
-                statusInformation = "Du arbeitest seit:"
+                statusInformation = this.workingSinceValue || "Du arbeitest seit:"
                 date = new Date(data.mainCheckin.date);
 
             } else if (data.type === 'pause') {
                 this.checkinButtonTarget.classList.remove('hidden');
                 this.checkoutButtonTarget.classList.add('hidden');
                 this.pauseinButtonTarget.classList.add('hidden');
-                statusInformation = "Du hast pause seit:"
+                statusInformation = this.pauseSinceValue || "Du hast pause seit:"
                 date = new Date(data.timestamp.date);
             } else {
                 this.checkinButtonTarget.classList.remove('hidden');
                 this.checkoutButtonTarget.classList.add('hidden');
                 this.pauseinButtonTarget.classList.add('hidden');
-                statusInformation = "Du hast dich ausgecheckt am"
+                statusInformation = this.checkedOutAtValue || "Du hast dich ausgecheckt am"
                 date = new Date(data.timestamp.date);
             }
 

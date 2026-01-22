@@ -10,7 +10,7 @@
                        focus:ring-2 focus:ring-blue-500/50
                        focus:border-blue-500 transition-all">
 
-            <option value="">Alle Objekte</option>
+            <option value="">{{ 'schedule.all_facilities'|trans }}</option>
 
             {% for facility in facilities %}
                 <option value="{{ facility['id'] }}"

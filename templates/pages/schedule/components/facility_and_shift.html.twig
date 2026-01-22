@@ -9,7 +9,7 @@
     {# ========= Objektauswahl ========= #}
     <div class="flex items-center gap-2">
         <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
-            Objekt
+            {{ 'schedule.facility'|trans }}
         </span>
 
         <select
@@ -24,11 +24,11 @@
 
             {% if is_granted("ROLE_ADMIN") %}
                 <option value="null">
-                    Bitte für Planung auswählen…
+                    {{ 'schedule.select_for_planning'|trans }}
                 </option>
             {% else %}
                 <option value="null">
-                    Alle Objekte anzeigen
+                    {{ 'schedule.show_all_facilities'|trans }}
                 </option>
             {% endif %}
 

@@ -10,7 +10,7 @@
             <input type="hidden" data-schedule-month-target="currentMonthInput">
             <div class="text-sm font-medium text-gray-900 dark:text-white"
                  data-schedule-month-target="currentMonthText">
-                Monat wird geladen…
+                {{ 'schedule.month_loading'|trans }}
             </div>
             <div class="text-xs text-gray-500 dark:text-gray-400"
                  data-schedule-month-target="currentYearText">
@@ -28,6 +28,6 @@
                    text-white dark:text-gray-900 rounded-2xl font-medium hover:shadow-xl transform hover:scale-[1.02]
                    transition-all duration-200"
             data-action="click->schedule-month#today">
-        Aktuell
+        {{ 'schedule.current'|trans }}
     </button>
 </div>

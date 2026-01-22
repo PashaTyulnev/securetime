@@ -17,7 +17,7 @@
 
                 <div class="relative">
                     <input type="text"
-                           placeholder="Suchen…"
+                           placeholder="{{ 'common.search'|trans }}…"
                            class="w-64
                                   bg-white/60 dark:bg-gray-700/40
                                   border border-gray-200/60 dark:border-gray-600/60
@@ -44,17 +44,17 @@
                     <th class="px-6 py-4 text-left text-xs font-medium
                                text-gray-500 dark:text-gray-400
                                uppercase tracking-wider">
-                        Firma
+                        {{ 'common.company'|trans }}
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-medium
                                text-gray-500 dark:text-gray-400
                                uppercase tracking-wider">
-                        Kontakte
+                        {{ 'common.contacts'|trans }}
                     </th>
                     <th class="px-6 py-4 text-right text-xs font-medium
                                text-gray-500 dark:text-gray-400
                                uppercase tracking-wider">
-                        Aktionen
+                        {{ 'common.actions'|trans }}
                     </th>
                 </tr>
                 </thead>
@@ -125,12 +125,12 @@
 
                                     {% if company.contacts|length > 2 %}
                                         <div class="text-xs text-gray-500 dark:text-gray-400">
-                                            +{{ company.contacts|length - 2 }} weitere
+                                            +{{ company.contacts|length - 2 }} {{ 'common.more'|trans }}
                                         </div>
                                     {% endif %}
                                 {% else %}
                                     <span class="text-sm text-gray-500 dark:text-gray-400 italic">
-                                        Keine Kontakte
+                                        {{ 'common.no_contacts'|trans }}
                                     </span>
                                 {% endif %}
                             </div>
@@ -178,9 +178,9 @@
                     flex justify-between items-center">
 
             <div class="text-sm text-gray-600 dark:text-gray-400">
-                Zeige <span class="font-medium">1</span>
-                bis <span class="font-medium">{{ companies|length }}</span>
-                von <span class="font-medium">{{ companies|length }}</span> Einträgen
+                {{ 'common.showing'|trans }} <span class="font-medium">1</span>
+                {{ 'common.to'|trans }} <span class="font-medium">{{ companies|length }}</span>
+                {{ 'common.of'|trans }} <span class="font-medium">{{ companies|length }}</span> {{ 'common.entries'|trans }}
             </div>
 
             <div class="flex gap-2">

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="{{ app.request.locale }}">
 <head>
     <meta charset="UTF-8">
     <style>
@@ -138,7 +138,7 @@
 
 <body>
 <div class="header">
-    <h1>Objektdienstplan 2-Wochen-Ansicht</h1>
+    <h1>{{ 'schedule.title'|trans }} {{ 'schedule.two_week_view'|trans }}</h1>
     <div class="date-range">{{ dateFrom|date('d.m.Y') }} - {{ dateTo|date('d.m.Y') }}</div>
 
     {% if selectedFacility is not null %}
@@ -156,7 +156,7 @@
 
 <table class="schedule-grid">
     <tr>
-        <th class="header-cell employee-cell">MA</th>
+        <th class="header-cell employee-cell">{{ 'schedule.employee_short'|trans }}</th>
         {% for day in datesRange %}
             <th class="header-cell">
                 <div class="header-cell-name">{{ day.name }}</div>

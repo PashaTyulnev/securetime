@@ -6,7 +6,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
             <h2 class="text-lg font-medium text-gray-900 dark:text-white"></h2>
             <div class="relative">
-                <input type="text" placeholder="Suchen..."
+                <input type="text" placeholder="{{ 'common.search'|trans }}..."
                        class="w-64 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800/80 transition-all duration-200">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     {{ ux_icon('lucide:search', { class: 'h-5 w-5 text-gray-400 dark:text-gray-500' }) }}
@@ -21,34 +21,34 @@
             <thead class="bg-gray-50/80 dark:bg-gray-800/80">
             <tr>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Name
+                    {{ 'common.name'|trans }}
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Benutzername
+                    {{ 'common.username'|trans }}
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Bewacher-ID
+                    {{ 'employee.guardian_id'|trans }}
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Nummer
+                    {{ 'employee.employee_number'|trans }}
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    E-Mail
+                    {{ 'common.email'|trans }}
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Telefon
+                    {{ 'common.phone'|trans }}
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Geb.-Datum
+                    {{ 'common.birth_date'|trans }}
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Status
+                    {{ 'common.status'|trans }}
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Passwort angelegt
+                    {{ 'common.password_created'|trans }}
                 </th>
                 <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Aktionen
+                    {{ 'common.actions'|trans }}
                 </th>
             </tr>
             </thead>
@@ -87,22 +87,22 @@
                     <td class="px-6 py-4 whitespace-nowrap" data-action="click->employee#toggleStatus" data-employee-id-param="{{ employee.id }}">
                         {% if employee.user and employee.user.active %}
                             <span
-                                class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 cursor-pointer hover:brightness-90 transition">Aktiv</span>
+                                class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 cursor-pointer hover:brightness-90 transition">{{ 'common.active'|trans }}</span>
                         {% else %}
                             <span
-                                class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 cursor-pointer hover:brightness-90 transition">Inaktiv</span>
+                                class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 cursor-pointer hover:brightness-90 transition">{{ 'common.inactive'|trans }}</span>
                         {% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                         {% if employee.password %}
                             <span
-                                class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 cursor-pointer hover:brightness-90 transition">Ja</span>
+                                class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 cursor-pointer hover:brightness-90 transition">{{ 'common.yes'|trans }}</span>
 
                         {% else %}
                             <span
                                 class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 cursor-pointer hover:brightness-90 transition"
                                 data-action="click->employee#sendPasswordEmail"
-                                data-employee-email-param="{{ employee.user.email }}">Senden</span>
+                                data-employee-email-param="{{ employee.user.email }}">{{ 'common.send'|trans }}</span>
                         {% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -133,9 +133,9 @@
     {# Pagination #}
     <div class="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center">
         <div class="text-sm text-gray-600 dark:text-gray-400">
-            Zeige <span class="font-medium">1</span> bis <span class="font-medium">{{ employees | length }}</span> von
+            {{ 'common.showing'|trans }} <span class="font-medium">1</span> {{ 'common.to'|trans }} <span class="font-medium">{{ employees | length }}</span> {{ 'common.of'|trans }}
             <span
-                class="font-medium">{{ employees | length }}</span> Einträgen
+                class="font-medium">{{ employees | length }}</span> {{ 'common.entries'|trans }}
         </div>
         <div class="flex space-x-2">
             <button
