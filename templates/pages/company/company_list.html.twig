@@ -78,9 +78,12 @@
                                             flex-shrink-0">
 
                                     {% if company.logoLink is defined and company.logoLink %}
-                                        <img src="{{ company.logoLink }}"
-                                             alt="{{ company.company }}"
-                                             class="h-full w-full object-cover p-2">
+                                        <div class="h-16 w-16 flex items-center justify-center">
+                                            <img src="{{ company.logoLink }}"
+                                                 alt="{{ company.company }}"
+                                                 class="h-full w-full object-contain p-2">
+                                        </div>
+
                                     {% else %}
                                         <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
                                             {{ company.company|slice(0, 2)|upper }}
