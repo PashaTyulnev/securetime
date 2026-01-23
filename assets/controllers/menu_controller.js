@@ -20,15 +20,8 @@ export default class extends Controller {
         this._onResize = this._onResize.bind(this);
         window.addEventListener('resize', this._onResize);
 
-        // Theme init
-        const theme = localStorage.getItem('theme');
-        const isDarkMode = theme === 'dark';
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        this.setTriggerVisibility(isDarkMode);
+        // Dark Mode ist immer aktiviert
+        document.documentElement.classList.add('dark');
 
         // Синхронизировать состояние сайдбара по размеру/при навигации
         this._closeIfNeeded();

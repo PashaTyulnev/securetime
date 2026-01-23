@@ -95,5 +95,66 @@ readonly class ShiftService
         ];
     }
 
+    /**
+     * Findet die nächste geplante Schicht für einen Benutzer (ab heute)
+     */
+    public function findNextPlannedShift(?User $user): ?array
+    {
+        if (!$user || !$user->getEmployee()) {
+            return null;
+        }
+
+        $employee = $user->getEmployee();
+        $today = new DateTime('today');
+        
+        // Suche die nächste Schicht ab heute (maximal 30 Tage in die Zukunft)
+        $endDate = (clone $today)->modify('+30 days');
+        
+        $shifts = $this->shiftRepository->getAllAssignedShiftsInRange(
+            $employee,
+            $today->format('Y-m-d'),
+            $endDate->format('Y-m-d')
+        );
+
+        $now = new DateTime();
+        $nextShift = null;
+        $nextShiftDateTime = null;
+
+        foreach ($shifts as $shift) {
+            $demandShift = $shift->getDemandShift();
+            if (!$demandShift || !$demandShift->getTimeFrom()) {
+                continue;
+            }
+
+            $shiftDate = $shift->getDate();
+            $shiftTime = $demandShift->getTimeFrom();
+            
+            // Kombiniere Datum und Uhrzeit
+            $shiftDateTime = new DateTime($shiftDate->format('Y-m-d') . ' ' . $shiftTime->format('H:i:s'));
+
+            // Nur Schichten in der Zukunft berücksichtigen
+            if ($shiftDateTime > $now) {
+                if ($nextShiftDateTime === null || $shiftDateTime < $nextShiftDateTime) {
+                    $nextShift = $shift;
+                    $nextShiftDateTime = $shiftDateTime;
+                }
+            }
+        }
+
+        if ($nextShift) {
+            $demandShift = $nextShift->getDemandShift();
+            return [
+                'shift' => $nextShift,
+                'dateTime' => $nextShiftDateTime,
+                'facility' => $demandShift->getFacility(),
+                'timeFrom' => $demandShift->getTimeFrom(),
+                'timeTo' => $demandShift->getTimeTo(),
+                'name' => $demandShift->getName(),
+            ];
+        }
+
+        return null;
+    }
+
 
 }

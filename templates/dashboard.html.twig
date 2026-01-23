@@ -24,24 +24,82 @@
                 {% if todayWorkingInformation['isCheckedIn'] or todayWorkingInformation['hasPause'] %}
                     {# Zeiterfassungsmodul immer anzeigen wenn eingecheckt oder in Pause #}
                     {% include 'modules/time_tracker.html.twig' %}
+                {% elseif todayWorkingInformation['isCheckedOut'] %}
+                    {# Benutzer hat heute schon ausgecheckt #}
+                    {% if todayWorkingInformation['nextPlannedShift'] %}
+                        {# Zeige nächste geplante Schicht #}
+                        {% set nextShift = todayWorkingInformation['nextPlannedShift'] %}
+                        <div class="bg-green-50 dark:bg-green-900/30 backdrop-blur-xl rounded-2xl border border-green-200 dark:border-green-800 p-6 shadow-sm">
+                            <div class="flex items-center gap-3 mb-3">
+                                {{ ux_icon('lucide:check-circle', { class: 'w-6 h-6 text-green-600 dark:text-green-400' }) }}
+                                <h2 class="text-base font-semibold text-green-800 dark:text-green-300">
+                                    {{ 'dashboard.shift_completed'|trans }}
+                                </h2>
+                            </div>
+
+                            <p class="text-sm text-green-700 dark:text-green-300 leading-relaxed mb-4">
+                                {{ 'dashboard.next_shift_info'|trans|raw }}
+                            </p>
+
+                            <div class="space-y-2 text-sm">
+                                {% if nextShift['facility'] %}
+                                    <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                        {{ ux_icon('lucide:building-2', { class: 'w-4 h-4 opacity-70' }) }}
+                                        <span>{{ nextShift['facility'].title }}</span>
+                                    </div>
+                                {% endif %}
+
+                                <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                    {{ ux_icon('lucide:calendar', { class: 'w-4 h-4 opacity-70' }) }}
+                                    <span>
+                                        {{ nextShift['dateTime']|date('d.m.Y') }}, 
+                                        {{ nextShift['timeFrom']|date('H:i') }} – {{ nextShift['timeTo']|date('H:i') }} {{ 'dashboard.time_suffix'|trans }}
+                                    </span>
+                                </div>
+
+                                {% if nextShift['name'] %}
+                                    <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                        {{ ux_icon('lucide:briefcase', { class: 'w-4 h-4 opacity-70' }) }}
+                                        <span>{{ nextShift['name'] }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        {# Keine nächste Schicht gefunden #}
+                        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-6 shadow-sm">
+                            <div class="flex items-center gap-3 mb-3">
+                                {{ ux_icon('lucide:check-circle', { class: 'w-6 h-6 text-green-600 dark:text-green-400' }) }}
+                                <h2 class="text-base font-semibold text-gray-900 dark:text-white">
+                                    {{ 'dashboard.shift_completed'|trans }}
+                                </h2>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">
+                                {{ 'dashboard.no_next_shift'|trans }}
+                            </p>
+                        </div>
+                    {% endif %}
                 {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] > -11 and todayWorkingInformation['minutesDifferenceToWorkBegin'] < 25%}
                     {# Normale Check-in Zeit #}
                     {% include 'modules/time_tracker.html.twig' %}
                 {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] > 25 %}
-                    <div class="bg-red-50 dark:bg-red-900/30 backdrop-blur-xl rounded-2xl border border-red-200 dark:border-red-800 p-6 shadow-sm">
-                        <div class="flex items-center justify-center gap-3 mb-3 relative">
-                            <h2 class="text-base font-semibold text-red-800 dark:text-red-300 text-center">
-                                {{ 'dashboard.work_start_missed'|trans }}!!!
-                            </h2>
-                            <div class="absolute right-0">
-                                {{ ux_icon('lucide:alert-triangle', { class: 'w-6 h-6 text-red-600 dark:text-red-400' }) }}
+                    {# Nur anzeigen wenn nicht bereits ausgecheckt #}
+                    {% if not todayWorkingInformation['isCheckedOut'] %}
+                        <div class="bg-red-50 dark:bg-red-900/30 backdrop-blur-xl rounded-2xl border border-red-200 dark:border-red-800 p-6 shadow-sm">
+                            <div class="flex items-center justify-center gap-3 mb-3 relative">
+                                <h2 class="text-base font-semibold text-red-800 dark:text-red-300 text-center">
+                                    {{ 'dashboard.work_start_missed'|trans }}!!!
+                                </h2>
+                                <div class="absolute right-0">
+                                    {{ ux_icon('lucide:alert-triangle', { class: 'w-6 h-6 text-red-600 dark:text-red-400' }) }}
+                                </div>
                             </div>
-                        </div>
 
-                        <p class="text-sm text-red-700 dark:text-red-300 leading-relaxed text-center">
-                            {{ 'dashboard.late_arrival_message'|trans|raw }}
-                        </p>
-                    </div>
+                            <p class="text-sm text-red-700 dark:text-red-300 leading-relaxed text-center">
+                                {{ 'dashboard.late_arrival_message'|trans|raw }}
+                            </p>
+                        </div>
+                    {% endif %}
                 {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] < -10 %}
                     {% set minutesUntilCheckin = (todayWorkingInformation['minutesDifferenceToWorkBegin'] * -1) - 10 %}
                     <div class="bg-amber-50 dark:bg-amber-900/30 backdrop-blur-xl rounded-2xl border border-amber-200 dark:border-amber-800 p-6 shadow-sm">

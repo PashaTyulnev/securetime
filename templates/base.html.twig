@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ app.request.locale }}" class="light">
+<html lang="{{ app.request.locale }}" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,19 +17,8 @@
 </head>
 
 <script>
-    const savedTheme = localStorage.getItem('theme');
-    let isDarkMode = true;
-
-    // if (savedTheme === 'dark') {
-    //     isDarkMode = true;
-    // } else if (savedTheme === 'light') {
-    //     isDarkMode = false;
-    // } else {
-    //     isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    //     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    // }
-
-    document.documentElement.classList.toggle('dark', isDarkMode);
+    // Dark Mode ist immer aktiviert
+    document.documentElement.classList.add('dark');
 </script>
 
 <body class="relative min-h-screen">
