@@ -54,13 +54,21 @@ readonly class TimeTrackerService
 
     }
 
-    private function createTimeTrackerEntry(?UserInterface $user, $type, $isShiftStart, $parent): void
+    /**
+     * @param \DateTimeImmutable|null $timestamp Optional: Spezifischer Timestamp. Wenn null, wird der aktuelle Zeitpunkt verwendet.
+     */
+    private function createTimeTrackerEntry(?UserInterface $user, $type, $isShiftStart, $parent, ?\DateTimeImmutable $timestamp = null): void
     {
         $timeTracker = new TimeTracker();
         $timeTracker->setUser($user);
         $timeTracker->setCreatedAt(new \DateTimeImmutable());
-        $checkinTimestamp = new \DateTimeImmutable();
-        $timeTracker->setTimestamp($checkinTimestamp);
+        
+        // Wenn kein Timestamp übergeben wurde, verwende aktuellen Zeitpunkt
+        if ($timestamp === null) {
+            $timestamp = new \DateTimeImmutable();
+        }
+        
+        $timeTracker->setTimestamp($timestamp);
         $timeTracker->setType($type);
 
         if ($type === "checkin" and $isShiftStart) {
@@ -102,7 +110,7 @@ readonly class TimeTrackerService
                 $plannedDateTime = new \DateTime($today->format('Y-m-d') . ' ' . $plannedStartTime->format('H:i:s'));
 
                 // Berechne Differenz in Minuten
-                $diffInSeconds = $checkinTimestamp->getTimestamp() - $plannedDateTime->getTimestamp();
+                $diffInSeconds = $timestamp->getTimestamp() - $plannedDateTime->getTimestamp();
                 $diffInMinutes = (int)round($diffInSeconds / 60);
 
                 // Maximal 2 Stunden (120 Minuten) Abweichung erlauben
@@ -125,7 +133,10 @@ readonly class TimeTrackerService
         $this->em->flush();
     }
 
-    public function checkout(?UserInterface $user): void
+    /**
+     * @param \DateTimeImmutable|null $checkoutTimestamp Optional: Spezifischer Checkout-Zeitpunkt. Wenn null, wird der aktuelle Zeitpunkt verwendet.
+     */
+    public function checkout(?UserInterface $user, ?\DateTimeImmutable $checkoutTimestamp = null): void
     {
         $userIsCheckedOut = $this->checkIfUserIsCheckedOut($user);
 
@@ -143,8 +154,23 @@ readonly class TimeTrackerService
         // Alle Einträge dieser Schicht laden
         $shiftEntries = $this->timeTrackerRepository->findShiftEntries($lastMainCheckin);
 
-        // Temporär: Checkout-Zeitpunkt ist jetzt
-        $checkoutTimestamp = new \DateTimeImmutable();
+        // Checkout-Zeitpunkt: Wenn nicht gesetzt, verwende aktuellen Zeitpunkt
+        if ($checkoutTimestamp === null) {
+            $checkoutTimestamp = new \DateTimeImmutable();
+        }
+
+        // Validiere, dass der Checkout-Timestamp nach dem letzten Checkin liegt
+        $lastTimeTracker = $this->timeTrackerRepository->findOneBy(['user' => $user], ['id' => 'DESC']);
+        if ($lastTimeTracker && $lastTimeTracker->getType() === 'checkin') {
+            $lastCheckinTimestamp = $lastTimeTracker->getTimestamp();
+            if ($checkoutTimestamp <= $lastCheckinTimestamp) {
+                throw new \Exception(sprintf(
+                    'Checkout-Timestamp (%s) muss nach dem letzten Checkin (%s) liegen.',
+                    $checkoutTimestamp->format('Y-m-d H:i:s'),
+                    $lastCheckinTimestamp->format('Y-m-d H:i:s')
+                ));
+            }
+        }
 
         // Virtueller Checkout-Zeitpunkt für die Berechnung:
         // 1 Sekunde VOR dem eigentlichen Checkout, damit in der Übersicht
@@ -183,10 +209,14 @@ readonly class TimeTrackerService
         if ($totalPauseMinutes < $requiredPauseMinutes) {
             $missingPauseMinutes = $requiredPauseMinutes - $totalPauseMinutes;
 
-            // Wir fügen eine Pause + Checkin direkt vor dem virtuellen Checkout hinzu:
-            // pause:   virtualCheckout - missingPause
-            // checkin: virtualCheckout
-            $pauseStart = $virtualCheckoutTimestamp->sub(new \DateInterval(sprintf('PT%dM', $missingPauseMinutes)));
+            // Wir fügen eine Pause + Checkin vor dem Checkout hinzu:
+            // Der Checkin nach der Pause sollte mindestens 1 Minute vor dem Checkout liegen,
+            // um sicherzustellen, dass es einen sinnvollen Abstand gibt
+            $minCheckinBeforeCheckout = 1; // Mindestens 1 Minute vor Checkout
+            $checkinAfterPause = $checkoutTimestamp->sub(new \DateInterval(sprintf('PT%dM', $minCheckinBeforeCheckout)));
+            
+            // Pause startet Pausendauer vor dem Checkin nach der Pause
+            $pauseStart = $checkinAfterPause->sub(new \DateInterval(sprintf('PT%dM', $missingPauseMinutes)));
 
             // 1) Pause-Eintrag
             $pauseEntry = new TimeTracker();
@@ -198,11 +228,11 @@ readonly class TimeTrackerService
             $pauseEntry->setParent($lastMainCheckin);
             $this->em->persist($pauseEntry);
 
-            // 2) Checkin-Eintrag (Ende der Pause)
+            // 2) Checkin-Eintrag (Ende der Pause) - mindestens 1 Minute vor Checkout
             $checkinEntry = new TimeTracker();
             $checkinEntry->setUser($user);
             $checkinEntry->setCreatedAt(new \DateTimeImmutable());
-            $checkinEntry->setTimestamp($virtualCheckoutTimestamp);
+            $checkinEntry->setTimestamp($checkinAfterPause);
             $checkinEntry->setType('checkin');
             $checkinEntry->setShiftStart(false);
             $checkinEntry->setParent($lastMainCheckin);
@@ -212,7 +242,7 @@ readonly class TimeTrackerService
         }
 
         // Abschließend regulären Checkout-Eintrag speichern
-        $this->createTimeTrackerEntry($user, "checkout", false, $lastMainCheckin);
+        $this->createTimeTrackerEntry($user, "checkout", false, $lastMainCheckin, $checkoutTimestamp);
     }
 
 

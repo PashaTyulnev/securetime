@@ -53,7 +53,7 @@ class TimeTrackerRepository extends ServiceEntityRepository
                 FROM App\Entity\TimeTracker t2
                 WHERE t2.user = t.user
             )')
-            ->orderBy('t.timestamp', 'DESC')
+            ->orderBy('t.timestamp', 'ASC')
             ->getQuery()
             ->getResult();
     }

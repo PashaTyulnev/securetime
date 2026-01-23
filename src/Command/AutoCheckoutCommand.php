@@ -49,24 +49,53 @@ class AutoCheckoutCommand extends Command
 
         foreach ($checkedInEntries as $checkinEntry) {
             $user = $checkinEntry->getUser();
-            $checkinTimestamp = $checkinEntry->getTimestamp();
+            
+            // Finde den Hauptcheckin (Schichtbeginn)
+            $mainCheckin = $this->timeTrackerService->getLastMainCheckin($user);
+            
+            if (!$mainCheckin) {
+                $io->warning(sprintf(
+                    'Kein Hauptcheckin für Benutzer %s gefunden. Überspringe...',
+                    $user->getUsername()
+                ));
+                continue;
+            }
+            
+            $mainCheckinTimestamp = $mainCheckin->getTimestamp();
+            $lastCheckinTimestamp = $checkinEntry->getTimestamp();
 
-            // Berechne die Arbeitszeit in Minuten
-            $workingMinutes = ($now->getTimestamp() - $checkinTimestamp->getTimestamp()) / 60;
+            // Berechne die Arbeitszeit seit dem Hauptcheckin in Minuten
+            $workingMinutes = ($now->getTimestamp() - $mainCheckinTimestamp->getTimestamp()) / 60;
             $workingHours = $workingMinutes / 60;
 
             // Prüfe ob die maximale Arbeitszeit überschritten wurde
             if ($workingMinutes > self::MAX_WORKING_MINUTES) {
+                // Berechne Checkout-Timestamp: Hauptcheckin + 12,5 Stunden
+                $checkoutTimestamp = $mainCheckinTimestamp->add(new \DateInterval('PT' . self::MAX_WORKING_MINUTES . 'M'));
+                
+                // Stelle sicher, dass der Checkout nach dem letzten Checkin liegt
+                // (wichtig nach Pausen, wenn jemand wieder eingecheckt hat)
+                // Mindestens 1 Minute Abstand, damit nachgetragene Pausen genug Platz haben
+                $minCheckoutAfterCheckin = 1; // Mindestens 1 Minute nach letztem Checkin
+                $minCheckoutTimestamp = $lastCheckinTimestamp->add(new \DateInterval(sprintf('PT%dM', $minCheckoutAfterCheckin)));
+                
+                if ($checkoutTimestamp <= $minCheckoutTimestamp) {
+                    // Wenn der berechnete Checkout zu nah am letzten Checkin ist,
+                    // setze ihn auf mindestens 1 Minute nach dem letzten Checkin
+                    $checkoutTimestamp = $minCheckoutTimestamp;
+                }
+                
                 $io->warning(sprintf(
-                    'Benutzer %s arbeitet seit %.2f Stunden (%.0f Minuten). Automatisches Auschecken...',
+                    'Benutzer %s arbeitet seit %.2f Stunden (%.0f Minuten). Automatisches Auschecken zum Zeitpunkt: %s...',
                     $user->getUsername(),
                     $workingHours,
-                    $workingMinutes
+                    $workingMinutes,
+                    $checkoutTimestamp->format('Y-m-d H:i:s')
                 ));
 
                 try {
-                    // Automatisches Auschecken
-                    $this->timeTrackerService->checkout($user);
+                    // Automatisches Auschecken mit spezifischem Timestamp (Hauptcheckin + 12,5 Stunden)
+                    $this->timeTrackerService->checkout($user, $checkoutTimestamp);
 
                     // Setze den autoCheckOut Flag auf dem Checkout-Eintrag
                     // Der Checkout-Eintrag ist der neueste Eintrag für diesen Benutzer
@@ -82,7 +111,11 @@ class AutoCheckoutCommand extends Command
                     }
 
                     $autoCheckedOutCount++;
-                    $io->success(sprintf('Benutzer %s wurde automatisch ausgecheckt.', $user->getUsername()));
+                    $io->success(sprintf(
+                        'Benutzer %s wurde automatisch ausgecheckt (Checkout-Zeitpunkt: %s).',
+                        $user->getUsername(),
+                        $checkoutTimestamp->format('Y-m-d H:i:s')
+                    ));
                 } catch (\Exception $e) {
                     $io->error(sprintf(
                         'Fehler beim automatischen Auschecken von %s: %s',

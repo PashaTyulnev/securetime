@@ -45,6 +45,7 @@ class TimeTrackerFrontendController extends AbstractController
     {
         $userInformationArrayElements = json_decode($request->getContent());
 
+
         return $this->render('pages/time_tracker/usersTable.html.twig', ['userInformation' => $userInformationArrayElements]);
     }
 
