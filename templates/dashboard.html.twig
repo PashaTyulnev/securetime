@@ -29,14 +29,16 @@
                     {% include 'modules/time_tracker.html.twig' %}
                 {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] > 25 %}
                     <div class="bg-red-50 dark:bg-red-900/30 backdrop-blur-xl rounded-2xl border border-red-200 dark:border-red-800 p-6 shadow-sm">
-                        <div class="flex items-center gap-3 mb-3">
-                            {{ ux_icon('lucide:alert-triangle', { class: 'w-6 h-6 text-red-600 dark:text-red-400' }) }}
-                            <h2 class="text-base font-semibold text-red-800 dark:text-red-300">
-                                {{ 'dashboard.work_start_missed'|trans }}
+                        <div class="flex items-center justify-center gap-3 mb-3 relative">
+                            <h2 class="text-base font-semibold text-red-800 dark:text-red-300 text-center">
+                                {{ 'dashboard.work_start_missed'|trans }}!!!
                             </h2>
+                            <div class="absolute right-0">
+                                {{ ux_icon('lucide:alert-triangle', { class: 'w-6 h-6 text-red-600 dark:text-red-400' }) }}
+                            </div>
                         </div>
 
-                        <p class="text-sm text-red-700 dark:text-red-300 leading-relaxed">
+                        <p class="text-sm text-red-700 dark:text-red-300 leading-relaxed text-center">
                             {{ 'dashboard.late_arrival_message'|trans|raw }}
                         </p>
                     </div>
