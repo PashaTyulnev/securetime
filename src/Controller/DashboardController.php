@@ -32,6 +32,14 @@ class DashboardController extends AbstractController
 
         $user = $security->getUser();
         $todayUserWorkingInformation = $this->shiftService->checkUserPlanForToday($user);
+        
+        // Prüfe ob Benutzer eingecheckt ist oder in der Pause ist
+        $isCheckedIn = $this->timeTrackerService->checkIfUserIsCheckedIn($user);
+        $hasPause = $this->timeTrackerService->checkIfUserHasPause($user);
+        
+        // Füge diese Informationen zu todayWorkingInformation hinzu
+        $todayUserWorkingInformation['isCheckedIn'] = $isCheckedIn;
+        $todayUserWorkingInformation['hasPause'] = $hasPause;
 
         $todayShifts = $this->shiftService->findShiftsForToday();
 
