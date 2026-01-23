@@ -26,13 +26,18 @@
             </thead>
             <tbody class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
             {% for trackedTime in trackedTimes %}
-                <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors {% if trackedTime.autoCheckOut|default(false) %}bg-amber-50/50 dark:bg-amber-900/20 border-l-4 border-amber-500{% endif %}">
+                <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors {% if trackedTime.autoCheckOut|default(false) %}bg-amber-50/50 dark:bg-amber-900/20 border-l-4 border-amber-500{% elseif trackedTime.isManualEntry|default(false) %}bg-blue-50/50 dark:bg-blue-900/20 border-l-4 border-blue-500{% endif %}">
                     <td class="px-3 py-2">
                         <div class="flex items-center gap-2">
                             <span class="text-xs font-medium text-gray-900 dark:text-white">{{ trackedTime.username }}</span>
                             {% if trackedTime.autoCheckOut|default(false) %}
                                 <span class="px-2 py-0.5 text-[10px] font-medium rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="{{ 'time_tracker.auto_checkout'|trans }}">
                                     {{ 'time_tracker.auto_checkout_short'|trans }}
+                                </span>
+                            {% endif %}
+                            {% if trackedTime.isManualEntry|default(false) %}
+                                <span class="px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300" title="{{ 'time_tracker.manual_entry'|trans }}">
+                                    {{ 'time_tracker.manual_entry_short'|trans }}
                                 </span>
                             {% endif %}
                         </div>

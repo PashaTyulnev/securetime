@@ -5,6 +5,7 @@ namespace App\Controller\ApiController;
 use App\Repository\EmployeeRepository;
 use App\Repository\ShiftRepository;
 use App\Repository\TimeTrackerRepository;
+use App\Service\EmployeeService;
 use App\Service\TimeTracker\TimeTrackerService;
 use Dompdf\Dompdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +26,7 @@ class TimeTrackerApiController extends AbstractController
         readonly EmployeeRepository $employeeRepository,
         readonly TimeTrackerRepository $timeTrackerRepository,
         readonly KernelInterface $kernel,
+        readonly EmployeeService $employeeService,
     ) {
 
     }
@@ -270,6 +272,51 @@ class TimeTrackerApiController extends AbstractController
         try {
             $yearlyHoursByEmployee = $this->timeTrackerService->getYearlyWorkingHoursByEmployeeMonthly($year);
             return new JsonResponse($yearlyHoursByEmployee, 200);
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/api/timetracker/employees', name: 'api_time_tracker_employees', methods: ['GET'])]
+    public function getEmployees(): JsonResponse
+    {
+        try {
+            $employees = $this->employeeService->getAllEmployees(false);
+            return new JsonResponse($employees, 200);
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/api/timetracker/create_manual_entry', name: 'api_time_tracker_create_manual_entry', methods: ['POST'])]
+    public function createManualTimeEntry(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['userId']) || !isset($data['date']) || !isset($data['timeFrom']) || !isset($data['timeTo'])) {
+            return new JsonResponse(['message' => 'Benutzer, Datum, Start- und Endzeit sind erforderlich'], 400);
+        }
+
+        try {
+            $employee = $this->employeeRepository->find($data['userId']);
+            if (!$employee || !$employee->getUser()) {
+                return new JsonResponse(['message' => 'Mitarbeiter nicht gefunden'], 400);
+            }
+
+            $user = $employee->getUser();
+
+            // Kombiniere Datum und Zeit zu DateTimeImmutable
+            $startDateTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['timeFrom']);
+            $endDateTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['timeTo']);
+
+            if (!$startDateTime || !$endDateTime) {
+                return new JsonResponse(['message' => 'Ungültiges Datum oder Zeitformat'], 400);
+            }
+
+            $this->timeTrackerService->createManualTimeEntry($user, $startDateTime, $endDateTime);
+            return new JsonResponse(['message' => 'Zeiteintrag wurde erfolgreich erstellt'], 200);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => $e->getMessage()], 400);
         }

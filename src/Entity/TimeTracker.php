@@ -46,6 +46,9 @@ class TimeTracker
     #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
     private bool $autoCheckOut = false;
 
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
+    private bool $isManualEntry = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -167,6 +170,18 @@ class TimeTracker
     public function setAutoCheckOut(bool $autoCheckOut): static
     {
         $this->autoCheckOut = $autoCheckOut;
+
+        return $this;
+    }
+
+    public function isManualEntry(): bool
+    {
+        return $this->isManualEntry;
+    }
+
+    public function setIsManualEntry(bool $isManualEntry): static
+    {
+        $this->isManualEntry = $isManualEntry;
 
         return $this;
     }

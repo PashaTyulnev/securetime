@@ -24,6 +24,14 @@
                 </h1>
 
                 <div class="flex items-center gap-3">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <button data-action="click->timetracker--admin#openCreateTimeEntryModal"
+                                class="px-4 py-2 rounded-xl bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white text-sm font-medium transition-all shadow-sm flex items-center gap-2">
+                            {{ ux_icon('lucide:plus', { class: 'h-4 w-4' }) }}
+                            <span>{{ 'time_tracker.create_entry'|trans|default('Zeiteintrag erstellen') }}</span>
+                        </button>
+                    {% endif %}
+
                     <select data-action="change->timetracker--admin#triggerSelectedMonth"
                             data-timetracker--admin-target="monthSelect"
                             class="bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 transition-all">
@@ -36,6 +44,11 @@
                 </div>
             </div>
         </header>
+
+        {# Modal für Zeiteintrag-Erstellung #}
+        {% if is_granted('ROLE_ADMIN') %}
+            {% include 'modules/create_time_entry_modal.html.twig' %}
+        {% endif %}
 
         {# ================= CONTENT ================= #}
         <div class="p-5">

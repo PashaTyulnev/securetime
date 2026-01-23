@@ -1,4 +1,5 @@
 import {Controller} from '@hotwired/stimulus';
+import {Modal} from 'flowbite';
 
 export default class extends Controller {
 
@@ -8,7 +9,11 @@ export default class extends Controller {
         "usersWorkTimeSummary",
         "singleUserTotals",
         "currentUser",
-        "toastContainer"
+        "toastContainer",
+        "employeeSelect",
+        "entryDate",
+        "timeFrom",
+        "timeTo"
     ];
 
     connect() {
@@ -384,40 +389,189 @@ export default class extends Controller {
     }
 
     displayToast(message, type) {
+        // Nutze das globale Toast-Element aus base.html.twig
+        const toastElement = document.getElementById('toast-default');
+        const toastMessage = document.getElementById('toast-message');
 
-        //post request to display a toast /toast
+        if (!toastElement || !toastMessage) {
+            // Fallback: Browser-Alert
+            alert(message);
+            return;
+        }
 
-        fetch(`/toast`, {
+        toastMessage.textContent = message;
+
+        // Mappe Typen auf Styles (danger => error)
+        const toastType = type === 'danger' ? 'error' : type;
+
+        if (toastType === 'error') {
+            toastElement.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-900', 'dark:text-gray-100');
+            toastElement.classList.add('bg-red-100', 'dark:bg-red-900', 'text-red-800', 'dark:text-red-200');
+        } else {
+            toastElement.classList.remove('bg-red-100', 'dark:bg-red-900', 'text-red-800', 'dark:text-red-200');
+            toastElement.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-900', 'dark:text-gray-100');
+        }
+
+        // Toast einblenden
+        toastElement.classList.remove('hidden', 'translate-y-2', 'opacity-0');
+        toastElement.classList.add('opacity-100');
+        toastElement.style.zIndex = '9999';
+
+        // Close-Button Handler
+        const closeButton = toastElement.querySelector('[data-dismiss-target]');
+        if (closeButton) {
+            const closeHandler = () => {
+                this.hideToast();
+                closeButton.removeEventListener('click', closeHandler);
+            };
+            closeButton.addEventListener('click', closeHandler);
+        }
+
+        // Automatisch nach 5 Sekunden ausblenden
+        setTimeout(() => {
+            this.hideToast();
+        }, 5000);
+    }
+
+    hideToast() {
+        const toastElement = document.getElementById('toast-default');
+        if (toastElement) {
+            toastElement.classList.add('hidden', 'translate-y-2', 'opacity-0');
+            toastElement.classList.remove('opacity-100');
+        }
+    }
+
+    openCreateTimeEntryModal(event) {
+        event.preventDefault();
+        
+        // Finde das Modal-Element für Zeiteintrag-Erstellung
+        // Suche nach Modal mit data-modal-no-autoshow Attribut
+        const modalElement = document.querySelector('[data-modal-no-autoshow]');
+        if (!modalElement) {
+            console.error('Modal für Zeiteintrag-Erstellung nicht gefunden');
+            return;
+        }
+        
+        // Lade Mitarbeiter
+        this.loadEmployees();
+        
+        // Setze heutiges Datum als Standard
+        const today = new Date().toISOString().split('T')[0];
+        if (this.hasEntryDateTarget && this.entryDateTarget) {
+            this.entryDateTarget.value = today;
+        }
+        
+        // Öffne Modal über den Modal-Controller
+        const modalController = this.application.getControllerForElementAndIdentifier(modalElement, 'modal');
+        if (modalController) {
+            modalController.show();
+        } else {
+            // Fallback: Direkt über Flowbite Modal-Instanz
+            const modalId = modalElement.id;
+            if (modalId) {
+                const flowbiteModal = Modal.getInstance(modalElement);
+                if (flowbiteModal) {
+                    flowbiteModal.show();
+                } else {
+                    // Erstelle neue Modal-Instanz falls noch nicht vorhanden
+                    const options = {
+                        onShow: () => {
+                            setTimeout(() => {
+                                if (typeof initFlowbite === 'function') {
+                                    initFlowbite();
+                                }
+                            }, 100);
+                        }
+                    };
+                    const newModal = new Modal(modalElement, options);
+                    newModal.show();
+                }
+            }
+        }
+    }
+
+    loadEmployees() {
+        fetch('/api/timetracker/employees')
+            .then(response => response.json())
+            .then(employees => {
+                const select = this.employeeSelectTarget;
+                select.innerHTML = '<option value="">Bitte auswählen</option>';
+                
+                employees.forEach(employee => {
+                    const option = document.createElement('option');
+                    option.value = employee.id;
+                    option.textContent = `${employee.firstName} ${employee.lastName}`;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Fehler beim Laden der Mitarbeiter:', error);
+                this.displayToast('Fehler beim Laden der Mitarbeiter', 'danger');
+            });
+    }
+
+    createManualTimeEntry(event) {
+        event.preventDefault();
+        
+        const employeeId = this.employeeSelectTarget.value;
+        const date = this.entryDateTarget.value;
+        const timeFrom = this.timeFromTarget.value;
+        const timeTo = this.timeToTarget.value;
+        
+        if (!employeeId || !date || !timeFrom || !timeTo) {
+            this.displayToast('Bitte füllen Sie alle Felder aus', 'danger');
+            return;
+        }
+        
+        const data = {
+            userId: parseInt(employeeId),
+            date: date,
+            timeFrom: timeFrom,
+            timeTo: timeTo
+        };
+        
+        fetch('/api/timetracker/create_manual_entry', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({message: message, type: type})
+            body: JSON.stringify(data)
         })
-            .then(response => response.text()).then(html => {
-            this.toastContainerTarget.innerHTML = html;
-
-            // Attach the close event listener to the new toast close button
-            const closeButton = this.toastContainerTarget.querySelector('[data-dismiss-target]');
-            if (closeButton) {
-                closeButton.addEventListener('click', (event) => {
-                    // Find the toast element by its unique ID (using the dynamic UID)
-                    const toastId = closeButton.getAttribute('data-dismiss-target').replace('#', '');
-                    const toastElement = document.getElementById(toastId);
-
-                    // Hide or remove the toast when close button is clicked
-                    if (toastElement) {
-                        toastElement.remove(); // Remove the toast element from the DOM
-                    }
-                });
+        .then(async response => {
+            const result = await response.json();
+            if (response.status === 400) {
+                throw new Error(result.message || 'Fehler beim Erstellen des Zeiteintrags');
             }
-
-            // //empty container after 5 seconds
-            // setTimeout(() => {
-            //     this.toastContainerTarget.innerHTML = ""
-            // }, 5000)
+            return result;
         })
-
+        .then(result => {
+            if (result.message) {
+                this.displayToast(result.message, 'success');
+                
+                // Schließe Modal
+                const modal = document.querySelector('[data-controller*="modal"]');
+                if (modal) {
+                    const modalController = this.application.getControllerForElementAndIdentifier(modal, 'modal');
+                    if (modalController) {
+                        modalController.hide();
+                    }
+                }
+                
+                // Aktualisiere die Zeiteinträge
+                let month = this.getSelectedMonth();
+                let year = this.getSelectedYear();
+                this.getTrackedTimes(year, month);
+                
+                // Reset Form
+                this.employeeSelectTarget.value = '';
+                this.timeFromTarget.value = '';
+                this.timeToTarget.value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Fehler beim Erstellen des Zeiteintrags:', error);
+            this.displayToast(error.message || 'Fehler beim Erstellen des Zeiteintrags', 'danger');
+        });
     }
 
 }

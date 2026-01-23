@@ -265,6 +265,105 @@ readonly class TimeTrackerService
         }
     }
 
+    /**
+     * Erstellt einen manuellen Zeiteintrag für einen Mitarbeiter
+     * @param User $user Der Benutzer/Mitarbeiter
+     * @param \DateTimeImmutable $startDateTime Startzeitpunkt
+     * @param \DateTimeImmutable $endDateTime Endzeitpunkt
+     * @param int|null $facilityId Optional: Facility ID
+     * @throws \Exception
+     */
+    public function createManualTimeEntry(User $user, \DateTimeImmutable $startDateTime, \DateTimeImmutable $endDateTime, ?int $facilityId = null): void
+    {
+        // Falls die Endzeit \"kleiner\" als die Startzeit ist, handelt es sich um eine Nachtschicht
+        // Beispiel: Start 22:00, Ende 06:00 -> Ende ist am nächsten Kalendertag
+        if ($endDateTime <= $startDateTime) {
+            $endDateTime = $endDateTime->modify('+1 day');
+        }
+
+        // Erstelle Checkin-Eintrag (Schichtbeginn)
+        $checkinEntry = new TimeTracker();
+        $checkinEntry->setUser($user);
+        $checkinEntry->setCreatedAt(new \DateTimeImmutable());
+        $checkinEntry->setTimestamp($startDateTime);
+        $checkinEntry->setType('checkin');
+        $checkinEntry->setShiftStart(true);
+        $checkinEntry->setIsManualEntry(true);
+
+        // Prüfe ob Mitarbeiter an diesem Tag verplant ist (optional für manuelle Einträge)
+        $shiftDate = new \DateTime($startDateTime->format('Y-m-d'));
+        $employee = $user->getEmployee();
+        if ($employee) {
+            $shifts = $this->shiftRepository->findByEmployeeAndDate($employee, $shiftDate);
+            if (!empty($shifts)) {
+                $shift = $shifts[0];
+                $demandShift = $shift->getDemandShift();
+                if ($demandShift && $demandShift->getFacility()) {
+                    $checkinEntry->setFacility($demandShift->getFacility());
+                }
+            }
+        }
+
+        $this->em->persist($checkinEntry);
+        $this->em->flush();
+
+        // Berechne Schichtdauer in Minuten
+        $shiftDuration = $endDateTime->getTimestamp() - $startDateTime->getTimestamp();
+        $shiftDurationMinutes = (int)($shiftDuration / 60);
+
+        // Berechne benötigte Pause basierend auf Schichtdauer (wie in calculateTotalsOfTimeSummary)
+        // > 9 Stunden: 45 Minuten, > 6 Stunden: 30 Minuten
+        $requiredPauseMinutes = 0;
+        if ($shiftDurationMinutes > 9 * 60) {
+            $requiredPauseMinutes = 45;
+        } elseif ($shiftDurationMinutes > 6 * 60) {
+            $requiredPauseMinutes = 30;
+        }
+
+        // Wenn Pause benötigt wird, füge sie automatisch ein (1 Stunde vor Checkout)
+        if ($requiredPauseMinutes > 0) {
+            // Pause endet 1 Stunde vor Checkout
+            $pauseEnd = $endDateTime->sub(new \DateInterval('PT60M'));
+            // Pause startet Pausendauer vor dem Pausenende
+            $pauseStart = $pauseEnd->sub(new \DateInterval(sprintf('PT%dM', $requiredPauseMinutes)));
+
+            // Pause-Eintrag
+            $pauseEntry = new TimeTracker();
+            $pauseEntry->setUser($user);
+            $pauseEntry->setCreatedAt(new \DateTimeImmutable());
+            $pauseEntry->setTimestamp($pauseStart);
+            $pauseEntry->setType('pause');
+            $pauseEntry->setShiftStart(false);
+            $pauseEntry->setParent($checkinEntry);
+            $pauseEntry->setIsManualEntry(true);
+            $this->em->persist($pauseEntry);
+
+            // Checkin nach Pause
+            $checkinAfterPause = new TimeTracker();
+            $checkinAfterPause->setUser($user);
+            $checkinAfterPause->setCreatedAt(new \DateTimeImmutable());
+            $checkinAfterPause->setTimestamp($pauseEnd);
+            $checkinAfterPause->setType('checkin');
+            $checkinAfterPause->setShiftStart(false);
+            $checkinAfterPause->setParent($checkinEntry);
+            $checkinAfterPause->setIsManualEntry(true);
+            $this->em->persist($checkinAfterPause);
+        }
+
+        // Erstelle Checkout-Eintrag
+        $checkoutEntry = new TimeTracker();
+        $checkoutEntry->setUser($user);
+        $checkoutEntry->setCreatedAt(new \DateTimeImmutable());
+        $checkoutEntry->setTimestamp($endDateTime);
+        $checkoutEntry->setType('checkout');
+        $checkoutEntry->setShiftStart(false);
+        $checkoutEntry->setParent($checkinEntry);
+        $checkoutEntry->setIsManualEntry(true);
+        $this->em->persist($checkoutEntry);
+
+        $this->em->flush();
+    }
+
     public function getLastTimeStamp(?UserInterface $getUser): ?array
     {
         $lastTimeTracker = $this->timeTrackerRepository->findOneBy(['user' => $getUser], ['id' => 'DESC']);
@@ -329,7 +428,8 @@ readonly class TimeTrackerService
 
 
         if ($entity->isShiftStart()) {
-            $this->handleShiftStart($output, $id, $user->getEmployee()->getFullName(), $timestamp, $userId);
+            $isManualEntry = $entity->isManualEntry();
+            $this->handleShiftStart($output, $id, $user->getEmployee()->getFullName(), $timestamp, $userId, $isManualEntry);
         } elseif (isset($output[$parent]) && $type === 'checkout') {
             $this->handleShiftEnd($output[$parent], $timestamp, $entity);
         } elseif (isset($output[$parent]) && $type === 'pause') {
@@ -342,7 +442,7 @@ readonly class TimeTrackerService
 
     }
 
-    private function handleShiftStart(array &$output, int $id, string $username, $timestamp, ?int $userId = null): void
+    private function handleShiftStart(array &$output, int $id, string $username, $timestamp, ?int $userId = null, ?bool $isManualEntry = false): void
     {
         $output[$id] = [
             'timeTrackerId' => $id,
@@ -354,6 +454,7 @@ readonly class TimeTrackerService
             'pausePeriods' => [],
             'userId' => $userId,
             'autoCheckOut' => false,
+            'isManualEntry' => $isManualEntry,
         ];
     }
 
