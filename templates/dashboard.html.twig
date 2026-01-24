@@ -24,8 +24,8 @@
                 {% if todayWorkingInformation['isCheckedIn'] or todayWorkingInformation['hasPause'] %}
                     {# Zeiterfassungsmodul immer anzeigen wenn eingecheckt oder in Pause #}
                     {% include 'modules/time_tracker.html.twig' %}
-                {% elseif todayWorkingInformation['isCheckedOut'] %}
-                    {# Benutzer hat heute schon ausgecheckt #}
+                {% elseif todayWorkingInformation['hasCheckedOutToday'] %}
+                    {# Benutzer hat heute während der Schicht ausgecheckt #}
                     {% if todayWorkingInformation['nextPlannedShift'] %}
                         {# Zeige nächste geplante Schicht #}
                         {% set nextShift = todayWorkingInformation['nextPlannedShift'] %}
@@ -52,7 +52,7 @@
                                 <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                                     {{ ux_icon('lucide:calendar', { class: 'w-4 h-4 opacity-70' }) }}
                                     <span>
-                                        {{ nextShift['dateTime']|date('d.m.Y') }}, 
+                                        {{ nextShift['dateTime']|date('d.m.Y') }},
                                         {{ nextShift['timeFrom']|date('H:i') }} – {{ nextShift['timeTo']|date('H:i') }} {{ 'dashboard.time_suffix'|trans }}
                                     </span>
                                 </div>
@@ -83,8 +83,8 @@
                     {# Normale Check-in Zeit #}
                     {% include 'modules/time_tracker.html.twig' %}
                 {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] > 25 %}
-                    {# Nur anzeigen wenn nicht bereits ausgecheckt #}
-                    {% if not todayWorkingInformation['isCheckedOut'] %}
+                    {# Nur anzeigen wenn nicht bereits heute ausgecheckt #}
+                    {% if not todayWorkingInformation['hasCheckedOutToday'] %}
                         <div class="bg-red-50 dark:bg-red-900/30 backdrop-blur-xl rounded-2xl border border-red-200 dark:border-red-800 p-6 shadow-sm">
                             <div class="flex items-center justify-center gap-3 mb-3 relative">
                                 <h2 class="text-base font-semibold text-red-800 dark:text-red-300 text-center">
@@ -116,6 +116,7 @@
                     </div>
                 {% endif %}
             {% else %}
+
                 <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-6 shadow-sm">
                     <div class="flex items-center gap-2 mb-2">
                         {{ ux_icon('lucide:info', { class: 'w-5 h-5 text-gray-500 dark:text-gray-400' }) }}

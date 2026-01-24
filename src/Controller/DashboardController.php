@@ -32,20 +32,24 @@ class DashboardController extends AbstractController
 
         $user = $security->getUser();
         $todayUserWorkingInformation = $this->shiftService->checkUserPlanForToday($user);
-        
+
         // Prüfe ob Benutzer eingecheckt ist oder in der Pause ist
         $isCheckedIn = $this->timeTrackerService->checkIfUserIsCheckedIn($user);
         $hasPause = $this->timeTrackerService->checkIfUserHasPause($user);
         $isCheckedOut = $this->timeTrackerService->checkIfUserIsCheckedOut($user);
         
+        // Prüfe, ob der Benutzer heute ausgecheckt hat (während der heutigen Schicht)
+        $hasCheckedOutToday = $this->timeTrackerService->hasCheckedOutToday($user);
+
         // Füge diese Informationen zu todayWorkingInformation hinzu
         $todayUserWorkingInformation['isCheckedIn'] = $isCheckedIn;
         $todayUserWorkingInformation['hasPause'] = $hasPause;
         $todayUserWorkingInformation['isCheckedOut'] = $isCheckedOut;
+        $todayUserWorkingInformation['hasCheckedOutToday'] = $hasCheckedOutToday;
 
         // Wenn der Benutzer heute schon ausgecheckt hat, finde die nächste geplante Schicht
         $nextPlannedShift = null;
-        if ($isCheckedOut && $todayUserWorkingInformation['workingToday']) {
+        if ($hasCheckedOutToday && $todayUserWorkingInformation['workingToday']) {
             $nextPlannedShift = $this->shiftService->findNextPlannedShift($user);
         }
         $todayUserWorkingInformation['nextPlannedShift'] = $nextPlannedShift;

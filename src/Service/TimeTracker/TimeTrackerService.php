@@ -272,6 +272,25 @@ readonly class TimeTrackerService
         return false;
     }
 
+    /**
+     * Prüft, ob der Benutzer heute ausgecheckt hat (während der heutigen Schicht)
+     */
+    public function hasCheckedOutToday(?UserInterface $user): bool
+    {
+        $lastTimeTracker = $this->timeTrackerRepository->findOneBy(['user' => $user], ['id' => 'DESC']);
+
+        if (!$lastTimeTracker || $lastTimeTracker->getType() !== 'checkout') {
+            return false;
+        }
+
+        // Prüfe, ob der Checkout heute war
+        $checkoutTimestamp = $lastTimeTracker->getTimestamp();
+        $today = new \DateTimeImmutable('today');
+        $tomorrow = new \DateTimeImmutable('tomorrow');
+
+        return $checkoutTimestamp >= $today && $checkoutTimestamp < $tomorrow;
+    }
+
     public function checkIfUserHasPause(?UserInterface $user): bool
     {
         $lastTimeTracker = $this->timeTrackerRepository->findOneBy(['user' => $user], ['id' => 'DESC']);
