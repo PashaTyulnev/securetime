@@ -100,61 +100,86 @@ readonly class ShiftService
      */
     public function findNextPlannedShift(?User $user): ?array
     {
-        if (!$user || !$user->getEmployee()) {
+        $upcoming = $this->findUpcomingShiftsForUser($user, 30);
+
+        if (empty($upcoming)) {
             return null;
+        }
+
+        $first = $upcoming[0];
+        $demandShift = $first->getDemandShift();
+        $shiftDate = $first->getDate();
+        $shiftTimeFrom = $demandShift?->getTimeFrom();
+        $shiftTimeTo = $demandShift?->getTimeTo();
+
+        $shiftDateTime = null;
+        if ($shiftTimeFrom !== null) {
+            $shiftDateTime = new DateTime($shiftDate->format('Y-m-d') . ' ' . $shiftTimeFrom->format('H:i:s'));
+        }
+
+        return [
+            'shift' => $first,
+            'dateTime' => $shiftDateTime,
+            'facility' => $demandShift?->getFacility(),
+            'timeFrom' => $shiftTimeFrom,
+            'timeTo' => $shiftTimeTo,
+            'name' => $demandShift?->getName(),
+        ];
+    }
+
+    /**
+     * Liefert alle kommenden Schichten des Benutzers für die nächsten $days Tage (inkl. heute).
+     *
+     * Rückgabe: Array von Shift-Entities, nach Datum/Uhrzeit aufsteigend sortiert.
+     */
+    public function findUpcomingShiftsForUser(?User $user, int $days = 7): array
+    {
+        if ($days <= 0 || !$user || !$user->getEmployee()) {
+            return [];
         }
 
         $employee = $user->getEmployee();
         $today = new DateTime('today');
-        
-        // Suche die nächste Schicht ab heute (maximal 30 Tage in die Zukunft)
-        $endDate = (clone $today)->modify('+30 days');
-        
+        $endDate = (clone $today)->modify(sprintf('+%d days', $days - 1));
+
         $shifts = $this->shiftRepository->getAllAssignedShiftsInRange(
             $employee,
             $today->format('Y-m-d'),
             $endDate->format('Y-m-d')
         );
 
-        $now = new DateTime();
-        $nextShift = null;
-        $nextShiftDateTime = null;
+        // Sicherstellen, dass Schichten nach Datum/Zeit sortiert sind
+        usort($shifts, static function ($a, $b): int {
+            $demandA = $a->getDemandShift();
+            $demandB = $b->getDemandShift();
 
-        foreach ($shifts as $shift) {
-            $demandShift = $shift->getDemandShift();
-            if (!$demandShift || !$demandShift->getTimeFrom()) {
-                continue;
+            $dateA = $a->getDate();
+            $dateB = $b->getDate();
+
+            if ($dateA < $dateB) {
+                return -1;
+            }
+            if ($dateA > $dateB) {
+                return 1;
             }
 
-            $shiftDate = $shift->getDate();
-            $shiftTime = $demandShift->getTimeFrom();
-            
-            // Kombiniere Datum und Uhrzeit
-            $shiftDateTime = new DateTime($shiftDate->format('Y-m-d') . ' ' . $shiftTime->format('H:i:s'));
+            $timeFromA = $demandA?->getTimeFrom();
+            $timeFromB = $demandB?->getTimeFrom();
 
-            // Nur Schichten in der Zukunft berücksichtigen
-            if ($shiftDateTime > $now) {
-                if ($nextShiftDateTime === null || $shiftDateTime < $nextShiftDateTime) {
-                    $nextShift = $shift;
-                    $nextShiftDateTime = $shiftDateTime;
-                }
+            if ($timeFromA === null && $timeFromB === null) {
+                return 0;
             }
-        }
+            if ($timeFromA === null) {
+                return 1;
+            }
+            if ($timeFromB === null) {
+                return -1;
+            }
 
-        if ($nextShift) {
-            $demandShift = $nextShift->getDemandShift();
-            return [
-                'shift' => $nextShift,
-                'dateTime' => $nextShiftDateTime,
-                'facility' => $demandShift->getFacility(),
-                'timeFrom' => $demandShift->getTimeFrom(),
-                'timeTo' => $demandShift->getTimeTo(),
-                'name' => $demandShift->getName(),
-            ];
-        }
+            return $timeFromA <=> $timeFromB;
+        });
 
-        return null;
+        return $shifts;
     }
-
 
 }

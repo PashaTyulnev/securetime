@@ -56,9 +56,13 @@ class DashboardController extends AbstractController
 
         $todayShifts = $this->shiftService->findShiftsForToday();
 
+        // Kommende Schichten (nächste 7 Tage) für den eingeloggten Benutzer
+        $upcomingUserShifts = $this->shiftService->findUpcomingShiftsForUser($user, 7);
+
         return $this->render('dashboard.html.twig', [
             'todayShifts' => $todayShifts,
             'todayWorkingInformation' => $todayUserWorkingInformation,
+            'upcomingUserShifts' => $upcomingUserShifts,
         ]);
     }
 

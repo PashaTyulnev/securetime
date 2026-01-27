@@ -129,77 +129,81 @@
             {% endif %}
         </div>
 
-        {# Shifts Grid #}
-        {% if todayShifts|length > 0 %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-5">
-                {% for shift in todayShifts %}
-                    {% set employee = shift.employee %}
-                    {% set demandShift = shift.demandShift %}
-                    {% set facility = demandShift.facility %}
+        {# Kommende Schichten des Benutzers (nächste 7 Tage) #}
+        <div class="px-5 pb-8">
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-5 md:p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        {{ ux_icon('lucide:calendar-days', { class: 'w-5 h-5 text-slate-700 dark:text-gray-200' }) }}
+                        <h2 class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ 'dashboard.my_upcoming_shifts'|trans }}
+                        </h2>
+                    </div>
+                    <span class="text-[11px] px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
+                        7 Tage
+                    </span>
+                </div>
 
-                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-6 shadow-sm hover:shadow-lg transition-all duration-200">
+                {% if upcomingUserShifts is defined and upcomingUserShifts|length > 0 %}
+                    <div class="space-y-3">
+                        {% for shift in upcomingUserShifts %}
+                            {% set demandShift = shift.demandShift %}
+                            {% set facility = demandShift.facility %}
+                            {% set shiftDate = shift.date %}
 
-                        <div class="flex items-start justify-between mb-5">
-                            <div class="flex items-center gap-4">
-                                <div class="w-11 h-11 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
-                                    {{ ux_icon('lucide:user', { class: 'w-5 h-5 text-slate-700 dark:text-gray-300' }) }}
+                            {% set isToday = shiftDate|date('Y-m-d') == 'now'|date('Y-m-d') %}
+                            {% set isTomorrow = shiftDate|date('Y-m-d') == ('tomorrow'|date('Y-m-d')) %}
+
+                            <div class="flex items-start gap-3 p-3 rounded-2xl border border-gray-200/70 dark:border-gray-700/70 bg-gray-50/60 dark:bg-gray-900/40">
+                                <div class="flex flex-col items-center w-14 text-xs text-gray-500 dark:text-gray-400">
+                                    <span class="font-semibold text-gray-900 dark:text-white">
+                                        {% if isToday %}
+                                            {{ 'schedule.today'|trans }}
+                                        {% elseif isTomorrow %}
+                                            {{ 'schedule.current'|trans }}
+                                        {% else %}
+                                            {{ shiftDate|date('d.m.') }}
+                                        {% endif %}
+                                    </span>
+                                    {% if demandShift.timeFrom and demandShift.timeTo %}
+                                        <span class="mt-1">
+                                            {{ demandShift.timeFrom|date('H:i') }}<br/>
+                                            {{ demandShift.timeTo|date('H:i') }}
+                                        </span>
+                                    {% endif %}
                                 </div>
-                                <div>
-                                    <h3 class="text-base font-medium text-gray-900 dark:text-white leading-tight">
-                                        {{ employee.firstName }} {{ employee.lastName }}
-                                    </h3>
-                                    {% if employee.number %}
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">#{{ employee.number }}</p>
+
+                                <div class="flex-1 space-y-1.5">
+                                    {% if facility %}
+                                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-slate-900 text-white text-[11px] font-semibold dark:bg-slate-100 dark:text-slate-900">
+                                            {{ ux_icon('lucide:building-2', { class: 'w-3.5 h-3.5 mr-1.5' }) }}
+                                            <span class="truncate max-w-[180px] sm:max-w-xs">{{ facility.title }}</span>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if demandShift.name %}
+                                        <div class="text-xs text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                                            {{ ux_icon('lucide:briefcase', { class: 'w-3.5 h-3.5 opacity-70' }) }}
+                                            <span class="truncate">{{ demandShift.name }}</span>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if shift.isOnCall %}
+                                        <span class="inline-flex items-center mt-1 px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-100/70 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
+                                            {{ 'dashboard.on_call'|trans }}
+                                        </span>
                                     {% endif %}
                                 </div>
                             </div>
-                            {% if shift.isOnCall %}
-                                <span class="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100/70 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
-                                    {{ 'dashboard.on_call'|trans }}
-                                </span>
-                            {% endif %}
-                        </div>
-
-                        <div class="space-y-2.5 text-sm text-gray-600 dark:text-gray-400">
-                            {% if facility %}
-                                <div class="flex items-center gap-2">
-                                    {{ ux_icon('lucide:building-2', { class: 'w-4 h-4 opacity-70' }) }}
-                                    <span>{{ facility.title }}</span>
-                                </div>
-                            {% endif %}
-
-                            {% if demandShift.timeFrom and demandShift.timeTo %}
-                                <div class="flex items-center gap-2">
-                                    {{ ux_icon('lucide:clock', { class: 'w-4 h-4 opacity-70' }) }}
-                                    <span>{{ demandShift.timeFrom|date('H:i') }} – {{ demandShift.timeTo|date('H:i') }} {{ 'dashboard.time_suffix'|trans }}</span>
-                                </div>
-                            {% endif %}
-
-                            {% if demandShift.name %}
-                                <div class="flex items-center gap-2">
-                                    {{ ux_icon('lucide:briefcase', { class: 'w-4 h-4 opacity-70' }) }}
-                                    <span>{{ demandShift.name }}</span>
-                                </div>
-                            {% endif %}
-
-                            {% if shift.note %}
-                                <div class="pt-3 mt-3 border-t border-gray-200/60 dark:border-gray-700/60">
-                                    <p class="italic text-gray-500 dark:text-gray-400 text-sm">{{ shift.note }}</p>
-                                </div>
-                            {% endif %}
-                        </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                {% else %}
+                    <p class="text-xs text-gray-600 dark:text-gray-400">
+                        {{ 'dashboard.no_upcoming_shifts_7_days'|trans }}
+                    </p>
+                {% endif %}
             </div>
-        {% else %}
-            <div class="bg-white/80 dark:bg-gray-800/80 m-5 backdrop-blur-xl rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-12 text-center">
-                <div class="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
-                    {{ ux_icon('lucide:calendar-x', { class: 'w-8 h-8 text-gray-400 dark:text-gray-500' }) }}
-                </div>
-                <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-2">{{ 'dashboard.no_shifts_today'|trans }}</h3>
-                <p class="text-gray-600 dark:text-gray-400">{{ 'dashboard.no_shifts_today_description'|trans }}</p>
-            </div>
-        {% endif %}
+        </div>
 
     </div>
 {% endblock %}
