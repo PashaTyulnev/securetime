@@ -262,6 +262,32 @@ readonly class TimeTrackerService
         return $this->timeTrackerRepository->findOneBy(['user' => $user, 'type' => 'checkin', 'isShiftStart' => true], ['id' => 'DESC']);
     }
 
+    /**
+     * Löscht einen Zeiteintrag inkl. Parent (Haupt-Checkin) und aller zugehörigen Einträge der Schicht.
+     * Erlaubt nur für Admins (Aufrufer muss ROLE_ADMIN prüfen).
+     *
+     * @param int $timeTrackerId ID eines Eintrags (Haupt-Checkin oder Kind)
+     * @throws \InvalidArgumentException wenn Eintrag nicht gefunden
+     */
+    public function deleteTimeEntryWithParent(int $timeTrackerId): void
+    {
+        $entry = $this->timeTrackerRepository->find($timeTrackerId);
+        if ($entry === null) {
+            throw new \InvalidArgumentException('Zeiteintrag nicht gefunden.');
+        }
+
+        $mainCheckin = $entry->getParent() ?? $entry;
+        $shiftEntries = $this->timeTrackerRepository->findShiftEntries($mainCheckin);
+
+        // Kinder zuerst löschen (höchste ID zuerst), dann Parent
+        usort($shiftEntries, static fn (TimeTracker $a, TimeTracker $b): int => $b->getId() <=> $a->getId());
+
+        foreach ($shiftEntries as $e) {
+            $this->em->remove($e);
+        }
+        $this->em->flush();
+    }
+
     public function checkIfUserIsCheckedOut(?UserInterface $user): bool
     {
         $lastTimeTracker = $this->timeTrackerRepository->findOneBy(['user' => $user], ['id' => 'DESC']);

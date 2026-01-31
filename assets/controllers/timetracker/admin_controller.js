@@ -20,8 +20,10 @@ export default class extends Controller {
 
         localStorage.removeItem('selectedUserId')
 
-        let currentMonth = new Date().getMonth() + 1;
-        let currentYear = new Date().getFullYear();
+        // Aktueller Kalendermonat (bis 24:00 Uhr gültig, kein UTC)
+        const now = new Date();
+        let currentMonth = now.getMonth() + 1;
+        let currentYear = now.getFullYear();
 
         this.getTrackedTimes(currentYear, currentMonth)
 
@@ -206,19 +208,32 @@ export default class extends Controller {
 
     createMonthOptionsDropdown(json) {
 
-        //für jedes element in json wird ein option element im month select erstellt
-        const monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
-        let latestYear = Math.max(...Object.keys(json).map(year => parseInt(year)));
-        let latestMonth = Math.max(...Object.keys(json[latestYear]).map(month => parseInt(month)));
+        // Standard: aktueller Kalendermonat (bis 24:00 Uhr)
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
 
-        Object.keys(json).forEach(year => {
+        const monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+        // Aktuellen Monat in die Liste aufnehmen, falls noch keine Einträge existieren
+        if (!json[currentYear]) {
+            json[currentYear] = {};
+        }
+        if (!json[currentYear][currentMonth]) {
+            json[currentYear][currentMonth] = String(currentMonth);
+        }
+
+        const years = Object.keys(json).map(y => parseInt(y)).sort((a, b) => a - b);
+
+        years.forEach(year => {
             let optgroup = document.createElement("optgroup");
-            optgroup.label = year;
-            Object.keys(json[year]).forEach(month => {
+            optgroup.label = String(year);
+            const months = Object.keys(json[year]).map(m => parseInt(m)).sort((a, b) => a - b);
+            months.forEach(month => {
                 let option = document.createElement("option");
-                option.text = `${monthNames[parseInt(month) - 1]} ${year}`;
+                option.text = `${monthNames[month - 1]} ${year}`;
                 option.value = `${year}-${month}`;
-                if (parseInt(year) === latestYear && parseInt(month) === latestMonth) {
+                if (year === currentYear && month === currentMonth) {
                     option.selected = true;
                 }
                 optgroup.appendChild(option);
@@ -386,6 +401,40 @@ export default class extends Controller {
                 this.displayToast(message.message, 'danger')
             });
 
+    }
+
+    deleteTimeEntry(event) {
+        const tr = event.target.closest('tr');
+        const timeTrackerIdInput = tr.querySelector('[name="timeTrackerId"]');
+        if (!timeTrackerIdInput) return;
+
+        const timeTrackerId = timeTrackerIdInput.value;
+        const confirmMessage = event.target.dataset.deleteConfirm || event.target.closest('[data-delete-confirm]')?.dataset?.deleteConfirm || 'Diesen Zeiteintrag inkl. aller zugehörigen Einträge unwiderruflich löschen?';
+        if (!confirm(confirmMessage)) return;
+
+        fetch('/api/timetracker/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ timeTrackerId: timeTrackerId })
+        })
+            .then(async (response) => {
+                const json = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(json.message || 'Löschen fehlgeschlagen.');
+                }
+                return json;
+            })
+            .then(() => {
+                this.getTrackedTimes(this.getSelectedYear(), this.getSelectedMonth(), this.currentUserTarget.value || null);
+                if (typeof this.displayToast === 'function') {
+                    this.displayToast(event.target.dataset.deleteSuccess || event.target.closest('[data-delete-success]')?.dataset?.deleteSuccess || 'Zeiteintrag wurde gelöscht.', 'success');
+                }
+            })
+            .catch((error) => {
+                if (typeof this.displayToast === 'function') {
+                    this.displayToast(error.message || 'Fehler beim Löschen.', 'danger');
+                }
+            });
     }
 
     displayToast(message, type) {

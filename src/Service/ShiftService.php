@@ -52,18 +52,34 @@ readonly class ShiftService
         return json_decode($presets, true);
     }
 
-    public function findShiftsForToday()
+    public function findShiftsForToday(): array
     {
         $allEmployees = $this->employeeService->getAllEmployeeEntities(true);
+        $tz = new \DateTimeZone(self::BUSINESS_TIMEZONE);
 
-        return $this->shiftRepository->findShiftsForToday($allEmployees);
+        return $this->shiftRepository->findShiftsForToday($allEmployees, $tz);
     }
 
-    public function checkUserPlanForToday(?User $user): array
+    /** Zeitzone für Schichtlogik (Check-in-Fenster etc.) – gleiche Zone wie Nutzer. */
+    private const BUSINESS_TIMEZONE = 'Europe/Berlin';
+
+    /**
+     * @param \DateTimeInterface|null $now Optional: aktueller Zeitpunkt (für Tests). Sonst „jetzt“ in Europe/Berlin.
+     */
+    public function checkUserPlanForToday(?User $user, ?\DateTimeInterface $now = null): array
     {
         $todayShifts = $this->findShiftsForToday();
 
         if ($user) {
+            $tz = new \DateTimeZone(self::BUSINESS_TIMEZONE);
+
+            $nowDateTime = $now !== null
+                ? (($now instanceof DateTime) ? $now : DateTime::createFromInterface($now))
+                : new DateTime('now', $tz);
+            if ($nowDateTime->getTimezone()->getName() !== $tz->getName()) {
+                $nowDateTime = $nowDateTime->setTimezone($tz);
+            }
+
             foreach ($todayShifts as $shift) {
                 $employee = $shift->getEmployee();
                 if ($employee && $employee->getUser() && $employee->getUser()->getId() === $user->getId()) {
@@ -71,18 +87,18 @@ readonly class ShiftService
                     $workBeginTime = $demandShift->getTimeFrom();
                     $workBeginDate = $shift->getDate();
 
-                    // Kombiniere Datum und Uhrzeit zu einem DateTime-Objekt
-                    $workBeginDateTime = new DateTime($workBeginDate->format('Y-m-d') . ' ' . $workBeginTime->format('H:i:s'));
+                    // Schichtbeginn in Business-Zeitzone (z. B. 18:30 Berlin)
+                    $workBeginDateTime = new DateTime(
+                        $workBeginDate->format('Y-m-d') . ' ' . $workBeginTime->format('H:i:s'),
+                        $tz
+                    );
 
-
-                    $now = new DateTime();
-
-                    //minuten unterschied zu jetzt in minuten
-                    $minutesDifference = (int) (($workBeginDateTime->getTimestamp() - $now->getTimestamp()) / 60);
-
+                    // Minuten bis Schichtbeginn (positiv = noch vor Beginn)
+                    $minutesUntilBegin = (int) (($workBeginDateTime->getTimestamp() - $nowDateTime->getTimestamp()) / 60);
+                    $minutesDifferenceToWorkBegin = -$minutesUntilBegin;
 
                     return [
-                        'minutesDifferenceToWorkBegin' => $minutesDifference*-1,
+                        'minutesDifferenceToWorkBegin' => $minutesDifferenceToWorkBegin,
                         'workingToday' => true
                     ];
                 }

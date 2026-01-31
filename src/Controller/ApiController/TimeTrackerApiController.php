@@ -159,6 +159,27 @@ class TimeTrackerApiController extends AbstractController
         }
     }
 
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/api/timetracker/delete', name: 'api_time_tracker_delete', methods: ['POST'])]
+    public function deleteTimeEntry(Request $request): JsonResponse
+    {
+        $requestContent = json_decode($request->getContent(), true);
+        $timeTrackerId = isset($requestContent['timeTrackerId']) ? (int) $requestContent['timeTrackerId'] : null;
+
+        if ($timeTrackerId <= 0) {
+            return new JsonResponse(['message' => 'Ungültige Zeiteintrag-ID.'], 400);
+        }
+
+        try {
+            $this->timeTrackerService->deleteTimeEntryWithParent($timeTrackerId);
+            return new JsonResponse(['message' => 'Zeiteintrag wurde gelöscht.'], 200);
+        } catch (\InvalidArgumentException $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 400);
+        }
+    }
+
     #[Route(path: '/api/timetracker/pdf', name: 'timetrackerpdf', methods: ['POST'])]
     public function createTimeTrackerPdf(Request $request): Response
     {

@@ -77,9 +77,15 @@ class ShiftRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findShiftsForToday(array $employees): array
+    /**
+     * @param array<int, \App\Entity\Employee> $employees
+     * @param \DateTimeZone|null $timezone Zeitzone für „heute“ (z. B. Europe/Berlin), sonst Server-Zeitzone
+     */
+    public function findShiftsForToday(array $employees, ?\DateTimeZone $timezone = null): array
     {
-        $today = new \DateTimeImmutable('today');
+        $today = $timezone
+            ? (new \DateTimeImmutable('now', $timezone))->setTime(0, 0, 0)
+            : new \DateTimeImmutable('today');
 
         return $this->createQueryBuilder('s')
             ->leftJoin('s.employee', 'e')

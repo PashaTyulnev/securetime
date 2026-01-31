@@ -100,11 +100,21 @@
 
                     <td class="px-3 py-2">
                         {% if is_granted("ROLE_ADMIN") %}
-                            <button
-                                class="hidden saveChangedTimeEntryButton p-1.5 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400 transition-all"
-                                data-action="click->timetracker--admin#saveChangedTimeEntry">
-                                {{ ux_icon('lucide:save', { class: 'h-4 w-4' }) }}
-                            </button>
+                            <div class="flex items-center gap-1">
+                                <button
+                                    class="hidden saveChangedTimeEntryButton p-1.5 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400 transition-all"
+                                    data-action="click->timetracker--admin#saveChangedTimeEntry">
+                                    {{ ux_icon('lucide:save', { class: 'h-4 w-4' }) }}
+                                </button>
+                                <button type="button"
+                                    class="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-all"
+                                    title="{{ 'time_tracker.delete_entry'|trans }}"
+                                    data-delete-confirm="{{ 'time_tracker.delete_confirm'|trans }}"
+                                    data-delete-success="{{ 'time_tracker.delete_success'|trans }}"
+                                    data-action="click->timetracker--admin#deleteTimeEntry">
+                                    {{ ux_icon('lucide:trash-2', { class: 'h-4 w-4' }) }}
+                                </button>
+                            </div>
                         {% endif %}
                     </td>
                 </tr>
