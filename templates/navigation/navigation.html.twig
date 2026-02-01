@@ -127,6 +127,16 @@
             {% include 'navigation/navigation_element.html.twig'
                 with { route:'app_settings', icon:'lucide:settings', title:('navigation.settings'|trans) } %}
 
+            {% if is_granted('ROLE_ADMIN') %}
+                <li class="mt-2">
+                    <div class="px-5 py-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                        {{ 'navigation.admin'|trans|default('Admin') }}
+                    </div>
+                </li>
+                {% include 'navigation/navigation_element.html.twig'
+                    with { route:'app_switch_user', icon:'lucide:user-cog', title:('switch_user.title'|trans) } %}
+            {% endif %}
+
         </ul>
 
         <div class="my-6 border-t border-gray-200/50 dark:border-gray-700/50"></div>

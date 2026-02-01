@@ -48,8 +48,9 @@ security:
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
+            # Als anderer Benutzer anmelden (nur für Admins)
             # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            switch_user: { role: ROLE_ADMIN }
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used

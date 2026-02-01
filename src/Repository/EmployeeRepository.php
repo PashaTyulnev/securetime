@@ -69,4 +69,23 @@ class EmployeeRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * Mitarbeiter mit Benutzerkonto (für Admin „Als Mitarbeiter anmelden“).
+     *
+     * @return Employee[]
+     */
+    public function findEmployeesWithUser(bool $activeOnly = true): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u')
+            ->addSelect('u')
+            ->orderBy('e.lastName', 'ASC')
+            ->addOrderBy('e.firstName', 'ASC');
+
+        if ($activeOnly) {
+            $qb->andWhere('u.active = :active')->setParameter('active', true);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
