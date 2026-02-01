@@ -561,23 +561,25 @@ export default class extends Controller {
 
     createManualTimeEntry(event) {
         event.preventDefault();
-        
+
         const employeeId = this.employeeSelectTarget.value;
         const date = this.entryDateTarget.value;
         const timeFrom = this.timeFromTarget.value;
         const timeTo = this.timeToTarget.value;
-        
-        if (!employeeId || !date || !timeFrom || !timeTo) {
-            this.displayToast('Bitte füllen Sie alle Felder aus', 'danger');
+
+        if (!employeeId || !date || !timeFrom) {
+            this.displayToast('Bitte Mitarbeiter, Datum und Startzeit auswählen.', 'danger');
             return;
         }
-        
+
         const data = {
             userId: parseInt(employeeId),
             date: date,
-            timeFrom: timeFrom,
-            timeTo: timeTo
+            timeFrom: timeFrom
         };
+        if (timeTo) {
+            data.timeTo = timeTo;
+        }
         
         fetch('/api/timetracker/create_manual_entry', {
             method: 'POST',

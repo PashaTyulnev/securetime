@@ -24,8 +24,24 @@
                 {% if todayWorkingInformation['isCheckedIn'] or todayWorkingInformation['hasPause'] %}
                     {# Zeiterfassungsmodul immer anzeigen wenn eingecheckt oder in Pause #}
                     {% include 'modules/time_tracker.html.twig' %}
+                {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] is not null and todayWorkingInformation['minutesDifferenceToWorkBegin'] > -11 and todayWorkingInformation['minutesDifferenceToWorkBegin'] < 25 %}
+                    {# Check-in-Fenster für nächste Schicht heute (z. B. zweite Schicht nach erstem Check-out) #}
+                    {% include 'modules/time_tracker.html.twig' %}
                 {% elseif todayWorkingInformation['hasCheckedOutToday'] %}
-                    {# Benutzer hat heute während der Schicht ausgecheckt #}
+                    {# Benutzer hat heute ausgecheckt, keine weitere Schicht heute im Fenster #}
+                    {% if todayWorkingInformation['earlyCheckoutToday'] %}
+                        <div class="bg-amber-50 dark:bg-amber-900/30 backdrop-blur-xl rounded-2xl border border-amber-200 dark:border-amber-800 p-6 shadow-sm mb-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                {{ ux_icon('lucide:log-out', { class: 'w-6 h-6 text-amber-600 dark:text-amber-400' }) }}
+                                <h2 class="text-base font-semibold text-amber-800 dark:text-amber-300">
+                                    {{ 'dashboard.early_checkout_title'|trans }}
+                                </h2>
+                            </div>
+                            <p class="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
+                                {{ 'dashboard.early_checkout_message'|trans }}
+                            </p>
+                        </div>
+                    {% endif %}
                     {% if todayWorkingInformation['nextPlannedShift'] %}
                         {# Zeige nächste geplante Schicht #}
                         {% set nextShift = todayWorkingInformation['nextPlannedShift'] %}
@@ -79,10 +95,7 @@
                             </p>
                         </div>
                     {% endif %}
-                {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] > -11 and todayWorkingInformation['minutesDifferenceToWorkBegin'] < 25%}
-                    {# Normale Check-in Zeit #}
-                    {% include 'modules/time_tracker.html.twig' %}
-                {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] > 25 %}
+                {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] is not null and todayWorkingInformation['minutesDifferenceToWorkBegin'] > 25 %}
                     {# Nur anzeigen wenn nicht bereits heute ausgecheckt #}
                     {% if not todayWorkingInformation['hasCheckedOutToday'] %}
                         <div class="bg-red-50 dark:bg-red-900/30 backdrop-blur-xl rounded-2xl border border-red-200 dark:border-red-800 p-6 shadow-sm">
@@ -100,7 +113,7 @@
                             </p>
                         </div>
                     {% endif %}
-                {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] < -10 %}
+                {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] is not null and todayWorkingInformation['minutesDifferenceToWorkBegin'] < -10 %}
                     {% set minutesUntilCheckin = (todayWorkingInformation['minutesDifferenceToWorkBegin'] * -1) - 10 %}
                     <div class="bg-amber-50 dark:bg-amber-900/30 backdrop-blur-xl rounded-2xl border border-amber-200 dark:border-amber-800 p-6 shadow-sm">
                         <div class="flex items-center gap-3 mb-3">
@@ -150,51 +163,52 @@
                             {% set demandShift = shift.demandShift %}
                             {% set facility = demandShift.facility %}
                             {% set shiftDate = shift.date %}
-
                             {% set isToday = shiftDate|date('Y-m-d') == 'now'|date('Y-m-d') %}
-                            {% set isTomorrow = shiftDate|date('Y-m-d') == ('tomorrow'|date('Y-m-d')) %}
 
-                            <div class="flex items-start gap-3 p-3 rounded-2xl border border-gray-200/70 dark:border-gray-700/70 bg-gray-50/60 dark:bg-gray-900/40">
-                                <div class="flex flex-col items-center w-14 text-xs text-gray-500 dark:text-gray-400">
-                                    <span class="font-semibold text-gray-900 dark:text-white">
-                                        {% if isToday %}
-                                            {{ 'schedule.today'|trans }}
-                                        {% elseif isTomorrow %}
-                                            {{ 'schedule.current'|trans }}
-                                        {% else %}
-                                            {{ shiftDate|date('d.m.') }}
+                            {% if not isToday %}
+                                {# Heutige Schicht wird oben bereits angezeigt #}
+                                {% set isTomorrow = shiftDate|date('Y-m-d') == ('tomorrow'|date('Y-m-d')) %}
+
+                                <div class="flex items-start gap-3 p-3 rounded-2xl border border-gray-200/70 dark:border-gray-700/70 bg-gray-50/60 dark:bg-gray-900/40">
+                                    <div class="flex flex-col items-center w-14 text-xs text-gray-500 dark:text-gray-400">
+                                        <span class="font-semibold text-gray-900 dark:text-white">
+                                            {% if isTomorrow %}
+                                                {{ 'schedule.tomorrow'|trans|default('Morgen') }}
+                                            {% else %}
+                                                {{ shiftDate|date('d.m.') }}
+                                            {% endif %}
+                                        </span>
+                                        {% if demandShift.timeFrom and demandShift.timeTo %}
+                                            <span class="mt-1">
+                                                {{ demandShift.timeFrom|date('H:i') }}<br/>
+                                                {{ demandShift.timeTo|date('H:i') }}
+                                            </span>
                                         {% endif %}
-                                    </span>
-                                    {% if demandShift.timeFrom and demandShift.timeTo %}
-                                        <span class="mt-1">
-                                            {{ demandShift.timeFrom|date('H:i') }}<br/>
-                                            {{ demandShift.timeTo|date('H:i') }}
-                                        </span>
-                                    {% endif %}
+                                    </div>
+
+                                    <div class="flex-1 space-y-1.5">
+                                        {% if facility %}
+                                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-slate-900 text-white text-[11px] font-semibold dark:bg-slate-100 dark:text-slate-900">
+                                                {{ ux_icon('lucide:building-2', { class: 'w-3.5 h-3.5 mr-1.5' }) }}
+                                                <span class="truncate max-w-[180px] sm:max-w-xs">{{ facility.title }}</span>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if demandShift.name %}
+                                            <div class="text-xs text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                                                {{ ux_icon('lucide:briefcase', { class: 'w-3.5 h-3.5 opacity-70' }) }}
+                                                <span class="truncate">{{ demandShift.name }}</span>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if shift.isOnCall %}
+                                            <span class="inline-flex items-center mt-1 px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-100/70 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
+                                                {{ 'dashboard.on_call'|trans }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
                                 </div>
-
-                                <div class="flex-1 space-y-1.5">
-                                    {% if facility %}
-                                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-slate-900 text-white text-[11px] font-semibold dark:bg-slate-100 dark:text-slate-900">
-                                            {{ ux_icon('lucide:building-2', { class: 'w-3.5 h-3.5 mr-1.5' }) }}
-                                            <span class="truncate max-w-[180px] sm:max-w-xs">{{ facility.title }}</span>
-                                        </div>
-                                    {% endif %}
-
-                                    {% if demandShift.name %}
-                                        <div class="text-xs text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                                            {{ ux_icon('lucide:briefcase', { class: 'w-3.5 h-3.5 opacity-70' }) }}
-                                            <span class="truncate">{{ demandShift.name }}</span>
-                                        </div>
-                                    {% endif %}
-
-                                    {% if shift.isOnCall %}
-                                        <span class="inline-flex items-center mt-1 px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-100/70 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
-                                            {{ 'dashboard.on_call'|trans }}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 {% else %}

@@ -74,16 +74,22 @@ class ShiftServiceTest extends TestCase
 
     /**
      * 10 Minuten nach Schichtbeginn → minutesDifferenceToWorkBegin = 10 (zu spät).
+     * Schicht hat Ende 16:00, damit sie um 08:10 noch als „nicht beendet“ gilt.
      */
     public function testCheckUserPlanForToday_afterShiftStart_returnsPositiveMinutesDifference(): void
     {
+        $tz = new \DateTimeZone('Europe/Berlin');
         $user = $this->createUser(1);
         $employee = $this->createEmployee($user);
-        $shiftDate = new \DateTime('today', new \DateTimeZone('Europe/Berlin'));
-        $workBeginTime = \DateTime::createFromFormat('H:i', '08:00', new \DateTimeZone('Europe/Berlin'));
-        $shift = $this->createShift($employee, $shiftDate, $workBeginTime);
+        $shiftDate = new \DateTime('today', $tz);
+        $shift = $this->createShiftWithTimes(
+            $employee,
+            $shiftDate,
+            \DateTime::createFromFormat('H:i', '08:00', $tz),
+            \DateTime::createFromFormat('H:i', '16:00', $tz)
+        );
 
-        $now = new \DateTime('today 08:10', new \DateTimeZone('Europe/Berlin'));
+        $now = new \DateTime('today 08:10', $tz);
 
         $shiftRepository = $this->createMock(ShiftRepository::class);
         $shiftRepository->method('findShiftsForToday')->willReturn([$shift]);
@@ -163,6 +169,83 @@ class ShiftServiceTest extends TestCase
         self::assertNull($result['minutesDifferenceToWorkBegin']);
     }
 
+    /**
+     * Zwei Schichten heute (06:00–14:00 und 18:00–22:00): Nach erstem Schichtende wird die zweite
+     * Schicht berücksichtigt. Um 17:50 → 10 Minuten vor zweiter Schicht → minutesDifferenceToWorkBegin = -10.
+     */
+    public function testCheckUserPlanForToday_twoShiftsToday_returnsSecondShiftWhenFirstEnded(): void
+    {
+        $user = $this->createUser(1);
+        $employee = $this->createEmployee($user);
+        $tz = new \DateTimeZone('Europe/Berlin');
+        $shiftDate = new \DateTime('today', $tz);
+
+        $shift1 = $this->createShiftWithTimes(
+            $employee,
+            $shiftDate,
+            \DateTime::createFromFormat('H:i', '06:00', $tz),
+            \DateTime::createFromFormat('H:i', '14:00', $tz)
+        );
+        $shift2 = $this->createShiftWithTimes(
+            $employee,
+            $shiftDate,
+            \DateTime::createFromFormat('H:i', '18:00', $tz),
+            \DateTime::createFromFormat('H:i', '22:00', $tz)
+        );
+
+        $now = new \DateTime('today 17:50', $tz);
+
+        $shiftRepository = $this->createMock(ShiftRepository::class);
+        $shiftRepository->method('findShiftsForToday')->willReturn([$shift1, $shift2]);
+
+        $employeeService = $this->createMock(EmployeeService::class);
+        $employeeService->method('getAllEmployeeEntities')->willReturn([$employee]);
+
+        $service = $this->createShiftService($shiftRepository, $employeeService);
+        $result = $service->checkUserPlanForToday($user, $now);
+
+        self::assertTrue($result['workingToday']);
+        self::assertSame(-10, $result['minutesDifferenceToWorkBegin']);
+    }
+
+    /**
+     * Zwei Schichten heute: Wenn beide beendet sind (now nach Ende der zweiten), workingToday true, minutesDifferenceToWorkBegin null.
+     */
+    public function testCheckUserPlanForToday_twoShiftsToday_bothEnded_returnsWorkingTodayTrueMinutesNull(): void
+    {
+        $user = $this->createUser(1);
+        $employee = $this->createEmployee($user);
+        $tz = new \DateTimeZone('Europe/Berlin');
+        $shiftDate = new \DateTime('today', $tz);
+
+        $shift1 = $this->createShiftWithTimes(
+            $employee,
+            $shiftDate,
+            \DateTime::createFromFormat('H:i', '06:00', $tz),
+            \DateTime::createFromFormat('H:i', '14:00', $tz)
+        );
+        $shift2 = $this->createShiftWithTimes(
+            $employee,
+            $shiftDate,
+            \DateTime::createFromFormat('H:i', '18:00', $tz),
+            \DateTime::createFromFormat('H:i', '22:00', $tz)
+        );
+
+        $now = new \DateTime('today 22:30', $tz);
+
+        $shiftRepository = $this->createMock(ShiftRepository::class);
+        $shiftRepository->method('findShiftsForToday')->willReturn([$shift1, $shift2]);
+
+        $employeeService = $this->createMock(EmployeeService::class);
+        $employeeService->method('getAllEmployeeEntities')->willReturn([$employee]);
+
+        $service = $this->createShiftService($shiftRepository, $employeeService);
+        $result = $service->checkUserPlanForToday($user, $now);
+
+        self::assertTrue($result['workingToday']);
+        self::assertNull($result['minutesDifferenceToWorkBegin']);
+    }
+
     private function createUser(int $id): User
     {
         $user = new User();
@@ -183,7 +266,24 @@ class ShiftServiceTest extends TestCase
     {
         $demandShift = new DemandShift();
         $demandShift->setTimeFrom($workBeginTime);
-        $demandShift->setTimeTo(clone $workBeginTime); // für getTimeTo falls nötig
+        $demandShift->setTimeTo(clone $workBeginTime);
+
+        $shift = new Shift();
+        $shift->setEmployee($employee);
+        $shift->setDate($shiftDate);
+        $shift->setDemandShift($demandShift);
+
+        return $shift;
+    }
+
+    /**
+     * Schicht mit explizitem Beginn und Ende (z. B. 06:00–14:00 und 18:00–22:00 am selben Tag).
+     */
+    private function createShiftWithTimes(Employee $employee, \DateTime $shiftDate, \DateTime $workBeginTime, \DateTime $workEndTime): Shift
+    {
+        $demandShift = new DemandShift();
+        $demandShift->setTimeFrom($workBeginTime);
+        $demandShift->setTimeTo($workEndTime);
 
         $shift = new Shift();
         $shift->setEmployee($employee);

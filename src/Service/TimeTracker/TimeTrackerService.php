@@ -317,6 +317,33 @@ readonly class TimeTrackerService
         return $checkoutTimestamp >= $today && $checkoutTimestamp < $tomorrow;
     }
 
+    /**
+     * Liefert den Zeitpunkt des letzten Check-outs, falls dieser heute erfolgt ist.
+     *
+     * @return \DateTimeImmutable|null Checkout-Zeitpunkt heute oder null
+     */
+    public function getLastCheckoutTimestampToday(?UserInterface $user): ?\DateTimeImmutable
+    {
+        $lastTimeTracker = $this->timeTrackerRepository->findOneBy(
+            ['user' => $user, 'type' => 'checkout'],
+            ['id' => 'DESC']
+        );
+
+        if (!$lastTimeTracker) {
+            return null;
+        }
+
+        $checkoutTimestamp = $lastTimeTracker->getTimestamp();
+        $today = new \DateTimeImmutable('today');
+        $tomorrow = new \DateTimeImmutable('tomorrow');
+
+        if ($checkoutTimestamp < $today || $checkoutTimestamp >= $tomorrow) {
+            return null;
+        }
+
+        return $checkoutTimestamp;
+    }
+
     public function checkIfUserHasPause(?UserInterface $user): bool
     {
         $lastTimeTracker = $this->timeTrackerRepository->findOneBy(['user' => $user], ['id' => 'DESC']);
@@ -341,19 +368,32 @@ readonly class TimeTrackerService
     }
 
     /**
-     * Erstellt einen manuellen Zeiteintrag für einen Mitarbeiter
+     * Erstellt einen manuellen Zeiteintrag für einen Mitarbeiter.
+     * Ohne Endzeit wird nur ein Check-in erstellt (offene Schicht).
+     *
      * @param User $user Der Benutzer/Mitarbeiter
-     * @param \DateTimeImmutable $startDateTime Startzeitpunkt
-     * @param \DateTimeImmutable $endDateTime Endzeitpunkt
+     * @param \DateTimeImmutable $startDateTime Startzeitpunkt (Check-in)
+     * @param \DateTimeImmutable|null $endDateTime Optional: Endzeitpunkt (Check-out). Null = nur Check-in.
      * @param int|null $facilityId Optional: Facility ID
      * @throws \Exception
      */
-    public function createManualTimeEntry(User $user, \DateTimeImmutable $startDateTime, \DateTimeImmutable $endDateTime, ?int $facilityId = null): void
+    public function createManualTimeEntry(User $user, \DateTimeImmutable $startDateTime, ?\DateTimeImmutable $endDateTime = null, ?int $facilityId = null): void
     {
-        // Falls die Endzeit \"kleiner\" als die Startzeit ist, handelt es sich um eine Nachtschicht
-        // Beispiel: Start 22:00, Ende 06:00 -> Ende ist am nächsten Kalendertag
-        if ($endDateTime <= $startDateTime) {
-            $endDateTime = $endDateTime->modify('+1 day');
+        if ($this->checkIfUserIsCheckedIn($user)) {
+            throw new \Exception('Es existiert bereits ein offener Zeiteintrag. Bitte schließen Sie diesen zuerst ab.');
+        }
+
+        $endGiven = $endDateTime !== null;
+
+        if ($endGiven) {
+            // Falls die Endzeit \"kleiner\" als die Startzeit ist, handelt es sich um eine Nachtschicht
+            if ($endDateTime <= $startDateTime) {
+                $endDateTime = $endDateTime->modify('+1 day');
+            }
+            $this->assertManualEntryDoesNotOverlap($user, $startDateTime, $endDateTime);
+        } else {
+            // Nur Check-in: Prüfen, ob Startzeit in einer bestehenden Schicht liegt
+            $this->assertManualEntryDoesNotOverlap($user, $startDateTime, $startDateTime);
         }
 
         // Erstelle Checkin-Eintrag (Schichtbeginn)
@@ -382,12 +422,16 @@ readonly class TimeTrackerService
         $this->em->persist($checkinEntry);
         $this->em->flush();
 
+        if (!$endGiven) {
+            // Nur Check-in erstellt, fertig
+            return;
+        }
+
         // Berechne Schichtdauer in Minuten
         $shiftDuration = $endDateTime->getTimestamp() - $startDateTime->getTimestamp();
         $shiftDurationMinutes = (int)($shiftDuration / 60);
 
         // Berechne benötigte Pause basierend auf Schichtdauer (wie in calculateTotalsOfTimeSummary)
-        // > 9 Stunden: 45 Minuten, > 6 Stunden: 30 Minuten
         $requiredPauseMinutes = 0;
         if ($shiftDurationMinutes > 9 * 60) {
             $requiredPauseMinutes = 45;
@@ -397,12 +441,9 @@ readonly class TimeTrackerService
 
         // Wenn Pause benötigt wird, füge sie automatisch ein (1 Stunde vor Checkout)
         if ($requiredPauseMinutes > 0) {
-            // Pause endet 1 Stunde vor Checkout
             $pauseEnd = $endDateTime->sub(new \DateInterval('PT60M'));
-            // Pause startet Pausendauer vor dem Pausenende
             $pauseStart = $pauseEnd->sub(new \DateInterval(sprintf('PT%dM', $requiredPauseMinutes)));
 
-            // Pause-Eintrag
             $pauseEntry = new TimeTracker();
             $pauseEntry->setUser($user);
             $pauseEntry->setCreatedAt(new \DateTimeImmutable());
@@ -413,7 +454,6 @@ readonly class TimeTrackerService
             $pauseEntry->setIsManualEntry(true);
             $this->em->persist($pauseEntry);
 
-            // Checkin nach Pause
             $checkinAfterPause = new TimeTracker();
             $checkinAfterPause->setUser($user);
             $checkinAfterPause->setCreatedAt(new \DateTimeImmutable());
@@ -437,6 +477,26 @@ readonly class TimeTrackerService
         $this->em->persist($checkoutEntry);
 
         $this->em->flush();
+    }
+
+    /**
+     * Prüft, ob der Zeitraum [start, end] mit einer bestehenden Schicht des Benutzers überlappt.
+     *
+     * @throws \Exception wenn Überlappung gefunden
+     */
+    private function assertManualEntryDoesNotOverlap(User $user, \DateTimeImmutable $start, \DateTimeImmutable $end): void
+    {
+        $ranges = $this->timeTrackerRepository->getTimeRangesForUser($user);
+        $now = new \DateTimeImmutable();
+
+        foreach ($ranges as $range) {
+            $existingStart = $range['start'];
+            $existingEnd = $range['end'] ?? $now;
+
+            if ($start < $existingEnd && $end > $existingStart) {
+                throw new \Exception('Der Zeitraum überlappt mit einer bestehenden Schicht.');
+            }
+        }
     }
 
     public function getLastTimeStamp(?UserInterface $getUser): ?array
@@ -467,7 +527,25 @@ readonly class TimeTrackerService
 
         $allTimeTrackEntities = $this->fetchTimeTrackEntities($userId);
         $output = $this->processTimeTrackEntities($allTimeTrackEntities);
-        return $this->filterByMonthAndYear($output, $year, $month);
+        $filtered = $this->filterByMonthAndYear($output, $year, $month);
+
+        // Neueste Einträge zuerst (nach Schichtbeginn absteigend)
+        usort($filtered, static function (array $a, array $b): int {
+            $startA = $a['shiftStart'] ?? null;
+            $startB = $b['shiftStart'] ?? null;
+            if ($startA === null && $startB === null) {
+                return 0;
+            }
+            if ($startA === null) {
+                return 1;
+            }
+            if ($startB === null) {
+                return -1;
+            }
+            return $startB <=> $startA;
+        });
+
+        return $filtered;
     }
 
     private function fetchTimeTrackEntities($userId): array

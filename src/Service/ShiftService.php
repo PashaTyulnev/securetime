@@ -64,51 +64,136 @@ readonly class ShiftService
     private const BUSINESS_TIMEZONE = 'Europe/Berlin';
 
     /**
+     * Prüft die heutige Schicht des Benutzers. Bei mehreren Schichten heute wird die Schicht
+     * berücksichtigt, die noch nicht beendet ist (workEnd > now) – damit kann sich der User
+     * in eine spätere Schicht am selben Tag einchecken.
+     *
      * @param \DateTimeInterface|null $now Optional: aktueller Zeitpunkt (für Tests). Sonst „jetzt“ in Europe/Berlin.
      */
     public function checkUserPlanForToday(?User $user, ?\DateTimeInterface $now = null): array
     {
         $todayShifts = $this->findShiftsForToday();
 
-        if ($user) {
-            $tz = new \DateTimeZone(self::BUSINESS_TIMEZONE);
+        if (!$user) {
+            return [
+                'minutesDifferenceToWorkBegin' => null,
+                'workingToday' => false
+            ];
+        }
 
-            $nowDateTime = $now !== null
-                ? (($now instanceof DateTime) ? $now : DateTime::createFromInterface($now))
-                : new DateTime('now', $tz);
-            if ($nowDateTime->getTimezone()->getName() !== $tz->getName()) {
-                $nowDateTime = $nowDateTime->setTimezone($tz);
+        $tz = new \DateTimeZone(self::BUSINESS_TIMEZONE);
+        $nowDateTime = $now !== null
+            ? (($now instanceof DateTime) ? $now : DateTime::createFromInterface($now))
+            : new DateTime('now', $tz);
+        if ($nowDateTime->getTimezone()->getName() !== $tz->getName()) {
+            $nowDateTime = $nowDateTime->setTimezone($tz);
+        }
+
+        $userShiftsToday = [];
+        foreach ($todayShifts as $shift) {
+            $employee = $shift->getEmployee();
+            if ($employee && $employee->getUser() && $employee->getUser()->getId() === $user->getId()) {
+                $userShiftsToday[] = $shift;
+            }
+        }
+
+        if ($userShiftsToday === []) {
+            return [
+                'minutesDifferenceToWorkBegin' => null,
+                'workingToday' => false
+            ];
+        }
+
+        // Nach Schichtbeginn sortieren, dann erste Schicht wählen, die noch nicht beendet ist (workEnd > now)
+        usort($userShiftsToday, static function ($a, $b) use ($tz): int {
+            $dateA = $a->getDate();
+            $timeA = $a->getDemandShift()?->getTimeFrom();
+            $dateB = $b->getDate();
+            $timeB = $b->getDemandShift()?->getTimeFrom();
+            if ($dateA === null || $timeA === null) {
+                return 1;
+            }
+            if ($dateB === null || $timeB === null) {
+                return -1;
+            }
+            $beginA = new DateTime($dateA->format('Y-m-d') . ' ' . $timeA->format('H:i:s'), $tz);
+            $beginB = new DateTime($dateB->format('Y-m-d') . ' ' . $timeB->format('H:i:s'), $tz);
+            return $beginA <=> $beginB;
+        });
+
+        foreach ($userShiftsToday as $shift) {
+            $demandShift = $shift->getDemandShift();
+            $workEndTime = $demandShift?->getTimeTo();
+            $workBeginTime = $demandShift?->getTimeFrom();
+            $shiftDate = $shift->getDate();
+
+            if ($workEndTime === null || $workBeginTime === null || $shiftDate === null) {
+                continue;
             }
 
-            foreach ($todayShifts as $shift) {
-                $employee = $shift->getEmployee();
-                if ($employee && $employee->getUser() && $employee->getUser()->getId() === $user->getId()) {
-                    $demandShift = $shift->getDemandShift();
-                    $workBeginTime = $demandShift->getTimeFrom();
-                    $workBeginDate = $shift->getDate();
+            $workEndDateTime = new DateTime(
+                $shiftDate->format('Y-m-d') . ' ' . $workEndTime->format('H:i:s'),
+                $tz
+            );
 
-                    // Schichtbeginn in Business-Zeitzone (z. B. 18:30 Berlin)
-                    $workBeginDateTime = new DateTime(
-                        $workBeginDate->format('Y-m-d') . ' ' . $workBeginTime->format('H:i:s'),
-                        $tz
-                    );
-
-                    // Minuten bis Schichtbeginn (positiv = noch vor Beginn)
-                    $minutesUntilBegin = (int) (($workBeginDateTime->getTimestamp() - $nowDateTime->getTimestamp()) / 60);
-                    $minutesDifferenceToWorkBegin = -$minutesUntilBegin;
-
-                    return [
-                        'minutesDifferenceToWorkBegin' => $minutesDifferenceToWorkBegin,
-                        'workingToday' => true
-                    ];
-                }
+            if ($workEndDateTime < $nowDateTime) {
+                continue;
             }
+
+            $workBeginDateTime = new DateTime(
+                $shiftDate->format('Y-m-d') . ' ' . $workBeginTime->format('H:i:s'),
+                $tz
+            );
+
+            $minutesUntilBegin = (int) (($workBeginDateTime->getTimestamp() - $nowDateTime->getTimestamp()) / 60);
+            $minutesDifferenceToWorkBegin = -$minutesUntilBegin;
+
+            return [
+                'minutesDifferenceToWorkBegin' => $minutesDifferenceToWorkBegin,
+                'workingToday' => true
+            ];
         }
 
         return [
             'minutesDifferenceToWorkBegin' => null,
-            'workingToday' => false
+            'workingToday' => true
         ];
+    }
+
+    /**
+     * Liefert das geplante Schichtende (Datum + Uhrzeit) der heutigen Schicht des Benutzers.
+     * Nur sinnvoll, wenn der Benutzer heute eine Schicht hat (workingToday).
+     *
+     * @return \DateTimeInterface|null Geplantes Ende heute in BUSINESS_TIMEZONE, oder null
+     */
+    public function getTodayShiftPlannedEnd(?User $user): ?\DateTimeInterface
+    {
+        if (!$user) {
+            return null;
+        }
+
+        $todayShifts = $this->findShiftsForToday();
+        $tz = new \DateTimeZone(self::BUSINESS_TIMEZONE);
+
+        foreach ($todayShifts as $shift) {
+            $employee = $shift->getEmployee();
+            if ($employee && $employee->getUser() && $employee->getUser()->getId() === $user->getId()) {
+                $demandShift = $shift->getDemandShift();
+                $workEndTime = $demandShift?->getTimeTo();
+                $shiftDate = $shift->getDate();
+
+                if ($workEndTime === null || $shiftDate === null) {
+                    return null;
+                }
+
+                return new DateTime(
+                    $shiftDate->format('Y-m-d') . ' ' . $workEndTime->format('H:i:s'),
+                    $tz
+                );
+            }
+        }
+
+        return null;
     }
 
     /**

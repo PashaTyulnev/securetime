@@ -90,4 +90,34 @@ class TimeTrackerRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Liefert alle erfassten Schicht-Zeiträume eines Benutzers (Beginn bis Ende je Schicht).
+     * Offene Schichten (ohne Checkout) haben end = null.
+     *
+     * @return array<int, array{start: \DateTimeImmutable, end: \DateTimeImmutable|null}>
+     */
+    public function getTimeRangesForUser(User $user): array
+    {
+        $mainCheckins = $this->createQueryBuilder('t')
+            ->where('t.user = :user')
+            ->andWhere('t.isShiftStart = :isShiftStart')
+            ->andWhere('t.type = :type')
+            ->setParameter('user', $user)
+            ->setParameter('isShiftStart', true)
+            ->setParameter('type', 'checkin')
+            ->orderBy('t.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $ranges = [];
+        foreach ($mainCheckins as $main) {
+            $checkout = $this->findOneBy(['parent' => $main, 'type' => 'checkout']);
+            $ranges[] = [
+                'start' => $main->getTimestamp(),
+                'end' => $checkout?->getTimestamp(),
+            ];
+        }
+        return $ranges;
+    }
 }

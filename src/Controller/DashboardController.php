@@ -49,10 +49,20 @@ class DashboardController extends AbstractController
 
         // Wenn der Benutzer heute schon ausgecheckt hat, finde die nächste geplante Schicht
         $nextPlannedShift = null;
+        $earlyCheckoutToday = false;
+
         if ($hasCheckedOutToday && $todayUserWorkingInformation['workingToday']) {
             $nextPlannedShift = $this->shiftService->findNextPlannedShift($user);
+
+            // Prüfen, ob vorzeitig ausgecheckt (Checkout vor geplantem Schichtende)
+            $lastCheckoutTimestamp = $this->timeTrackerService->getLastCheckoutTimestampToday($user);
+            $plannedEnd = $this->shiftService->getTodayShiftPlannedEnd($user);
+            if ($lastCheckoutTimestamp !== null && $plannedEnd !== null && $lastCheckoutTimestamp < $plannedEnd) {
+                $earlyCheckoutToday = true;
+            }
         }
         $todayUserWorkingInformation['nextPlannedShift'] = $nextPlannedShift;
+        $todayUserWorkingInformation['earlyCheckoutToday'] = $earlyCheckoutToday;
 
         $todayShifts = $this->shiftService->findShiftsForToday();
 

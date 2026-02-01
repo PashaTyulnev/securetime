@@ -316,8 +316,8 @@ class TimeTrackerApiController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['userId']) || !isset($data['date']) || !isset($data['timeFrom']) || !isset($data['timeTo'])) {
-            return new JsonResponse(['message' => 'Benutzer, Datum, Start- und Endzeit sind erforderlich'], 400);
+        if (!isset($data['userId']) || !isset($data['date']) || !isset($data['timeFrom'])) {
+            return new JsonResponse(['message' => 'Benutzer, Datum und Startzeit sind erforderlich.'], 400);
         }
 
         try {
@@ -328,16 +328,25 @@ class TimeTrackerApiController extends AbstractController
 
             $user = $employee->getUser();
 
-            // Kombiniere Datum und Zeit zu DateTimeImmutable
             $startDateTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['timeFrom']);
-            $endDateTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['timeTo']);
-
-            if (!$startDateTime || !$endDateTime) {
+            if (!$startDateTime) {
                 return new JsonResponse(['message' => 'Ungültiges Datum oder Zeitformat'], 400);
             }
 
+            $endDateTime = null;
+            if (!empty($data['timeTo'])) {
+                $endDateTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['timeTo']);
+                if (!$endDateTime) {
+                    return new JsonResponse(['message' => 'Ungültiges Endzeit-Format'], 400);
+                }
+            }
+
             $this->timeTrackerService->createManualTimeEntry($user, $startDateTime, $endDateTime);
-            return new JsonResponse(['message' => 'Zeiteintrag wurde erfolgreich erstellt'], 200);
+            $message = $endDateTime !== null
+                ? 'Zeiteintrag wurde erfolgreich erstellt.'
+                : 'Check-in wurde erfolgreich erstellt.';
+
+            return new JsonResponse(['message' => $message], 200);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => $e->getMessage()], 400);
         }
