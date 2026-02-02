@@ -1,24 +1,31 @@
 {# Arbeitsstatus / Zeiterfassung. Erwartet: todayWorkingInformation #}
 <div class="px-5 pt-5 pb-4 w-full md:w-1/2 lg:w-1/4">
+
     {% if todayWorkingInformation['workingToday'] %}
-        {% if todayWorkingInformation['isCheckedIn'] or todayWorkingInformation['hasPause'] %}
+        {# Zeige Time Tracker wenn: eingecheckt, in Pause, oder 10 Min vor bis 25 Min nach Schichtbeginn #}
+        {% if todayWorkingInformation['isCheckedIn']
+            or todayWorkingInformation['hasPause']
+            or (todayWorkingInformation['minutesDifferenceToWorkBegin'] is not null
+            and todayWorkingInformation['minutesDifferenceToWorkBegin'] >= -10
+            and todayWorkingInformation['minutesDifferenceToWorkBegin'] <= 25) %}
             {% include 'modules/time_tracker.html.twig' %}
-        {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] is not null and todayWorkingInformation['minutesDifferenceToWorkBegin'] > -11 and todayWorkingInformation['minutesDifferenceToWorkBegin'] < 25 %}
-            {% include 'modules/time_tracker.html.twig' %}
-        {% elseif todayWorkingInformation['hasCheckedOutToday'] %}
-            {% if todayWorkingInformation['earlyCheckoutToday'] %}
-                <div class="bg-amber-50 dark:bg-amber-900/30 backdrop-blur-xl rounded-2xl border border-amber-200 dark:border-amber-800 p-6 shadow-sm mb-4">
-                    <div class="flex items-center gap-3 mb-2">
-                        {{ ux_icon('lucide:log-out', { class: 'w-6 h-6 text-amber-600 dark:text-amber-400' }) }}
-                        <h2 class="text-base font-semibold text-amber-800 dark:text-amber-300">
-                            {{ 'dashboard.early_checkout_title'|trans }}
-                        </h2>
-                    </div>
-                    <p class="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
-                        {{ 'dashboard.early_checkout_message'|trans }}
-                    </p>
+
+            {# Ausgecheckt und zu früh gekommen #}
+        {% elseif todayWorkingInformation['hasCheckedOutToday'] and todayWorkingInformation['earlyCheckoutToday'] %}
+            <div class="bg-amber-50 dark:bg-amber-900/30 backdrop-blur-xl rounded-2xl border border-amber-200 dark:border-amber-800 p-6 shadow-sm mb-4">
+                <div class="flex items-center gap-3 mb-2">
+                    {{ ux_icon('lucide:log-out', { class: 'w-6 h-6 text-amber-600 dark:text-amber-400' }) }}
+                    <h2 class="text-base font-semibold text-amber-800 dark:text-amber-300">
+                        {{ 'dashboard.early_checkout_title'|trans }}
+                    </h2>
                 </div>
-            {% endif %}
+                <p class="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
+                    {{ 'dashboard.early_checkout_message'|trans }}
+                </p>
+            </div>
+
+            {# Ausgecheckt - zeige nächste Schicht falls vorhanden #}
+        {% elseif todayWorkingInformation['hasCheckedOutToday'] %}
             {% if todayWorkingInformation['nextPlannedShift'] %}
                 {% set nextShift = todayWorkingInformation['nextPlannedShift'] %}
                 <div class="bg-green-50 dark:bg-green-900/30 backdrop-blur-xl rounded-2xl border border-green-200 dark:border-green-800 p-6 shadow-sm">
@@ -66,36 +73,24 @@
                     </p>
                 </div>
             {% endif %}
+
+            {# Zu spät (mehr als 25 Min nach Schichtbeginn) #}
         {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] is not null and todayWorkingInformation['minutesDifferenceToWorkBegin'] > 25 %}
-            {% if not todayWorkingInformation['hasCheckedOutToday'] %}
-                <div class="bg-red-50 dark:bg-red-900/30 backdrop-blur-xl rounded-2xl border border-red-200 dark:border-red-800 p-6 shadow-sm">
-                    <div class="flex items-center justify-center gap-3 mb-3 relative">
-                        <h2 class="text-base font-semibold text-red-800 dark:text-red-300 text-center">
-                            {{ 'dashboard.work_start_missed'|trans }}!!!
-                        </h2>
-                        <div class="absolute right-0">
-                            {{ ux_icon('lucide:alert-triangle', { class: 'w-6 h-6 text-red-600 dark:text-red-400' }) }}
-                        </div>
-                    </div>
-                    <p class="text-sm text-red-700 dark:text-red-300 leading-relaxed text-center">
-                        {{ 'dashboard.late_arrival_message'|trans|raw }}
-                    </p>
-                </div>
-            {% endif %}
-        {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] is not null and todayWorkingInformation['minutesDifferenceToWorkBegin'] < -10 %}
-            {% set minutesUntilCheckin = (todayWorkingInformation['minutesDifferenceToWorkBegin'] * -1) - 10 %}
-            <div class="bg-amber-50 dark:bg-amber-900/30 backdrop-blur-xl rounded-2xl border border-amber-200 dark:border-amber-800 p-6 shadow-sm">
-                <div class="flex items-center gap-3 mb-3">
-                    {{ ux_icon('lucide:clock', { class: 'w-6 h-6 text-amber-600 dark:text-amber-400' }) }}
-                    <h2 class="text-base font-semibold text-amber-800 dark:text-amber-300">
-                        {{ 'dashboard.too_early'|trans }}
+            <div class="bg-red-50 dark:bg-red-900/30 backdrop-blur-xl rounded-2xl border border-red-200 dark:border-red-800 p-6 shadow-sm">
+                <div class="flex items-center justify-center gap-3 mb-3 relative">
+                    <h2 class="text-base font-semibold text-red-800 dark:text-red-300 text-center">
+                        {{ 'dashboard.work_start_missed'|trans }}!!!
                     </h2>
+                    <div class="absolute right-0">
+                        {{ ux_icon('lucide:alert-triangle', { class: 'w-6 h-6 text-red-600 dark:text-red-400' }) }}
+                    </div>
                 </div>
-                <p class="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
-                    {{ 'dashboard.early_checkin_message'|trans({'%minutes%': minutesUntilCheckin})|raw }}
+                <p class="text-sm text-red-700 dark:text-red-300 leading-relaxed text-center">
+                    {{ 'dashboard.late_arrival_message'|trans|raw }}
                 </p>
             </div>
         {% endif %}
+
     {% else %}
         <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-6 shadow-sm">
             <div class="flex items-center gap-2 mb-2">
@@ -107,4 +102,9 @@
             </p>
         </div>
     {% endif %}
+
+    {# Debug Info #}
+
+        <pre class="text-[9px] leading-tight text-gray-500 dark:text-gray-500 bg-gray-50 dark:bg-gray-900/50 p-2 rounded mt-1 overflow-x-auto">{{ todayWorkingInformation|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+
 </div>

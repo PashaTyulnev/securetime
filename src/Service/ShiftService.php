@@ -8,6 +8,8 @@ use App\Repository\FacilityRepository;
 use App\Repository\ShiftPresetRepository;
 use App\Repository\ShiftRepository;
 use DateTime;
+use DateTimeInterface;
+use DateTimeZone;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -64,16 +66,19 @@ readonly class ShiftService
     private const BUSINESS_TIMEZONE = 'Europe/Berlin';
 
     /**
+     *
      * Prüft die heutige Schicht des Benutzers. Bei mehreren Schichten heute wird die Schicht
      * berücksichtigt, die noch nicht beendet ist (workEnd > now) – damit kann sich der User
      * in eine spätere Schicht am selben Tag einchecken.
      *
-     * @param \DateTimeInterface|null $now Optional: aktueller Zeitpunkt (für Tests). Sonst „jetzt“ in Europe/Berlin.
+     * @param DateTimeInterface|null $now Optional: aktueller Zeitpunkt (für Tests). Sonst „jetzt“ in Europe/Berlin.
+     *
+     * @throws \Exception
      */
-    public function checkUserPlanForToday(?User $user, ?\DateTimeInterface $now = null): array
+    public function checkUserPlanForToday(?User $user, ?DateTimeInterface $now = null): array
     {
         $todayShifts = $this->findShiftsForToday();
-        
+
         if (!$user) {
             return [
                 'minutesDifferenceToWorkBegin' => null,
@@ -81,7 +86,7 @@ readonly class ShiftService
             ];
         }
 
-        $tz = new \DateTimeZone(self::BUSINESS_TIMEZONE);
+        $tz = new DateTimeZone(self::BUSINESS_TIMEZONE);
         $nowDateTime = $now !== null
             ? (($now instanceof DateTime) ? $now : DateTime::createFromInterface($now))
             : new DateTime('now', $tz);
@@ -121,6 +126,7 @@ readonly class ShiftService
             return $beginA <=> $beginB;
         });
 
+
         foreach ($userShiftsToday as $shift) {
             $demandShift = $shift->getDemandShift();
             $workEndTime = $demandShift?->getTimeTo();
@@ -131,19 +137,11 @@ readonly class ShiftService
                 continue;
             }
 
-            $workEndDateTime = new DateTime(
-                $shiftDate->format('Y-m-d') . ' ' . $workEndTime->format('H:i:s'),
-                $tz
-            );
-
-            if ($workEndDateTime < $nowDateTime) {
-                continue;
-            }
-
             $workBeginDateTime = new DateTime(
                 $shiftDate->format('Y-m-d') . ' ' . $workBeginTime->format('H:i:s'),
                 $tz
             );
+
 
             $minutesUntilBegin = (int) (($workBeginDateTime->getTimestamp() - $nowDateTime->getTimestamp()) / 60);
             $minutesDifferenceToWorkBegin = -$minutesUntilBegin;
