@@ -104,6 +104,7 @@
   "dashboard.early_checkout_message": "لقد سجّلت الخروج من مناوبة اليوم قبل انتهائها.",
   "dashboard.next_shift_info": "مناوبتك التالية المخططة:",
   "dashboard.no_next_shift": "لا توجد مناوبات مخططة في الثلاثين يوماً القادمة.",
+  "dashboard.today_shift_title": "المناوبات اليوم",
   "dashboard.time_suffix": "",
   "employee.management": "إدارة الموظفين",
   "employee.new": "موظف جديد",

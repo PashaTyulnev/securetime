@@ -104,6 +104,7 @@
   "dashboard.early_checkout_message": "Sie haben sich aus der heutigen Schicht vorzeitig ausgecheckt.",
   "dashboard.next_shift_info": "Ihre nächste geplante Schicht:",
   "dashboard.no_next_shift": "Keine weiteren Schichten in den nächsten 30 Tagen geplant.",
+  "dashboard.today_shift_title": "Heutige Schicht(en)",
   "dashboard.my_upcoming_shifts": "Deine Schichten (nächste 7 Tage)",
   "dashboard.no_upcoming_shifts_7_days": "Für die nächsten 7 Tage sind keine Schichten geplant.",
   "dashboard.time_suffix": "Uhr",

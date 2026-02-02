@@ -37,7 +37,7 @@ class DashboardController extends AbstractController
         $isCheckedIn = $this->timeTrackerService->checkIfUserIsCheckedIn($user);
         $hasPause = $this->timeTrackerService->checkIfUserHasPause($user);
         $isCheckedOut = $this->timeTrackerService->checkIfUserIsCheckedOut($user);
-        
+
         // Prüfe, ob der Benutzer heute ausgecheckt hat (während der heutigen Schicht)
         $hasCheckedOutToday = $this->timeTrackerService->hasCheckedOutToday($user);
 

@@ -78,14 +78,18 @@ class ShiftRepository extends ServiceEntityRepository
     }
 
     /**
+     * Shifts for the given employees on the calendar day "today" in the given timezone.
+     * Uses date string to avoid timezone conversion issues (DATE column vs. DateTime in UTC).
+     *
      * @param array<int, \App\Entity\Employee> $employees
      * @param \DateTimeZone|null $timezone Zeitzone für „heute“ (z. B. Europe/Berlin), sonst Server-Zeitzone
      */
     public function findShiftsForToday(array $employees, ?\DateTimeZone $timezone = null): array
     {
-        $today = $timezone
+        $todayDateTime = $timezone
             ? (new \DateTimeImmutable('now', $timezone))->setTime(0, 0, 0)
             : new \DateTimeImmutable('today');
+        $todayString = $todayDateTime->format('Y-m-d');
 
         return $this->createQueryBuilder('s')
             ->leftJoin('s.employee', 'e')
@@ -93,7 +97,7 @@ class ShiftRepository extends ServiceEntityRepository
             ->leftJoin('ds.facility', 'f')
             ->andWhere('s.date = :today')
             ->andWhere('s.employee IN (:employees)')
-            ->setParameter('today', $today)
+            ->setParameter('today', $todayString)
             ->setParameter('employees', $employees)
             ->orderBy('e.lastName', 'ASC')
             ->addOrderBy('e.firstName', 'ASC')

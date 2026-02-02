@@ -73,7 +73,7 @@ readonly class ShiftService
     public function checkUserPlanForToday(?User $user, ?\DateTimeInterface $now = null): array
     {
         $todayShifts = $this->findShiftsForToday();
-
+        
         if (!$user) {
             return [
                 'minutesDifferenceToWorkBegin' => null,
