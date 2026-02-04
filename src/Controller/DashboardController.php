@@ -29,50 +29,13 @@ class DashboardController extends AbstractController
 //            return $this->redirectToRoute('app_register_google_auth');
 //        }
 
-
         $user = $security->getUser();
-        $todayUserWorkingInformation = $this->shiftService->checkUserPlanForToday($user);
 
-        // Prüfe ob Benutzer eingecheckt ist oder in der Pause ist
-        $isCheckedIn = $this->timeTrackerService->checkIfUserIsCheckedIn($user);
-        $hasPause = $this->timeTrackerService->checkIfUserHasPause($user);
-        $isCheckedOut = $this->timeTrackerService->checkIfUserIsCheckedOut($user);
-
-        // Prüfe, ob der Benutzer heute ausgecheckt hat (während der heutigen Schicht)
-        $hasCheckedOutToday = $this->timeTrackerService->hasCheckedOutToday($user);
-
-        // Füge diese Informationen zu todayWorkingInformation hinzu
-        $todayUserWorkingInformation['isCheckedIn'] = $isCheckedIn;
-        $todayUserWorkingInformation['hasPause'] = $hasPause;
-        $todayUserWorkingInformation['isCheckedOut'] = $isCheckedOut;
-        $todayUserWorkingInformation['hasCheckedOutToday'] = $hasCheckedOutToday;
-
-        // Wenn der Benutzer heute schon ausgecheckt hat, finde die nächste geplante Schicht
-        $nextPlannedShift = null;
-        $earlyCheckoutToday = false;
-
-        if ($hasCheckedOutToday && $todayUserWorkingInformation['workingToday']) {
-            $nextPlannedShift = $this->shiftService->findNextPlannedShift($user);
-
-            // Prüfen, ob vorzeitig ausgecheckt (Checkout vor geplantem Schichtende)
-            $lastCheckoutTimestamp = $this->timeTrackerService->getLastCheckoutTimestampToday($user);
-            $plannedEnd = $this->shiftService->getTodayShiftPlannedEnd($user);
-            if ($lastCheckoutTimestamp !== null && $plannedEnd !== null && $lastCheckoutTimestamp < $plannedEnd) {
-                $earlyCheckoutToday = true;
-            }
-        }
-        $todayUserWorkingInformation['nextPlannedShift'] = $nextPlannedShift;
-        $todayUserWorkingInformation['earlyCheckoutToday'] = $earlyCheckoutToday;
-
-        $todayShifts = $this->shiftService->findShiftsForToday();
-
-        // Kommende Schichten (nächste 7 Tage) für den eingeloggten Benutzer
-        $upcomingUserShifts = $this->shiftService->findUpcomingShiftsForUser($user, 7);
+        $todayWorkingInformation =
+            $this->shiftService->getDashboardWorkingInfo($user, $this->timeTrackerService);
 
         return $this->render('dashboard.html.twig', [
-            'todayShifts' => $todayShifts,
-            'todayWorkingInformation' => $todayUserWorkingInformation,
-            'upcomingUserShifts' => $upcomingUserShifts,
+            'todayWorkingInformation' => $todayWorkingInformation,
         ]);
     }
 

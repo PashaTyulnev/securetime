@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ShiftRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
         new Get(),
@@ -74,6 +75,12 @@ class Shift
     #[Groups(['shift:read'])]
     private int $onCall = 0;
 
+    /** Computed: date + demandShift timeFrom (not persisted). */
+    public ?\DateTime $shiftBeginn = null;
+
+    /** Computed: date + demandShift timeTo, next day if timeTo <= timeFrom (not persisted). */
+    public ?\DateTime $shiftEnd = null;
+
     public function getOnCall(): ?bool
     {
         return (string)$this->isOnCall;
@@ -106,6 +113,7 @@ class Shift
     public function setDemandShift(?DemandShift $demandShift): static
     {
         $this->demandShift = $demandShift;
+        $this->updateShiftBeginnAndEnd();
 
         return $this;
     }
@@ -128,6 +136,7 @@ class Shift
     public function setDate(\DateTime $date): static
     {
         $this->date = $date;
+        $this->updateShiftBeginnAndEnd();
 
         return $this;
     }
@@ -156,5 +165,62 @@ class Shift
         return $this;
     }
 
+    /**
+     * Shift start: shift date + demandShift timeFrom.
+     */
+    public function getShiftBeginn(): ?\DateTime
+    {
+        return $this->shiftBeginn;
+    }
 
+    /**
+     * Shift end: shift date + demandShift timeTo; if timeTo <= timeFrom, end is next day.
+     */
+    public function getShiftEnd(): ?\DateTime
+    {
+        return $this->shiftEnd;
+    }
+
+    #[ORM\PostLoad]
+    public function onPostLoad(): void
+    {
+        $this->updateShiftBeginnAndEnd();
+    }
+
+    private function updateShiftBeginnAndEnd(): void
+    {
+        if ($this->date === null) {
+            $this->shiftBeginn = null;
+            $this->shiftEnd = null;
+
+            return;
+        }
+        $timeFrom = $this->demandShift?->getTimeFrom();
+        $timeTo = $this->demandShift?->getTimeTo();
+
+        if ($timeFrom === null) {
+            $this->shiftBeginn = null;
+        } else {
+            $this->shiftBeginn = clone $this->date;
+            $this->shiftBeginn->setTime(
+                (int) $timeFrom->format('H'),
+                (int) $timeFrom->format('i'),
+                (int) $timeFrom->format('s')
+            );
+        }
+
+        if ($timeTo === null) {
+            $this->shiftEnd = null;
+        } else {
+            $this->shiftEnd = clone $this->date;
+            if ($timeFrom !== null && $timeTo->format('H:i:s') <= $timeFrom->format('H:i:s')) {
+                $this->shiftEnd->modify('+1 day');
+            }
+            $this->shiftEnd->setTime(
+                (int) $timeTo->format('H'),
+                (int) $timeTo->format('i'),
+                (int) $timeTo->format('s')
+            );
+        }
+    }
 }

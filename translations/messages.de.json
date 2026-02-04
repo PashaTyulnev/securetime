@@ -102,6 +102,7 @@
   "dashboard.shift_completed": "Schicht abgeschlossen",
   "dashboard.early_checkout_title": "Vorzeitig ausgecheckt",
   "dashboard.early_checkout_message": "Sie haben sich aus der heutigen Schicht vorzeitig ausgecheckt.",
+  "dashboard.next_shift_title": "Nächste geplante Schicht",
   "dashboard.next_shift_info": "Ihre nächste geplante Schicht:",
   "dashboard.no_next_shift": "Keine weiteren Schichten in den nächsten 30 Tagen geplant.",
   "dashboard.today_shift_title": "Heutige Schicht(en)",
