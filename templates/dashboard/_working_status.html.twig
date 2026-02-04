@@ -1,6 +1,8 @@
 {# Arbeitsstatus / Zeiterfassung. Erwartet: todayWorkingInformation #}
 <div class="px-5 pt-5 pb-4 w-full md:w-1/2 lg:w-1/4">
 
+    {% include 'modules/time_tracker.html.twig' %}
+
     {% if todayWorkingInformation['workingToday'] %}
         {# Zeige Time Tracker wenn: eingecheckt, in Pause, oder 10 Min vor bis 25 Min nach Schichtbeginn #}
         {% if todayWorkingInformation['isCheckedIn']
@@ -8,7 +10,7 @@
             or (todayWorkingInformation['minutesDifferenceToWorkBegin'] is not null
             and todayWorkingInformation['minutesDifferenceToWorkBegin'] >= -10
             and todayWorkingInformation['minutesDifferenceToWorkBegin'] <= 25) %}
-            {% include 'modules/time_tracker.html.twig' %}
+
 
             {# Zu spät (mehr als 25 Min nach Schichtbeginn) #}
         {% elseif todayWorkingInformation['minutesDifferenceToWorkBegin'] is not null and todayWorkingInformation['minutesDifferenceToWorkBegin'] > 25 %}
