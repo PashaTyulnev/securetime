@@ -209,14 +209,22 @@ readonly class TimeTrackerService
         if ($totalPauseMinutes < $requiredPauseMinutes) {
             $missingPauseMinutes = $requiredPauseMinutes - $totalPauseMinutes;
 
-            // Wir fügen eine Pause + Checkin vor dem Checkout hinzu:
-            // Der Checkin nach der Pause sollte mindestens 1 Minute vor dem Checkout liegen,
-            // um sicherzustellen, dass es einen sinnvollen Abstand gibt
-            $minCheckinBeforeCheckout = 1; // Mindestens 1 Minute vor Checkout
+            // Der Checkin nach der Pause mindestens 1 Minute vor Checkout (sinnvoller Abstand)
+            $minCheckinBeforeCheckout = 1;
             $checkinAfterPause = $checkoutTimestamp->sub(new \DateInterval(sprintf('PT%dM', $minCheckinBeforeCheckout)));
-            
-            // Pause startet Pausendauer vor dem Checkin nach der Pause
             $pauseStart = $checkinAfterPause->sub(new \DateInterval(sprintf('PT%dM', $missingPauseMinutes)));
+
+            // Konsistenz: Pause darf nicht vor Schichtbeginn liegen
+            $mainCheckinTimestamp = $lastMainCheckin->getTimestamp();
+            if ($pauseStart < $mainCheckinTimestamp) {
+                $pauseStart = $mainCheckinTimestamp;
+                $checkinAfterPause = $pauseStart->add(new \DateInterval(sprintf('PT%dM', $missingPauseMinutes)));
+            }
+
+            // Checkout muss strikt nach Checkin-Ende liegen (verhindert Inkonsistenzen)
+            if ($checkoutTimestamp <= $checkinAfterPause) {
+                $checkoutTimestamp = $checkinAfterPause->add(new \DateInterval('PT1M'));
+            }
 
             // 1) Pause-Eintrag
             $pauseEntry = new TimeTracker();
@@ -228,7 +236,7 @@ readonly class TimeTrackerService
             $pauseEntry->setParent($lastMainCheckin);
             $this->em->persist($pauseEntry);
 
-            // 2) Checkin-Eintrag (Ende der Pause) - mindestens 1 Minute vor Checkout
+            // 2) Checkin-Eintrag (Ende der Pause)
             $checkinEntry = new TimeTracker();
             $checkinEntry->setUser($user);
             $checkinEntry->setCreatedAt(new \DateTimeImmutable());
@@ -239,6 +247,20 @@ readonly class TimeTrackerService
             $this->em->persist($checkinEntry);
 
             $this->em->flush();
+        }
+
+        // Einheitliche Absicherung: Checkout-Zeitpunkt muss nach dem letzten Eintrag der Schicht liegen
+        $shiftEntriesForValidation = $this->timeTrackerRepository->findShiftEntries($lastMainCheckin);
+        $lastTimestampInShift = $lastMainCheckin->getTimestamp();
+        foreach ($shiftEntriesForValidation as $entry) {
+            $ts = $entry->getTimestamp();
+            if ($ts > $lastTimestampInShift) {
+                $lastTimestampInShift = $ts;
+            }
+        }
+        $minCheckoutTimestamp = $lastTimestampInShift->add(new \DateInterval('PT1M'));
+        if ($checkoutTimestamp <= $lastTimestampInShift) {
+            $checkoutTimestamp = $minCheckoutTimestamp;
         }
 
         // Abschließend regulären Checkout-Eintrag speichern
@@ -443,6 +465,15 @@ readonly class TimeTrackerService
         if ($requiredPauseMinutes > 0) {
             $pauseEnd = $endDateTime->sub(new \DateInterval('PT60M'));
             $pauseStart = $pauseEnd->sub(new \DateInterval(sprintf('PT%dM', $requiredPauseMinutes)));
+
+            // Konsistenz: Pause darf nicht vor Schichtbeginn liegen
+            if ($pauseStart < $startDateTime) {
+                $pauseStart = $startDateTime;
+                $pauseEnd = $startDateTime->add(new \DateInterval(sprintf('PT%dM', $requiredPauseMinutes)));
+            }
+            if ($pauseEnd >= $endDateTime) {
+                $pauseEnd = $endDateTime->sub(new \DateInterval('PT1M'));
+            }
 
             $pauseEntry = new TimeTracker();
             $pauseEntry->setUser($user);

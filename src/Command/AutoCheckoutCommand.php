@@ -70,18 +70,14 @@ class AutoCheckoutCommand extends Command
 
             // Prüfe ob die maximale Arbeitszeit überschritten wurde
             if ($workingMinutes > self::MAX_WORKING_MINUTES) {
-                // Berechne Checkout-Timestamp: Hauptcheckin + 12,5 Stunden
+                // Checkout-Zeitpunkt: Hauptcheckin + exakt 12,5 Stunden (750 Minuten)
                 $checkoutTimestamp = $mainCheckinTimestamp->add(new \DateInterval('PT' . self::MAX_WORKING_MINUTES . 'M'));
-                
-                // Stelle sicher, dass der Checkout nach dem letzten Checkin liegt
-                // (wichtig nach Pausen, wenn jemand wieder eingecheckt hat)
-                // Mindestens 1 Minute Abstand, damit nachgetragene Pausen genug Platz haben
-                $minCheckoutAfterCheckin = 1; // Mindestens 1 Minute nach letztem Checkin
+
+                // Checkout muss immer mindestens 1 Minute nach dem letzten Checkin liegen
+                // (verhindert Inkonsistenzen durch automatische Pausen)
+                $minCheckoutAfterCheckin = 1;
                 $minCheckoutTimestamp = $lastCheckinTimestamp->add(new \DateInterval(sprintf('PT%dM', $minCheckoutAfterCheckin)));
-                
-                if ($checkoutTimestamp <= $minCheckoutTimestamp) {
-                    // Wenn der berechnete Checkout zu nah am letzten Checkin ist,
-                    // setze ihn auf mindestens 1 Minute nach dem letzten Checkin
+                if ($checkoutTimestamp < $minCheckoutTimestamp) {
                     $checkoutTimestamp = $minCheckoutTimestamp;
                 }
                 
