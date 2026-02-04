@@ -475,6 +475,11 @@ readonly class TimeTrackerService
                 $pauseEnd = $endDateTime->sub(new \DateInterval('PT1M'));
             }
 
+            // Checkout muss strikt nach Checkin-Ende liegen (monoton)
+            if ($endDateTime <= $pauseEnd) {
+                $endDateTime = $pauseEnd->add(new \DateInterval('PT1M'));
+            }
+
             $pauseEntry = new TimeTracker();
             $pauseEntry->setUser($user);
             $pauseEntry->setCreatedAt(new \DateTimeImmutable());
