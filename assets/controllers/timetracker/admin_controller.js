@@ -354,12 +354,37 @@ export default class extends Controller {
         //alle inputs aus der Reihe
         let tr = target.closest('tr')
 
-        //suche inputs mit name shiftStartDate, shiftEndDate, shiftStartTime, shiftEndTime
-        let shiftStartDate = tr.querySelector('[name="shiftStartDate"]').value
-        let shiftEndDate = tr.querySelector('[name="shiftEndDate"]').value
-        let shiftStartTime = tr.querySelector('[name="shiftStartTime"]').value
-        let shiftEndTime = tr.querySelector('[name="shiftEndTime"]').value
-        let timeTrackerId = tr.querySelector('[name="timeTrackerId"]').value
+        if (!tr) {
+            this.displayToast('Interner Fehler: Zeile konnte nicht ermittelt werden.', 'danger')
+            return
+        }
+
+        // suche inputs mit name shiftStartDate, shiftEndDate, shiftStartTime, shiftEndTime
+        const shiftStartDateInput = tr.querySelector('[name="shiftStartDate"]')
+        const shiftStartTimeInput = tr.querySelector('[name="shiftStartTime"]')
+        const shiftEndDateInput = tr.querySelector('[name="shiftEndDate"]')
+        const shiftEndTimeInput = tr.querySelector('[name="shiftEndTime"]')
+        const timeTrackerIdInput = tr.querySelector('[name="timeTrackerId"]')
+
+        // grundlegende Felder müssen vorhanden sein
+        if (!shiftStartDateInput || !shiftStartTimeInput || !timeTrackerIdInput) {
+            this.displayToast('Interner Fehler: Bearbeitungsfelder fehlen.', 'danger')
+            return
+        }
+
+        const shiftStartDate = shiftStartDateInput.value
+        const shiftStartTime = shiftStartTimeInput.value
+        const timeTrackerId = timeTrackerIdInput.value
+
+        // Für aktuelle Implementierung erwarten wir ein vorhandenes Schichtende.
+        // Bei offenen Schichten (kein Ende gerendert) sauber abbrechen.
+        if (!shiftEndDateInput || !shiftEndTimeInput || !shiftEndDateInput.value || !shiftEndTimeInput.value) {
+            this.displayToast('Für offene Schichten ohne Endzeit kann diese Bearbeitung nicht verwendet werden. Bitte zuerst einen Checkout erfassen oder den Eintrag manuell schließen.', 'danger')
+            return
+        }
+
+        const shiftEndDate = shiftEndDateInput.value
+        const shiftEndTime = shiftEndTimeInput.value
 
         //create array with all values
         let data = {
