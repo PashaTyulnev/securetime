@@ -253,6 +253,7 @@ readonly class ShiftService
 
         // -------------------------------------------------
         // 2) Active Shift läuft gerade (Night Shift Safe)
+        //    → Wenn nicht eingecheckt und >25 Min nach Start: LATE
         // -------------------------------------------------
         $activeShift = $this->findActiveShift($user, $now);
 
@@ -260,13 +261,33 @@ readonly class ShiftService
             $minutesSinceStart =
                 (int)(($now->getTimestamp() - $activeShift->shiftBeginn->getTimestamp()) / 60);
 
+            // Benutzer arbeitet laut Plan gerade, ist aber nicht eingecheckt:
+            // ab 25 Minuten nach Schichtbeginn als „zu spät“ markieren
+            if (!$isCheckedIn && !$hasPause && $minutesSinceStart > 25) {
+                return [
+                    'state' => 'LATE',
+                    'workingToday' => true,
+
+                    'isCheckedIn' => false,
+                    'hasPause' => false,
+                    'isCheckedOut' => $isCheckedOut,
+
+                    'minutesDifferenceToWorkBegin' => $minutesSinceStart,
+
+                    'nextPlannedShift' => null,
+                    'earlyCheckoutToday' => false,
+                ];
+            }
+
+            // Fallback: Active-Status (wird aktuell faktisch nicht genutzt,
+            // da eingecheckte Nutzer oben bereits als CHECKED_IN behandelt werden)
             return [
                 'state' => 'ACTIVE',
                 'workingToday' => true,
 
-                'isCheckedIn' => false,
-                'hasPause' => false,
-                'isCheckedOut' => true,
+                'isCheckedIn' => $isCheckedIn,
+                'hasPause' => $hasPause,
+                'isCheckedOut' => $isCheckedOut,
 
                 'minutesDifferenceToWorkBegin' => $minutesSinceStart,
 
