@@ -32,47 +32,58 @@
        ============================================================ #}
     {% elseif todayWorkingInformation.state == 'UPCOMING' %}
 
-        {% set nextShift = todayWorkingInformation.nextPlannedShift %}
+        {# Check-in-Fenster: 10 Minuten vor Schichtbeginn bis 25 Minuten danach #}
+        {% set minutesDiff = todayWorkingInformation.minutesDifferenceToWorkBegin %}
 
-        <div class="bg-green-50 dark:bg-green-900/30 backdrop-blur-xl rounded-2xl border border-green-200 dark:border-green-800 p-6 shadow-sm">
-            <div class="flex items-center gap-3 mb-3">
-                {{ ux_icon('lucide:calendar-clock', { class: 'w-6 h-6 text-green-600 dark:text-green-400' }) }}
-                <h2 class="text-base font-semibold text-green-800 dark:text-green-300">
-                    {{ 'dashboard.next_shift_title'|trans }}
-                </h2>
-            </div>
+        {% if minutesDiff is not null and minutesDiff <= 10 and minutesDiff >= -25 %}
 
-            <p class="text-sm text-green-700 dark:text-green-300 leading-relaxed mb-4">
-                {{ 'dashboard.next_shift_info'|trans|raw }}
-            </p>
+            {# Innerhalb des Fensters → TimeTracker anzeigen, damit Check-in möglich ist #}
+            {% include 'modules/time_tracker.html.twig' %}
 
-            <div class="space-y-2 text-sm">
+        {% else %}
 
-                {% if nextShift.facility %}
-                    <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        {{ ux_icon('lucide:building-2', { class: 'w-4 h-4 opacity-70' }) }}
-                        <span>{{ nextShift.facility.title }}</span>
-                    </div>
-                {% endif %}
+            {% set nextShift = todayWorkingInformation.nextPlannedShift %}
 
-                <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                    {{ ux_icon('lucide:calendar', { class: 'w-4 h-4 opacity-70' }) }}
-                    <span>
-                        {{ nextShift.dateTime|date('d.m.Y') }},
-                        {{ nextShift.timeFrom|date('H:i') }} – {{ nextShift.timeTo|date('H:i') }}
-                        {{ 'dashboard.time_suffix'|trans }}
-                    </span>
+            <div class="bg-green-50 dark:bg-green-900/30 backdrop-blur-xl rounded-2xl border border-green-200 dark:border-green-800 p-6 shadow-sm">
+                <div class="flex items-center gap-3 mb-3">
+                    {{ ux_icon('lucide:calendar-clock', { class: 'w-6 h-6 text-green-600 dark:text-green-400' }) }}
+                    <h2 class="text-base font-semibold text-green-800 dark:text-green-300">
+                        {{ 'dashboard.next_shift_title'|trans }}
+                    </h2>
                 </div>
 
-                {% if nextShift.name %}
-                    <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        {{ ux_icon('lucide:briefcase', { class: 'w-4 h-4 opacity-70' }) }}
-                        <span>{{ nextShift.name }}</span>
-                    </div>
-                {% endif %}
+                <p class="text-sm text-green-700 dark:text-green-300 leading-relaxed mb-4">
+                    {{ 'dashboard.next_shift_info'|trans|raw }}
+                </p>
 
+                <div class="space-y-2 text-sm">
+
+                    {% if nextShift.facility %}
+                        <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                            {{ ux_icon('lucide:building-2', { class: 'w-4 h-4 opacity-70' }) }}
+                            <span>{{ nextShift.facility.title }}</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                        {{ ux_icon('lucide:calendar', { class: 'w-4 h-4 opacity-70' }) }}
+                        <span>
+                            {{ nextShift.dateTime|date('d.m.Y') }},
+                            {{ nextShift.timeFrom|date('H:i') }} – {{ nextShift.timeTo|date('H:i') }}
+                            {{ 'dashboard.time_suffix'|trans }}
+                        </span>
+                    </div>
+
+                    {% if nextShift.name %}
+                        <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                            {{ ux_icon('lucide:briefcase', { class: 'w-4 h-4 opacity-70' }) }}
+                            <span>{{ nextShift.name }}</span>
+                        </div>
+                    {% endif %}
+
+                </div>
             </div>
-        </div>
+        {% endif %}
 
         {# ============================================================
        4) OFF → keine Schicht geplant
