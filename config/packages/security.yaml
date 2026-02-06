@@ -24,8 +24,7 @@ security:
             stateless: false
             security: true
             provider: app_user_provider
-            http_basic:
-                realm: 'Secsoft API'
+            context: main
             lazy: true
         main:
             two_factor:
