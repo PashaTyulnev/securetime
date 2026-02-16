@@ -34,8 +34,11 @@ class DashboardController extends AbstractController
         $todayWorkingInformation =
             $this->shiftService->getDashboardWorkingInfo($user, $this->timeTrackerService);
 
+        $upcomingUserShifts = $this->shiftService->findUpcomingShiftsForUser($user, 7);
+
         return $this->render('dashboard.html.twig', [
             'todayWorkingInformation' => $todayWorkingInformation,
+            'upcomingUserShifts' => $upcomingUserShifts,
         ]);
     }
 

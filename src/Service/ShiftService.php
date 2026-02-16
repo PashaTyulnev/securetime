@@ -205,8 +205,8 @@ readonly class ShiftService
             return [];
         }
 
-        $today = new DateTime('today');
-        $end = (clone $today)->modify("+$days days");
+        $today = (new \DateTimeImmutable('now', $this->tz()))->setTime(0, 0, 0);
+        $end = $today->modify("+{$days} days");
 
         return $this->shiftRepository->getAllAssignedShiftsInRange(
             $user->getEmployee(),
