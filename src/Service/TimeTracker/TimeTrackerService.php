@@ -1072,20 +1072,112 @@ readonly class TimeTrackerService
         $shiftStart = new \DateTimeImmutable($requestContent->shiftStartDate . ' ' . $requestContent->shiftStartTime);
         $shiftEnd = new \DateTimeImmutable($requestContent->shiftEndDate . ' ' . $requestContent->shiftEndTime);
 
-        //Parent TimeTracker ID
         $timeTrackerId = $requestContent->timeTrackerId;
 
         $timeTrackerEntryCheckin = $this->timeTrackerRepository->findOneBy(['id' => $timeTrackerId]);
         $timeTrackerEntryCheckout = $this->timeTrackerRepository->findOneBy(['parent' => $timeTrackerId, 'type' => 'checkout']);
 
         $user = $timeTrackerEntryCheckin->getUser();
+
+        $this->slideShiftMiddleEntriesBeforeSave(
+            $timeTrackerEntryCheckin,
+            $timeTrackerEntryCheckout,
+            $shiftStart,
+            $shiftEnd
+        );
+
         $this->validateInputDates($user, $timeTrackerId, $shiftStart, $shiftEnd, $timeTrackerEntryCheckin, $timeTrackerEntryCheckout);
 
         $this->em->persist($timeTrackerEntryCheckin);
         $this->em->persist($timeTrackerEntryCheckout);
 
         $this->em->flush();
+    }
 
+    /**
+     * If the new shift end is before the current last entry (e.g. checkin after pause),
+     * slide all middle entries (pauses and checkins) so they fit before shift end.
+     */
+    private function slideShiftMiddleEntriesBeforeSave(
+        TimeTracker $mainCheckin,
+        TimeTracker $checkoutEntry,
+        \DateTimeImmutable $shiftStart,
+        \DateTimeImmutable $shiftEnd
+    ): void {
+        $shiftEntries = $this->timeTrackerRepository->findShiftEntries($mainCheckin);
+        $lastTimestampInShift = $mainCheckin->getTimestamp();
+        foreach ($shiftEntries as $entry) {
+            if ($entry === $checkoutEntry) {
+                continue;
+            }
+            $ts = $entry->getTimestamp();
+            if ($ts !== null && $ts > $lastTimestampInShift) {
+                $lastTimestampInShift = $ts;
+            }
+        }
+
+        if ($shiftEnd >= $lastTimestampInShift) {
+            return;
+        }
+
+        $middleEntries = [];
+        foreach ($shiftEntries as $entry) {
+            if ($entry === $mainCheckin || $entry === $checkoutEntry) {
+                continue;
+            }
+            $middleEntries[] = $entry;
+        }
+        if ($middleEntries === []) {
+            return;
+        }
+
+        usort($middleEntries, static fn (TimeTracker $a, TimeTracker $b): int => ($a->getId() ?? 0) <=> ($b->getId() ?? 0));
+
+        $pairs = [];
+        for ($i = 0; $i < count($middleEntries); $i += 2) {
+            $pause = $middleEntries[$i];
+            $checkin = $middleEntries[$i + 1] ?? null;
+            if ($pause->getType() !== 'pause' || ($checkin !== null && $checkin->getType() !== 'checkin')) {
+                return;
+            }
+            $pauseTs = $pause->getTimestamp();
+            $checkinTs = $checkin?->getTimestamp();
+            if ($pauseTs === null || $checkinTs === null) {
+                return;
+            }
+            $durationSeconds = $checkinTs->getTimestamp() - $pauseTs->getTimestamp();
+            $durationSeconds = max(0, $durationSeconds);
+            $pairs[] = ['pause' => $pause, 'checkin' => $checkin, 'durationSeconds' => $durationSeconds];
+        }
+
+        $gapMinutes = 1;
+        $gapSeconds = $gapMinutes * 60;
+        $lastCheckinTime = $shiftEnd->getTimestamp() - $gapSeconds;
+
+        for ($p = count($pairs) - 1; $p >= 0; $p--) {
+            $checkinTime = $lastCheckinTime;
+            $pauseTime = $checkinTime - $pairs[$p]['durationSeconds'];
+
+            if ($pauseTime < $shiftStart->getTimestamp()) {
+                $pauseTime = $shiftStart->getTimestamp();
+                $checkinTime = $pauseTime + $pairs[$p]['durationSeconds'];
+                if ($checkinTime >= $shiftEnd->getTimestamp()) {
+                    throw new \DateMalformedStringException(
+                        sprintf(
+                            'Schichtende liegt zu nah am Schichtanfang: Für die erfasste Pausendauer (%d Min) ist kein Platz.',
+                            (int) round($pairs[$p]['durationSeconds'] / 60)
+                        )
+                    );
+                }
+            }
+
+            $pairs[$p]['pause']->setTimestamp(new \DateTimeImmutable('@' . $pauseTime));
+            $pairs[$p]['checkin']->setTimestamp(new \DateTimeImmutable('@' . $checkinTime));
+            $this->em->persist($pairs[$p]['pause']);
+            $this->em->persist($pairs[$p]['checkin']);
+
+            $lastCheckinTime = $pauseTime - $gapSeconds;
+        }
     }
 
     /**

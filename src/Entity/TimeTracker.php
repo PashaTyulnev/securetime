@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Listener\TimeTrackerEntityListener;
 use App\Entity\User;
 use App\Repository\TimeTrackerRepository;
 use DateTimeImmutable;
@@ -9,6 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TimeTrackerRepository::class)]
+#[ORM\EntityListeners([TimeTrackerEntityListener::class])]
 class TimeTracker
 {
     #[ORM\Id]
