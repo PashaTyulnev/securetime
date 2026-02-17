@@ -1070,7 +1070,11 @@ readonly class TimeTrackerService
     public function saveChangedTimeEntry(mixed $requestContent): void
     {
         $shiftStart = new \DateTimeImmutable($requestContent->shiftStartDate . ' ' . $requestContent->shiftStartTime);
-        $shiftEnd = new \DateTimeImmutable($requestContent->shiftEndDate . ' ' . $requestContent->shiftEndTime);
+
+        $shiftEnd = null;
+        if (!empty($requestContent->shiftEndDate ?? '') && !empty($requestContent->shiftEndTime ?? '')) {
+            $shiftEnd = new \DateTimeImmutable($requestContent->shiftEndDate . ' ' . $requestContent->shiftEndTime);
+        }
 
         $timeTrackerId = $requestContent->timeTrackerId;
 
@@ -1078,6 +1082,31 @@ readonly class TimeTrackerService
         $timeTrackerEntryCheckout = $this->timeTrackerRepository->findOneBy(['parent' => $timeTrackerId, 'type' => 'checkout']);
 
         $user = $timeTrackerEntryCheckin->getUser();
+
+        $isOpenShift = $timeTrackerEntryCheckout === null;
+
+        if ($isOpenShift && $shiftEnd === null) {
+            $this->validateOpenShiftStartOnly($user, $timeTrackerId, $shiftStart, $timeTrackerEntryCheckin);
+            $timeTrackerEntryCheckin->setTimestamp($shiftStart);
+            $this->em->persist($timeTrackerEntryCheckin);
+            $this->em->flush();
+            return;
+        }
+
+        if ($isOpenShift && $shiftEnd !== null) {
+            $timeTrackerEntryCheckout = new TimeTracker();
+            $timeTrackerEntryCheckout->setUser($user);
+            $timeTrackerEntryCheckout->setCreatedAt(new \DateTimeImmutable());
+            $timeTrackerEntryCheckout->setTimestamp($shiftEnd);
+            $timeTrackerEntryCheckout->setType('checkout');
+            $timeTrackerEntryCheckout->setShiftStart(false);
+            $timeTrackerEntryCheckout->setParent($timeTrackerEntryCheckin);
+            $this->em->persist($timeTrackerEntryCheckout);
+        }
+
+        if ($shiftEnd === null) {
+            throw new \DateMalformedStringException('Schichtende ist erforderlich für geschlossene Schichten.');
+        }
 
         $this->slideShiftMiddleEntriesBeforeSave(
             $timeTrackerEntryCheckin,
@@ -1092,6 +1121,56 @@ readonly class TimeTrackerService
         $this->em->persist($timeTrackerEntryCheckout);
 
         $this->em->flush();
+    }
+
+    /**
+     * Validate and enforce no overlap when only updating the start of an open shift.
+     */
+    private function validateOpenShiftStartOnly(
+        User $user,
+        mixed $timeTrackerId,
+        \DateTimeImmutable $shiftStart,
+        TimeTracker $timeTrackerEntryCheckin
+    ): void {
+        $previousMainCheckin = $this->timeTrackerRepository->findPreviousMainCheckinEntry($user, (int) $timeTrackerId);
+        if ($previousMainCheckin !== null) {
+            $previousCheckout = $this->timeTrackerRepository->findOneBy([
+                'parent' => $previousMainCheckin->getId(),
+                'type'   => 'checkout',
+            ]);
+            if ($previousCheckout !== null && $shiftStart < $previousCheckout->getTimestamp()) {
+                throw new \DateMalformedStringException(
+                    'Schichtanfang darf nicht vor dem Ende der vorherigen Schicht liegen (keine Überlappung).'
+                );
+            }
+        }
+
+        $nextMainCheckin = $this->timeTrackerRepository->findNextMainCheckinEntry($user, (int) $timeTrackerId);
+        if ($nextMainCheckin !== null && $shiftStart >= $nextMainCheckin->getTimestamp()) {
+            throw new \DateMalformedStringException(
+                'Schichtanfang darf nicht nach dem Anfang der nächsten Schicht liegen (keine Überlappung).'
+            );
+        }
+
+        $shiftEntries = $this->timeTrackerRepository->findShiftEntries($timeTrackerEntryCheckin);
+        $firstOtherTs = null;
+        foreach ($shiftEntries as $entry) {
+            if ($entry === $timeTrackerEntryCheckin) {
+                continue;
+            }
+            $ts = $entry->getTimestamp();
+            if ($ts !== null && ($firstOtherTs === null || $ts < $firstOtherTs)) {
+                $firstOtherTs = $ts;
+            }
+        }
+        if ($firstOtherTs !== null && $shiftStart > $firstOtherTs) {
+            throw new \DateMalformedStringException(
+                sprintf(
+                    'Schichtanfang darf nicht nach dem ersten Folgeeintrag der Schicht liegen (z. B. Pause: %s).',
+                    $firstOtherTs->format('d.m.Y H:i')
+                )
+            );
+        }
     }
 
     /**

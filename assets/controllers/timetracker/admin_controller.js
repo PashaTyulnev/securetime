@@ -376,23 +376,16 @@ export default class extends Controller {
         const shiftStartTime = shiftStartTimeInput.value
         const timeTrackerId = timeTrackerIdInput.value
 
-        // Für aktuelle Implementierung erwarten wir ein vorhandenes Schichtende.
-        // Bei offenen Schichten (kein Ende gerendert) sauber abbrechen.
-        if (!shiftEndDateInput || !shiftEndTimeInput || !shiftEndDateInput.value || !shiftEndTimeInput.value) {
-            this.displayToast('Für offene Schichten ohne Endzeit kann diese Bearbeitung nicht verwendet werden. Bitte zuerst einen Checkout erfassen oder den Eintrag manuell schließen.', 'danger')
-            return
-        }
+        const hasShiftEnd = shiftEndDateInput?.value && shiftEndTimeInput?.value
 
-        const shiftEndDate = shiftEndDateInput.value
-        const shiftEndTime = shiftEndTimeInput.value
-
-        //create array with all values
         let data = {
             shiftStartDate: shiftStartDate,
-            shiftEndDate: shiftEndDate,
             shiftStartTime: shiftStartTime,
-            shiftEndTime: shiftEndTime,
             timeTrackerId: timeTrackerId
+        }
+        if (hasShiftEnd) {
+            data.shiftEndDate = shiftEndDateInput.value
+            data.shiftEndTime = shiftEndTimeInput.value
         }
 
         //send data to backend

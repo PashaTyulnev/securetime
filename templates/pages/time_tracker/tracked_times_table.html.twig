@@ -63,23 +63,21 @@
                     </td>
 
                     <td class="px-3 py-2">
-                        {% if trackedTime.shiftEnd is not null %}
-                            <div class="flex gap-2">
-                                <input type="date"
-                                       class="bg-transparent border-0 text-xs text-gray-900 dark:text-white w-28 px-1 focus:outline-none focus:ring-1 focus:ring-slate-500/50 rounded"
-                                       name="shiftEndDate"
-                                       data-action="change->timetracker--admin#displaySaveButton"
-                                       value="{{ trackedTime.shiftEnd.date|date('Y-m-d') }}"
-                                       {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
+                        <div class="flex gap-2">
+                            <input type="date"
+                                   class="bg-transparent border-0 text-xs text-gray-900 dark:text-white w-28 px-1 focus:outline-none focus:ring-1 focus:ring-slate-500/50 rounded"
+                                   name="shiftEndDate"
+                                   data-action="change->timetracker--admin#displaySaveButton"
+                                   value="{{ trackedTime.shiftEnd is not null ? trackedTime.shiftEnd.date|date('Y-m-d') : '' }}"
+                                   {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
 
-                                <input type="time"
-                                       class="bg-transparent border-0 text-xs text-gray-900 dark:text-white w-16 px-1 focus:outline-none focus:ring-1 focus:ring-slate-500/50 rounded"
-                                       name="shiftEndTime"
-                                       data-action="change->timetracker--admin#displaySaveButton"
-                                       value="{{ trackedTime.shiftEnd.date|date('H:i') }}"
-                                       {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
-                            </div>
-                        {% endif %}
+                            <input type="time"
+                                   class="bg-transparent border-0 text-xs text-gray-900 dark:text-white w-16 px-1 focus:outline-none focus:ring-1 focus:ring-slate-500/50 rounded"
+                                   name="shiftEndTime"
+                                   data-action="change->timetracker--admin#displaySaveButton"
+                                   value="{{ trackedTime.shiftEnd is not null ? trackedTime.shiftEnd.date|date('H:i') : '' }}"
+                                   {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
+                        </div>
                     </td>
 
                     <td class="px-3 py-2">
