@@ -1158,6 +1158,30 @@ readonly class TimeTrackerService
         }
 
         // ==============================
+        // Schichtende nach letztem Eintrag (z. B. Checkin nach Pause)
+        // ==============================
+        $shiftEntries = $this->timeTrackerRepository->findShiftEntries($timeTrackerEntryCheckin);
+        $lastTimestampInShift = $timeTrackerEntryCheckin->getTimestamp();
+        foreach ($shiftEntries as $entry) {
+            if ($entry === $timeTrackerEntryCheckout) {
+                continue;
+            }
+            $ts = $entry->getTimestamp();
+            if ($ts > $lastTimestampInShift) {
+                $lastTimestampInShift = $ts;
+            }
+        }
+        // Gleiches Ende wie letzter Eintrag ist erlaubt, nur davor nicht.
+        if ($shiftEnd < $lastTimestampInShift) {
+            throw new \DateMalformedStringException(
+                sprintf(
+                    'Schichtende muss nach dem letzten Eintrag der Schicht liegen (z. B. Checkin nach Pause: %s).',
+                    $lastTimestampInShift->format('d.m.Y H:i')
+                )
+            );
+        }
+
+        // ==============================
         // Persistieren
         // ==============================
         $timeTrackerEntryCheckin->setTimestamp($shiftStart);
