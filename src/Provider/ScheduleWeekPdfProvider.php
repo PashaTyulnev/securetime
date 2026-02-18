@@ -5,11 +5,11 @@ namespace App\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\ScheduleMonthPdf;
-use App\Entity\Employee;
 use App\Service\EmployeeService;
 use App\Service\FacilityService;
 use App\Service\ScheduleService;
 use Dompdf\Dompdf;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -20,7 +20,8 @@ class ScheduleWeekPdfProvider implements ProviderInterface
                                 readonly Environment $twig,
                                 readonly EmployeeService $employeeService,
                                 readonly FacilityService $facilityService,
-                                readonly ScheduleService $scheduleService) {}
+                                readonly ScheduleService $scheduleService,
+                                readonly Security $security) {}
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): Response
     {
 
@@ -40,7 +41,7 @@ class ScheduleWeekPdfProvider implements ProviderInterface
         }
 
 
-        $pdfContent = $this->generatePdf($week, $year,$weekSpan, $facilityId);
+        $pdfContent = $this->generatePdf($week, $year, $weekSpan, $facilityId);
 
         return new Response(
             $pdfContent,
@@ -54,17 +55,35 @@ class ScheduleWeekPdfProvider implements ProviderInterface
         );
     }
 
-    private function generatePdf(int $week, int $year, $weekSpan, $facilityId = null): string
+    private function generatePdf(int $week, int $year, int $weekSpan, $facilityId = null): string
     {
         $dompdf = new Dompdf();
 
 
         $facilities = $this->facilityService->getAllFacilities();
-        $datesRange = $this->scheduleService->buildWeekDaysRange((int)$year, (int)$week, (int)$weekSpan);
+        $datesRange = $this->scheduleService->buildWeekDaysRange($year, $week, $weekSpan);
 
-        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange,$facilityId);
+        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange, $facilityId);
 
         $employees = $this->employeeService->getAllEmployees();
+
+        $currentRoles = $this->security->getUser()?->getRoles() ?? [];
+
+        if (!in_array('ROLE_ADMIN', $currentRoles, true) && !in_array('ROLE_PARTNER_ADMIN', $currentRoles, true)) {
+            $currentEmployeeIri = $this->employeeService->getCurrentEmployeeIri();
+
+            if ($currentEmployeeIri !== null) {
+                $shifts = array_values(array_filter(
+                    $shifts,
+                    static fn (array $shift): bool => ($shift['employee'] ?? null) === $currentEmployeeIri
+                ));
+
+                $employees = array_values(array_filter(
+                    $employees,
+                    static fn (array $employee): bool => ($employee['@id'] ?? null) === $currentEmployeeIri
+                ));
+            }
+        }
 
         $relevantEmployees = $this->employeeService->filterOnlyShiftedEmployees($employees, $shifts);
 

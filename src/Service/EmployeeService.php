@@ -85,6 +85,17 @@ class EmployeeService
         return json_decode($allQualifications, true);
     }
 
+    public function getCurrentEmployeeIri(): ?string
+    {
+        $currentUser = $this->security->getUser();
+
+        if (!$currentUser || !$currentUser->getEmployee()) {
+            return null;
+        }
+
+        return '/api/employees/' . $currentUser->getEmployee()->getId();
+    }
+
     public function assignPlannedHoursToEmployees(mixed $employees, array $plannedHoursData)
     {
         // 1️⃣ Lookup-Tabelle nach Employee-ID
