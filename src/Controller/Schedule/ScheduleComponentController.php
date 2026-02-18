@@ -9,6 +9,7 @@ use App\Service\ScheduleService;
 use App\Service\ShiftService;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,9 +22,31 @@ class ScheduleComponentController extends AbstractController
                                 readonly FacilityService $facilityService,
                                 readonly ShiftService $shiftService,
                                 readonly PartnerService $partnerService,
-                                readonly ScheduleService $scheduleService)
+                                readonly ScheduleService $scheduleService,
+                                readonly Security $security)
     {
 
+    }
+
+    private function restrictToCurrentUserIfNeeded(array $employees, array $shifts): array
+    {
+        $roles = $this->security->getUser()?->getRoles() ?? [];
+        if (in_array('ROLE_ADMIN', $roles, true) || in_array('ROLE_PARTNER_ADMIN', $roles, true)) {
+            return [$employees, $shifts];
+        }
+        $iri = $this->employeeService->getCurrentEmployeeIri();
+        if ($iri === null) {
+            return [$employees, $shifts];
+        }
+        $employees = array_values(array_filter(
+            $employees,
+            static fn (array $e): bool => ($e['@id'] ?? null) === $iri
+        ));
+        $shifts = array_values(array_filter(
+            $shifts,
+            static fn (array $s): bool => ($s['employee'] ?? null) === $iri
+        ));
+        return [$employees, $shifts];
     }
 
     #[Route(path: '/components/schedule-week', name: 'schedule_week_component', methods: ['GET'])]
@@ -42,13 +65,14 @@ class ScheduleComponentController extends AbstractController
         $facilities = $this->facilityService->getAllFacilities();
         $datesRange = $this->scheduleService->buildWeekDaysRange((int)$year, (int)$week);
 
-        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange);
+        $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange, $facilityId);
+
+        [$employees, $shifts] = $this->restrictToCurrentUserIfNeeded($employees, $shifts);
 
         $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
         $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
 
-
-        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate,$facilityId);
+        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate, $facilityId);
 
         $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 
@@ -103,10 +127,12 @@ class ScheduleComponentController extends AbstractController
 
         $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange, $facilityId);
 
+        [$employees, $shifts] = $this->restrictToCurrentUserIfNeeded($employees, $shifts);
+
         $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
         $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);
 
-        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate,$facilityId);
+        $plannedHours = $this->scheduleService->getPlannedHoursForEmployeesForDateRange($firstDate, $lastDate, $facilityId);
 
         $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 
@@ -135,8 +161,10 @@ class ScheduleComponentController extends AbstractController
 
         $employees = $this->employeeService->getAllEmployees();
         $facilities = $this->facilityService->getAllFacilities();
-        $datesRange = $this->scheduleService->buildWeekDaysRange((int)$year, (int)$week,2);
+        $datesRange = $this->scheduleService->buildWeekDaysRange((int)$year, (int)$week, 2);
         $shifts = $this->scheduleService->getShiftsForEmployeesInDateRange($datesRange, $facilityId);
+
+        [$employees, $shifts] = $this->restrictToCurrentUserIfNeeded($employees, $shifts);
 
         $firstDate = DateTime::createFromFormat('d.m.Y', $datesRange[0]['date']);
         $lastDate = DateTime::createFromFormat('d.m.Y', end($datesRange)['date']);

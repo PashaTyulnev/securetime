@@ -557,7 +557,7 @@ readonly class TimeTrackerService
         $currentUser = $this->security->getUser();
         $userRoles = $currentUser->getRoles();
 
-        if (!in_array('ROLE_ADMIN', $userRoles)) {
+        if (!in_array('ROLE_ADMIN', $userRoles, true) && !in_array('ROLE_PARTNER_ADMIN', $userRoles, true)) {
             $userId = $currentUser->getId();
         }
 
@@ -740,11 +740,22 @@ readonly class TimeTrackerService
 
     public function getLastUserWorkingTimes(): array
     {
-        //Für alle Users den letzten TimeTracker Eintrag holen
         $lastUserWorkingTimes = $this->timeTrackerRepository->lastUserWorkingTimes();
+        $formatted = $this->formatLastUserWorkingTimes($lastUserWorkingTimes);
 
-        return $this->formatLastUserWorkingTimes($lastUserWorkingTimes);
-
+        $currentUser = $this->security->getUser();
+        $roles = $currentUser?->getRoles() ?? [];
+        if (in_array('ROLE_ADMIN', $roles, true) || in_array('ROLE_PARTNER_ADMIN', $roles, true)) {
+            return $formatted;
+        }
+        $currentUserId = $currentUser?->getId();
+        if ($currentUserId === null) {
+            return $formatted;
+        }
+        return array_values(array_filter(
+            $formatted,
+            static fn (array $row): bool => (int) ($row['userId'] ?? 0) === (int) $currentUserId
+        ));
     }
 
     private function formatLastUserWorkingTimes($lastUserWorkingTimes): array
