@@ -31,27 +31,20 @@ class LocaleSubscriber implements EventSubscriberInterface
         }
 
         // Versuche Locale aus Session zu holen
+        $allowedLocales = ['de', 'ru', 'ar'];
+
         if ($locale = $request->attributes->get('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
-            // Versuche Locale aus Session zu holen, sonst Browser-Locale, sonst Default
-            $sessionLocale = $request->getSession()->get('_locale');
-            
-            if ($sessionLocale) {
-                $request->setLocale($sessionLocale);
-            } else {
-                // Versuche Browser-Locale zu erkennen
-                $preferredLanguage = $request->getPreferredLanguage(['de', 'ru', 'ar']);
-                
-                if ($preferredLanguage) {
-                    $request->setLocale($preferredLanguage);
-                    $request->getSession()->set('_locale', $preferredLanguage);
-                } else {
-                    // Fallback auf Deutsch
-                    $request->setLocale($this->defaultLocale);
-                    $request->getSession()->set('_locale', $this->defaultLocale);
-                }
+            $locale = $request->getSession()->get('_locale');
+
+            if (!$locale) {
+                $cookieLocale = $request->cookies->get('_locale');
+                $locale = in_array($cookieLocale, $allowedLocales) ? $cookieLocale : $this->defaultLocale;
+                $request->getSession()->set('_locale', $locale);
             }
+
+            $request->setLocale($locale);
         }
     }
 }

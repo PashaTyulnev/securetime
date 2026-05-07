@@ -3,6 +3,7 @@
 namespace App\Controller\Settings;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -39,7 +40,9 @@ class SettingsController extends AbstractController
         $session = $request->getSession();
         $session->set('_locale', $locale);
 
-        // Redirect zurück zu den Einstellungen
-        return $this->redirectToRoute('app_settings');
+        $response = $this->redirectToRoute('app_settings');
+        $response->headers->setCookie(Cookie::create('_locale', $locale, new \DateTimeImmutable('+1 year')));
+
+        return $response;
     }
 }
