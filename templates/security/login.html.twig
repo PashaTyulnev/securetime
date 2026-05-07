@@ -11,11 +11,9 @@
         {# Logo und Titel mit Animation #}
         <div class="text-center mb-10 animate-fade-in">
             <div class="mx-auto h-24 w-24 flex items-center justify-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
-                {% include "logo.svg" %}
+                <img src="{{ asset('logo.svg') }}" alt="Logo" class="h-full w-full object-contain dark:hidden">
+                <img src="{{ asset('logo_white.svg') }}" alt="Logo" class="h-full w-full object-contain hidden dark:block">
             </div>
-            <h2 class="mt-8 text-4xl font-thin text-gray-900 dark:text-white tracking-tight">
-                SecureTime
-            </h2>
         </div>
 
         {# Glassmorphism Login Card #}
