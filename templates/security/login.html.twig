@@ -3,36 +3,33 @@
 {% block title %}SecureTime - Anmeldung{% endblock %}
 
 {% block body %}
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black relative overflow-hidden">
-        {# Subtle background pattern #}
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.02"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black relative overflow-hidden">
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.02"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
 
-    <div class="relative z-10 max-w-md w-full mx-4 mt-4">
-        {# Logo und Titel mit Animation #}
-        <div class="text-center mb-10 animate-fade-in">
-            <div class="mx-auto h-48 w-48 flex items-center justify-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
-                <img src="{{ asset('logo.svg') }}" alt="Logo" class="h-full w-full object-contain dark:hidden">
-                <img src="{{ asset('logo_white.svg') }}" alt="Logo" class="h-full w-full object-contain hidden dark:block">
+    <div class="relative z-10 max-w-md w-full mx-4 py-8">
+
+        {# Logo + Titel #}
+        <div class="text-center mb-8 animate-fade-in">
+            <div class="mx-auto w-40 h-40 flex items-center justify-center">
+                <img src="{{ asset('logo.svg') }}" alt="SecureTime Logo" class="w-full h-full object-contain dark:hidden">
+                <img src="{{ asset('logo_white.svg') }}" alt="SecureTime Logo" class="w-full h-full object-contain hidden dark:block">
             </div>
+            <h1 class="mt-4 text-3xl font-thin tracking-tight text-gray-900 dark:text-white">SecureTime</h1>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 font-light">Melden Sie sich an, um fortzufahren</p>
         </div>
 
-        {# Glassmorphism Login Card #}
-        <div class="backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 p-8 sm:p-10 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 animate-slide-up">
-            <form class="space-y-6" method="post">
+        {# Login-Karte #}
+        <div class="backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 p-8 sm:p-10 animate-slide-up">
+            <form class="space-y-5" method="post">
+
                 {% if error %}
-                    <div class="animate-shake rounded-2xl bg-red-50/80 dark:bg-red-900/20 p-4 border border-red-200/50 dark:border-red-800/50 backdrop-blur">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-red-700 dark:text-red-400 font-light">
-                                    {{ error.messageKey|trans(error.messageData, 'security') }}
-                                </p>
-                            </div>
-                        </div>
+                    <div class="animate-shake rounded-2xl bg-red-50/80 dark:bg-red-900/20 p-4 border border-red-200/50 dark:border-red-800/50 backdrop-blur flex items-start gap-3">
+                        <svg class="h-5 w-5 text-red-500 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-sm text-red-700 dark:text-red-400 font-light">
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </p>
                     </div>
                 {% endif %}
 
@@ -47,177 +44,100 @@
                     </div>
                 {% endif %}
 
-                <div>
-                    <h1 class="text-3xl font-thin text-gray-900 dark:text-white text-center mb-2">
-                        Willkommen
-                    </h1>
-                    <p class="text-center text-gray-500 dark:text-gray-400 text-sm font-light">
-                        Melden Sie sich an, um fortzufahren
-                    </p>
-                </div>
-
-                <div class="space-y-5 mt-8">
-                    <div class="group">
-                        <label for="username" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2.5 uppercase tracking-wider">
-                            Benutzername
-                        </label>
-                        <div class="relative">
-                            <input
-                                type="text"
-                                value="{{ last_username }}"
-                                name="_username"
-                                id="username"
-                                class="block w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800 transition-all duration-200 text-base backdrop-blur-sm"
-                                placeholder="Geben Sie Ihren Benutzernamen ein"
-                                autocomplete="username"
-                                required
-                                autofocus
-                            >
-                            <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
+                <div class="group">
+                    <label for="username" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
+                        Benutzername
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="text"
+                            value="{{ last_username }}"
+                            name="_username"
+                            id="username"
+                            class="block w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800 transition-all duration-200 text-base"
+                            placeholder="Benutzername eingeben"
+                            autocomplete="username"
+                            required
+                            autofocus
+                        >
+                        <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
                         </div>
                     </div>
+                </div>
 
-                    <div class="group">
-                        <label for="password" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2.5 uppercase tracking-wider">
-                            Passwort
-                        </label>
-                        <div class="relative">
-                            <input
-                                type="password"
-                                name="_password"
-                                id="password"
-                                class="block w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800 transition-all duration-200 text-base backdrop-blur-sm"
-                                placeholder="Geben Sie Ihr Passwort ein"
-                                autocomplete="current-password"
-                                required
-                            >
-                            <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m0 0a2 2 0 01-2 2m2-2a2 2 0 00-2-2m2 2a2 2 0 01-2 2m-6 0a2 2 0 01-2-2m0 0a2 2 0 012-2m-2 2a2 2 0 012 2m0-2a2 2 0 012 2" />
-                                </svg>
-                            </div>
+                <div class="group">
+                    <label for="password" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
+                        Passwort
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="password"
+                            name="_password"
+                            id="password"
+                            class="block w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-500/50 dark:focus:ring-slate-400/50 focus:border-transparent focus:bg-white dark:focus:bg-gray-800 transition-all duration-200 text-base"
+                            placeholder="Passwort eingeben"
+                            autocomplete="current-password"
+                            required
+                        >
+                        <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
                         </div>
                     </div>
                 </div>
 
                 <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
 
-                <div class="pt-6">
-                    <button
-                        type="submit"
-                        class="relative w-full bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-gray-100 text-white dark:text-gray-900 font-medium py-4 px-6 rounded-2xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-slate-500/20 dark:focus:ring-white/20"
-                    >
-                            <span class="relative z-10 flex items-center justify-center">
-                                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                </svg>
-                                Anmelden
-                            </span>
-                        <div class="absolute inset-0 bg-gradient-to-r from-slate-700 to-slate-800 dark:from-gray-100 dark:to-gray-200 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-200"></div>
+                <div class="pt-2">
+                    <button type="submit" class="relative w-full bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-gray-100 text-white dark:text-gray-900 font-medium py-4 px-6 rounded-2xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-slate-500/20 dark:focus:ring-white/20 overflow-hidden">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            Anmelden
+                        </span>
                     </button>
                 </div>
 
-                {# Zusätzliche Links #}
-                <div class="pt-4 text-center">
+                <div class="text-center pt-1">
                     <a href="{{ path('app_forgot_password_request') }}" class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 font-light">
                         Passwort vergessen?
                     </a>
                 </div>
+
             </form>
         </div>
 
-        {# Footer mit elegantem Stil #}
-        <div class="text-center mt-8 animate-fade-in-delayed">
-            <p class="text-xs text-gray-400 dark:text-gray-500 font-light">
-                © {{ "now"|date("Y") }} SecureTime
-            </p>
+        {# Footer #}
+        <div class="text-center mt-6 animate-fade-in-delayed">
+            <p class="text-xs text-gray-400 dark:text-gray-500 font-light">© {{ "now"|date("Y") }} SecureTime</p>
         </div>
+
     </div>
-    </div>
+</div>
 
-    {# CSS für Animationen #}
-    <style>
-        @keyframes fade-in {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slide-up {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes shake {
-            0%, 100% {
-                transform: translateX(0);
-            }
-            10%, 30%, 50%, 70%, 90% {
-                transform: translateX(-2px);
-            }
-            20%, 40%, 60%, 80% {
-                transform: translateX(2px);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fade-in 0.6s ease-out;
-        }
-
-        .animate-slide-up {
-            animation: slide-up 0.8s ease-out;
-        }
-
-        .animate-fade-in-delayed {
-            animation: fade-in 0.6s ease-out 0.4s both;
-        }
-
-        .animate-shake {
-            animation: shake 0.5s ease-in-out;
-        }
-
-        /* Smooth focus transitions */
-        input:focus {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Button hover effect */
-        button {
-            position: relative;
-            overflow: hidden;
-        }
-
-        button::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-    </style>
+<style>
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(-10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slide-up {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+        20%, 40%, 60%, 80% { transform: translateX(2px); }
+    }
+    .animate-fade-in          { animation: fade-in  0.6s ease-out; }
+    .animate-slide-up         { animation: slide-up 0.8s ease-out; }
+    .animate-fade-in-delayed  { animation: fade-in  0.6s ease-out 0.4s both; }
+    .animate-shake            { animation: shake    0.5s ease-in-out; }
+    input:focus { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+</style>
 {% endblock %}

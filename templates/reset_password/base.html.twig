@@ -35,15 +35,13 @@
 
 <div class="relative z-10 max-w-md w-full mx-4 mt-4">
     {# Logo und Titel mit Animation #}
-    <div class="text-center mb-10 animate-fade-in">
-        <div class="mx-auto h-48 w-48 flex items-center justify-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
-            <img src="{{ asset('logo.svg') }}" alt="Logo" class="h-full w-full object-contain dark:hidden">
-            <img src="{{ asset('logo_white.svg') }}" alt="Logo" class="h-full w-full object-contain hidden dark:block">
+    <div class="text-center mb-8 animate-fade-in">
+        <div class="mx-auto w-40 h-40 flex items-center justify-center">
+            <img src="{{ asset('logo.svg') }}" alt="SecureTime Logo" class="w-full h-full object-contain dark:hidden">
+            <img src="{{ asset('logo_white.svg') }}" alt="SecureTime Logo" class="w-full h-full object-contain hidden dark:block">
         </div>
-        <h2 class="mt-8 text-4xl font-thin text-gray-900 dark:text-white tracking-tight">
-            SecureTime
-        </h2>
-
+        <h1 class="mt-4 text-3xl font-thin tracking-tight text-gray-900 dark:text-white">SecureTime</h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 font-light">Passwort zurücksetzen</p>
     </div>
 
     {# Content Card #}
