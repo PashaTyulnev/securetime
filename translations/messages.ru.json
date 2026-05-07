@@ -1,6 +1,6 @@
 {
-  "app.name": "SecurePlan",
-  "app.subtitle": "DWSD • Охрана объектов",
+  "app.name": "SecureTime",
+  "app.subtitle": "Охрана объектов",
   "navigation.dashboard": "Панель управления",
   "navigation.facility_shifts": "Смены объектов",
   "navigation.working_hours": "Рабочее время",

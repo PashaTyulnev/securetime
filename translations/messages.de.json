@@ -1,6 +1,6 @@
 {
-  "app.name": "SecurePlan",
-  "app.subtitle": "DWSD • Objektsicherheit",
+  "app.name": "SecureTime",
+  "app.subtitle": "Objektsicherheit",
   "navigation.dashboard": "Dashboard",
   "navigation.facility_shifts": "Objekt-Schichten",
   "navigation.working_hours": "Arbeitszeiten",

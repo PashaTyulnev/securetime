@@ -1,6 +1,6 @@
 {
-  "app.name": "SecurePlan",
-  "app.subtitle": "DWSD • أمن المنشآت",
+  "app.name": "SecureTime",
+  "app.subtitle": "أمن المنشآت",
   "navigation.dashboard": "لوحة التحكم",
   "navigation.facility_shifts": "نوبات المنشآت",
   "navigation.working_hours": "ساعات العمل",
