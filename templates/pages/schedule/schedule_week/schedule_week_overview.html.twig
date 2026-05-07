@@ -57,39 +57,21 @@
                     data-date="{{ datesRange[0].date|date('Y-m-d') }}"
                     data-whole-week="true"
                     class="bg-white/50 dark:bg-gray-900/50
-                           px-3 py-2
+                           px-3 py-1.5
                            border-b border-r border-gray-200/50 dark:border-gray-700/50
                            sticky left-0 z-10">
 
                     <div class="flex items-center gap-2">
-                        <div class="p-1 bg-indigo-100 dark:bg-indigo-900/30 rounded-md">
+                        <div class="p-1 bg-indigo-100 dark:bg-indigo-900/30 rounded-md shrink-0">
                             {{ ux_icon('lucide:user', { class: 'h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400' }) }}
                         </div>
-
-                        <div class="leading-tight">
-                            <div class="text-xs font-semibold text-gray-900 dark:text-white">
+                        <div class="leading-tight min-w-0">
+                            <div class="text-xs font-semibold text-gray-900 dark:text-white truncate">
                                 {{ employee.firstName|slice(0,1)|upper }}. {{ employee.lastName }}
                             </div>
-                            <div class="text-[10px] text-gray-500 dark:text-gray-400">
+                            <div class="text-[10px] text-gray-500 dark:text-gray-400 truncate">
                                 {{ employee.qualification.title }}
-                            </div>
-
-                            <div
-                                class="mt-0.5 grid grid-cols-3 gap-x-1
-                                       text-[9px] leading-[10px]
-                                       text-gray-500 dark:text-gray-400">
-                                <div>
-                                    <div class="font-medium">{{ 'schedule.planned'|trans }}</div>
-                                    <div>{{ employee.plannedHours.regular }}h</div>
-                                </div>
-                                <div>
-                                    <div class="font-medium">{{ 'schedule.on_call'|trans }}</div>
-                                    <div>{{ employee.plannedHours.onCall }}h</div>
-                                </div>
-                                <div>
-                                    <div class="font-semibold">{{ 'schedule.total'|trans }}</div>
-                                    <div class="font-semibold">{{ employee.plannedHours.total }}h</div>
-                                </div>
+                                · <span class="font-medium">{{ employee.plannedHours.total }}h</span>
                             </div>
                         </div>
                     </div>
