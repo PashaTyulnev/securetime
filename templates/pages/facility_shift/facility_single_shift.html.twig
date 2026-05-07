@@ -1,7 +1,7 @@
 {% set presetsArray = shiftPresets.member is defined ? shiftPresets.member : shiftPresets %}
 <div data-controller="facility-shift-behavior"
      data-facility-shift-behavior-shift-presets-value="{{ {'member': presetsArray}|json_encode|e('html_attr') }}"
-     class="border border-gray-200/30 dark:border-gray-700/30 rounded-xl bg-white/50 dark:bg-gray-800/50 hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all mb-3 overflow-visible">
+     class="border border-gray-200/30 dark:border-gray-700/30 rounded-xl bg-white/50 dark:bg-gray-800/50 hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all mb-2 overflow-visible">
 
     <form method="post" id="shift-form-{{ demandShift.id|default('new') }}"
           data-action="submit->facility-shift#submitShift">
@@ -12,13 +12,13 @@
         <input type="hidden" name="facility" value="{{ facility['@id'] }}">
 
         {# Hauptbereich mit Schicht-Informationen #}
-        <div class="p-4">
-            <div class="grid grid-cols-12 gap-4 items-start">
+        <div class="p-3">
+            <div class="grid grid-cols-12 gap-3 items-start">
 
                 {# Schichtname mit Farbe - 3 Spalten #}
                 <div class="col-span-3">
                     <label
-                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'facility_shift.shift'|trans }}
                     </label>
                     <div class="flex items-center gap-2">
@@ -57,7 +57,7 @@
                 {# Qualifikation - 2 Spalten #}
                 <div class="col-span-2">
                     <label
-                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'facility_shift.qualification'|trans }}
                     </label>
                     <select name="requiredQualification"
@@ -79,7 +79,7 @@
                 {# Zeit - 2 Spalten #}
                 <div class="col-span-2">
                     <label
-                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'common.time'|trans }}
                     </label>
                     <div class="flex items-center gap-1.5">
@@ -104,7 +104,7 @@
                 {# Personal - 1 Spalte #}
                 <div class="col-span-1">
                     <label
-                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'facility_shift.personnel'|trans }}
                     </label>
                     <input type="number" name="amountEmployees"
@@ -119,7 +119,7 @@
                 {# Wochentage - 3 Spalten (mehr Platz!) #}
                 <div class="col-span-3">
                     <label
-                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'schedule.weekdays'|trans }}
                     </label>
                     <div class="flex gap-1 flex-wrap">
@@ -146,7 +146,7 @@
                 {# Aktionen - 1 Spalte #}
                 <div class="col-span-1">
                     <label
-                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2 block">
+                        class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         &nbsp;
                     </label>
                     <div class="flex items-center justify-end gap-1">
@@ -179,7 +179,7 @@
         <div class="flex">
 
         {% if facility.positions | length > 0 %}
-            <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
+            <div class="px-3 pb-2 pt-1.5 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
                 {% include 'elements/multi_select.html.twig' with {
                     'systemName': 'requiredPositions',
                     'title': ('facility_shift.required_positions'|trans),
@@ -197,7 +197,7 @@
             </div>
         {% endif %}
 
-        <div class="px-4 pb-4 pt-2 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
+        <div class="px-3 pb-2 pt-1.5 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
             {% include 'elements/multi_select.html.twig' with {
                 'systemName': 'partnerVisibility',
                 'title': ('facility_shift.partner_visibility'|trans),
