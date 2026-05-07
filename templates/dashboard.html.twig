@@ -5,11 +5,12 @@
 
         {% include 'dashboard/_header.html.twig' %}
 
-        {% include 'dashboard/_today_shifts.html.twig' with { upcomingUserShifts: upcomingUserShifts ?? [] } %}
-
         {% include 'dashboard/_working_status.html.twig' with { todayWorkingInformation: todayWorkingInformation } %}
 
-        {% include 'dashboard/_upcoming_shifts.html.twig' with { upcomingUserShifts: upcomingUserShifts ?? [] } %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-5 pt-2 pb-8">
+            {% include 'dashboard/_today_shifts.html.twig' with { upcomingUserShifts: upcomingUserShifts ?? [] } %}
+            {% include 'dashboard/_upcoming_shifts.html.twig' with { upcomingUserShifts: upcomingUserShifts ?? [] } %}
+        </div>
 
     </div>
 {% endblock %}

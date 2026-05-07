@@ -1,6 +1,5 @@
 {# Kommende Schichten (nächste 7 Tage). Erwartet: upcomingUserShifts #}
-<div class="px-5 pb-8">
-    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-5 md:p-6 shadow-sm">
+<div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-5 shadow-sm h-full">
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
                 {{ ux_icon('lucide:calendar-days', { class: 'w-5 h-5 text-slate-700 dark:text-gray-200' }) }}
@@ -71,5 +70,4 @@
                 {{ 'dashboard.no_upcoming_shifts_7_days'|trans }}
             </p>
         {% endif %}
-    </div>
 </div>
