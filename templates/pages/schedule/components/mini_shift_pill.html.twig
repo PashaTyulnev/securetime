@@ -1,5 +1,5 @@
 <div
-    class="group/pill relative w-full mb-1.5 rounded-lg border border-white/20 dark:border-white/10 backdrop-blur-md flex items-center overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.01]"
+    class="group/pill relative w-full mb-1 rounded-lg border border-white/20 dark:border-white/10 backdrop-blur-md flex items-center overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.01]"
     style="background: linear-gradient(135deg, {{ shift.demandShift.color }}, {{ shift.demandShift.color }}dd);"
     data-shift-uri="{{ shift['@id'] }}"
     data-user-employee="{{ shift.employee }}"
@@ -9,7 +9,7 @@
     data-date="{{ shift.date|date('Y-m-d') }}">
 
     {# Content Container #}
-    <div class="flex-1 py-1.5 px-2 sm:px-2.5 flex items-center justify-center gap-1.5 sm:gap-2">
+    <div class="flex-1 py-1 px-2 sm:px-2.5 flex items-center justify-center gap-1.5 sm:gap-2">
 
         {% if shift.demandShift.onCall %}
             {% if shift.onCall %}
