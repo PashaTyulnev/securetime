@@ -2,12 +2,15 @@
 
 namespace App\Controller\Schedule;
 
+use App\Entity\Absence;
+use App\Repository\AbsenceRepository;
 use App\Service\EmployeeService;
 use App\Service\FacilityService;
 use App\Service\PartnerService;
 use App\Service\ScheduleService;
 use App\Service\ShiftService;
 use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +26,8 @@ class ScheduleComponentController extends AbstractController
                                 readonly ShiftService $shiftService,
                                 readonly PartnerService $partnerService,
                                 readonly ScheduleService $scheduleService,
-                                readonly Security $security)
+                                readonly Security $security,
+                                readonly AbsenceRepository $absenceRepository)
     {
 
     }
@@ -47,6 +51,35 @@ class ScheduleComponentController extends AbstractController
             static fn (array $s): bool => ($s['employee'] ?? null) === $iri
         ));
         return [$employees, $shifts];
+    }
+
+    /**
+     * Baut eine Lookup-Map: "{employeeId}-{Y-m-d}" → ['status' => ..., 'type' => ...]
+     * Jede Abwesenheit wird auf alle betroffenen Einzeltage aufgefächert.
+     */
+    private function buildAbsenceMap(DateTimeImmutable $startDate, DateTimeImmutable $endDate): array
+    {
+        $absences = $this->absenceRepository->findVisibleForSchedule($startDate, $endDate);
+        $map = [];
+
+        foreach ($absences as $absence) {
+            $empId   = $absence->getEmployee()->getId();
+            $current = $absence->getStartDate();
+            $end     = $absence->getEndDate();
+
+            while ($current <= $end) {
+                $key = $empId . '-' . $current->format('Y-m-d');
+                if (!isset($map[$key])) {
+                    $map[$key] = [
+                        'status' => $absence->getStatus()->value,
+                        'type'   => $absence->getType()->value,
+                    ];
+                }
+                $current = $current->modify('+1 day');
+            }
+        }
+
+        return $map;
     }
 
     #[Route(path: '/components/schedule-week', name: 'schedule_week_component', methods: ['GET'])]
@@ -76,11 +109,17 @@ class ScheduleComponentController extends AbstractController
 
         $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 
+        $absenceMap = $this->buildAbsenceMap(
+            DateTimeImmutable::createFromMutable(DateTime::createFromFormat('d.m.Y', $datesRange[0]['date'])),
+            DateTimeImmutable::createFromMutable(DateTime::createFromFormat('d.m.Y', end($datesRange)['date']))
+        );
+
         return $this->render('pages/schedule/schedule_week/schedule_week_overview.html.twig', [
-            'employees' => $employees,
-            'facilities' => $facilities,
-            'datesRange' => $datesRange,
-            'shifts' => $shifts
+            'employees'   => $employees,
+            'facilities'  => $facilities,
+            'datesRange'  => $datesRange,
+            'shifts'      => $shifts,
+            'absenceMap'  => $absenceMap,
         ]);
     }
 
@@ -136,12 +175,18 @@ class ScheduleComponentController extends AbstractController
 
         $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 
+        $absenceMap = $this->buildAbsenceMap(
+            DateTimeImmutable::createFromMutable(DateTime::createFromFormat('d.m.Y', $datesRange[0]['date'])),
+            DateTimeImmutable::createFromMutable(DateTime::createFromFormat('d.m.Y', end($datesRange)['date']))
+        );
+
         return $this->render('pages/schedule/schedule_month/schedule_month_overview.html.twig', [
-            'employees' => $employees,
-            'facilities' => $facilities,
-            'datesRange' => $datesRange,
-            'shifts' => $shifts,
-            'selectedFacilityId' => $facilityId
+            'employees'          => $employees,
+            'facilities'         => $facilities,
+            'datesRange'         => $datesRange,
+            'shifts'             => $shifts,
+            'selectedFacilityId' => $facilityId,
+            'absenceMap'         => $absenceMap,
         ]);
     }
 
@@ -173,12 +218,18 @@ class ScheduleComponentController extends AbstractController
 
         $employees = $this->employeeService->assignPlannedHoursToEmployees($employees, $plannedHours);
 
+        $absenceMap = $this->buildAbsenceMap(
+            DateTimeImmutable::createFromMutable(DateTime::createFromFormat('d.m.Y', $datesRange[0]['date'])),
+            DateTimeImmutable::createFromMutable(DateTime::createFromFormat('d.m.Y', end($datesRange)['date']))
+        );
+
         return $this->render('pages/schedule/schedule_two_week/schedule_two_week_overview.html.twig', [
-            'employees' => $employees,
-            'facilities' => $facilities,
-            'datesRange' => $datesRange,
-            'shifts' => $shifts,
+            'employees'          => $employees,
+            'facilities'         => $facilities,
+            'datesRange'         => $datesRange,
+            'shifts'             => $shifts,
             'selectedFacilityId' => $facilityId,
+            'absenceMap'         => $absenceMap,
         ]);
     }
 }

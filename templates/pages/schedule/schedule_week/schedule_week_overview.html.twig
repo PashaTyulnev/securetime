@@ -3,7 +3,7 @@
            border border-gray-200/50 dark:border-gray-800/50 overflow-hidden">
 
     {# Raster-Layout: 180px Mitarbeiter, 7 Tage #}
-    <div class="grid grid-cols-[180px_repeat(7,1fr)] min-h-[220px] overflow-auto">
+    <div class="grid grid-cols-[180px_repeat(7,1fr)] overflow-auto">
 
         {# Kopfzelle Mitarbeiter #}
         <div
@@ -57,21 +57,39 @@
                     data-date="{{ datesRange[0].date|date('Y-m-d') }}"
                     data-whole-week="true"
                     class="bg-white/50 dark:bg-gray-900/50
-                           px-3 py-1.5
+                           px-3 py-2
                            border-b border-r border-gray-200/50 dark:border-gray-700/50
                            sticky left-0 z-10">
 
                     <div class="flex items-center gap-2">
-                        <div class="p-1 bg-indigo-100 dark:bg-indigo-900/30 rounded-md shrink-0">
+                        <div class="p-1 bg-indigo-100 dark:bg-indigo-900/30 rounded-md">
                             {{ ux_icon('lucide:user', { class: 'h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400' }) }}
                         </div>
-                        <div class="leading-tight min-w-0">
-                            <div class="text-xs font-semibold text-gray-900 dark:text-white truncate">
+
+                        <div class="leading-tight">
+                            <div class="text-xs font-semibold text-gray-900 dark:text-white">
                                 {{ employee.firstName|slice(0,1)|upper }}. {{ employee.lastName }}
                             </div>
-                            <div class="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+                            <div class="text-[10px] text-gray-500 dark:text-gray-400">
                                 {{ employee.qualification.title }}
-                                · <span class="font-medium">{{ employee.plannedHours.total }}h</span>
+                            </div>
+
+                            <div
+                                class="mt-0.5 grid grid-cols-3 gap-x-1
+                                       text-[9px] leading-[10px]
+                                       text-gray-500 dark:text-gray-400">
+                                <div>
+                                    <div class="font-medium">{{ 'schedule.planned'|trans }}</div>
+                                    <div>{{ employee.plannedHours.regular }}h</div>
+                                </div>
+                                <div>
+                                    <div class="font-medium">{{ 'schedule.on_call'|trans }}</div>
+                                    <div>{{ employee.plannedHours.onCall }}h</div>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">{{ 'schedule.total'|trans }}</div>
+                                    <div class="font-semibold">{{ employee.plannedHours.total }}h</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -79,18 +97,22 @@
 
                 {# Tages-Zellen #}
                 {% for day in 0..6 %}
+                    {% set empId = employee['@id']|split('/')|last %}
+                    {% set absenceKey = empId ~ '-' ~ datesRange[day].date|date('Y-m-d') %}
+                    {% set absence = absenceMap[absenceKey] is defined ? absenceMap[absenceKey] : null %}
                     <div
                         data-action="dragover->schedule-week#onDragOver
                                      dragleave->schedule-week#onDragLeave
                                      drop->schedule-week#onDrop"
                         data-employee-uri="{{ employee['@id'] }}"
                         data-date="{{ datesRange[day].date|date('Y-m-d') }}"
-                        class="drop-zone relative
-                               px-2 py-1
-                               border-b border-r border-gray-200/50 dark:border-gray-700/50
-                               hover:bg-gray-50/50 dark:hover:bg-gray-800/50
-                               transition-colors duration-200
-                               group/cell">
+                        class="drop-zone relative flex flex-col
+       px-2 py-1.5
+       min-h-[44px]
+       border-b border-r border-gray-200/50 dark:border-gray-700/50
+       hover:bg-gray-50/50 dark:hover:bg-gray-800/50
+       transition-colors duration-200
+       group/cell">
 
                         {% for shift in shifts %}
                             {% if shift.date|date('Y-m-d') == datesRange[day].date|date('Y-m-d')
@@ -98,6 +120,19 @@
                                 {% include 'pages/schedule/components/mini_shift_pill.html.twig' with {'shift': shift} %}
                             {% endif %}
                         {% endfor %}
+
+                        {% if absence %}
+                            <div title="{% if absence.status == 'approved' %}Genehmigt{% else %}Offen (ausstehend){% endif %}: {% if absence.type == 'vacation' %}Urlaub{% elseif absence.type == 'sick' %}Krank{% else %}Nicht verfügbar{% endif %}"
+                                 class="flex items-center gap-1 w-full rounded px-1 py-0.5 text-[9px] font-medium pointer-events-none mt-0.5
+                                        {% if absence.status == 'approved' %}bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400
+                                        {% else %}bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400{% endif %}">
+                                {{ ux_icon('lucide:calendar-off', { class: 'w-2.5 h-2.5 flex-shrink-0' }) }}
+                                <span class="truncate">
+                                    {% if absence.type == 'vacation' %}Urlaub{% elseif absence.type == 'sick' %}Krank{% else %}N/V{% endif %}
+                                    {% if absence.status == 'pending' %}(?){% endif %}
+                                </span>
+                            </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
 

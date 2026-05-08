@@ -13,6 +13,7 @@ use App\Processor\ShiftProcessor;
 use App\Processor\ShiftUpdateProcessor;
 use App\Repository\ShiftRepository;
 use App\Validator\Constraint\EmployeeQualificationConstraint;
+use App\Validator\Constraint\NoAbsenceConflictConstraint;
 use App\Validator\Constraint\ShiftCustomRulesConstraint;
 use App\Validator\Constraint\ShiftTimeRulesConstraint;
 use Doctrine\DBAL\Types\Types;
@@ -39,6 +40,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[EmployeeQualificationConstraint]
 #[ShiftTimeRulesConstraint]
 #[ShiftCustomRulesConstraint]
+#[NoAbsenceConflictConstraint]
 class Shift
 {
     #[ORM\Id]

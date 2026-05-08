@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Put;
 use App\Controller\ApiController\EmployeeStatusController;
 use App\Repository\EmployeeRepository;
 use App\Processor\EmployeeProcessor;
+use App\Entity\Absence;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -94,10 +95,17 @@ class Employee
     #[Groups(['employee:read', 'employee:write'])]
     private ?PartnerCompany $partnerCompany = null;
 
+    /**
+     * @var Collection<int, Absence>
+     */
+    #[ORM\OneToMany(targetEntity: Absence::class, mappedBy: 'employee')]
+    private Collection $absences;
+
     public function __construct()
     {
         $this->shifts = new ArrayCollection();
         $this->contracts = new ArrayCollection();
+        $this->absences = new ArrayCollection();
     }
 
 
@@ -306,5 +314,32 @@ class Employee
         return $this;
     }
 
+    /**
+     * @return Collection<int, Absence>
+     */
+    public function getAbsences(): Collection
+    {
+        return $this->absences;
+    }
 
+    public function addAbsence(Absence $absence): static
+    {
+        if (!$this->absences->contains($absence)) {
+            $this->absences->add($absence);
+            $absence->setEmployee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAbsence(Absence $absence): static
+    {
+        if ($this->absences->removeElement($absence)) {
+            if ($absence->getEmployee() === $this) {
+                $absence->setEmployee(null);
+            }
+        }
+
+        return $this;
+    }
 }

@@ -1,0 +1,215 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Abwesenheiten{% endblock %}
+
+{% block body %}
+
+{% set typeLabels = {
+    'vacation':    'Urlaub',
+    'sick':        'Krank',
+    'unavailable': 'Nicht verfügbar'
+} %}
+
+<div data-controller="absence">
+
+    {# ================= HEADER ================= #}
+    <header class="relative
+               -mx-6 px-6
+               backdrop-blur-xl bg-white/70 dark:bg-gray-900/70
+               border-b border-gray-200/50 dark:border-gray-800/50">
+        <div class="px-6 py-4 flex items-center justify-between">
+            <h1 class="text-3xl font-light tracking-tight
+                   bg-gradient-to-r from-slate-900 to-slate-600
+                   dark:from-white dark:to-gray-400
+                   bg-clip-text text-transparent">
+                Abwesenheiten
+            </h1>
+        </div>
+
+        {# ---- Filter-Tabs ---- #}
+        <div class="flex space-x-1 px-6 pb-0">
+            {% set tabs = [
+                { status: 'pending',  label: 'Ausstehend' },
+                { status: 'approved', label: 'Genehmigt'  },
+                { status: 'rejected', label: 'Abgelehnt'  },
+            ] %}
+            {% for tab in tabs %}
+                {% set isActive = activeStatus.value == tab.status %}
+                <a href="{{ path('app_absences', { status: tab.status }) }}"
+                   class="px-4 py-2.5 text-sm font-medium rounded-t-xl border-b-2 transition-colors
+                          {% if isActive %}
+                              border-slate-700 dark:border-white text-slate-900 dark:text-white
+                          {% else %}
+                              border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200
+                          {% endif %}">
+                    {{ tab.label }}
+                </a>
+            {% endfor %}
+        </div>
+    </header>
+
+    {# ================= CONTENT ================= #}
+    <div class="p-5">
+        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+
+            {# ---- Tabellenkopf ---- #}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50/80 dark:bg-gray-800/80">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mitarbeiter</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Typ</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Zeitraum</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grund</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            {% if activeStatus.value == 'pending' %}
+                                <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aktionen</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+
+                    {% for absence in absences %}
+                        {% set employee = absence.employee %}
+                        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-200">
+
+                            {# Mitarbeiter #}
+                            <td class="px-6 py-4 align-top">
+                                {% if employee %}
+                                    {% set colors = ['blue','green','purple','indigo','orange','teal'] %}
+                                    {% set color = colors[employee.id % colors|length] %}
+                                    <div class="flex items-center space-x-3">
+                                        <div class="h-9 w-9 rounded-full bg-gradient-to-br from-{{ color }}-200 to-{{ color }}-300 dark:from-{{ color }}-600 dark:to-{{ color }}-700 flex items-center justify-center flex-shrink-0">
+                                            <span class="text-xs font-medium text-gray-700 dark:text-gray-200">
+                                                {{ employee.firstName|slice(0,1)|upper }}{{ employee.lastName|slice(0,1)|upper }}
+                                            </span>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ employee.firstName }} {{ employee.lastName }}
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <span class="text-sm text-gray-400 italic">—</span>
+                                {% endif %}
+                            </td>
+
+                            {# Typ #}
+                            <td class="px-6 py-4 align-top">
+                                {% set typeValue = absence.type.value %}
+                                {% set typeLabel = typeLabels[typeValue] ?? typeValue %}
+                                {% if typeValue == 'vacation' %}
+                                    {% set typeIcon = 'lucide:plane' %}
+                                    {% set typeBg = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' %}
+                                {% elseif typeValue == 'sick' %}
+                                    {% set typeIcon = 'lucide:thermometer' %}
+                                    {% set typeBg = 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' %}
+                                {% else %}
+                                    {% set typeIcon = 'lucide:ban' %}
+                                    {% set typeBg = 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' %}
+                                {% endif %}
+                                <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-medium {{ typeBg }}">
+                                    {{ ux_icon(typeIcon, { class: 'w-3.5 h-3.5' }) }}
+                                    <span>{{ typeLabel }}</span>
+                                </span>
+                            </td>
+
+                            {# Zeitraum #}
+                            <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                {{ absence.startDate|date('d.m.Y') }}
+                                {% if absence.startDate != absence.endDate %}
+                                    <span class="text-gray-400 mx-1">–</span>
+                                    {{ absence.endDate|date('d.m.Y') }}
+                                {% endif %}
+                            </td>
+
+                            {# Grund #}
+                            <td class="px-6 py-4 align-top">
+                                {% if absence.reason %}
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ absence.reason }}</span>
+                                {% else %}
+                                    <span class="text-sm text-gray-400 italic">—</span>
+                                {% endif %}
+                            </td>
+
+                            {# Status #}
+                            <td class="px-6 py-4 align-top">
+                                {% if absence.status.value == 'pending' %}
+                                    <span class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                                        {{ ux_icon('lucide:clock', { class: 'w-3.5 h-3.5' }) }}
+                                        <span>Ausstehend</span>
+                                    </span>
+                                {% elseif absence.status.value == 'approved' %}
+                                    <span class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                                        {{ ux_icon('lucide:check-circle', { class: 'w-3.5 h-3.5' }) }}
+                                        <span>Genehmigt</span>
+                                    </span>
+                                    {% if absence.adminComment %}
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 max-w-xs">{{ absence.adminComment }}</p>
+                                    {% endif %}
+                                {% elseif absence.status.value == 'rejected' %}
+                                    <span class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
+                                        {{ ux_icon('lucide:x-circle', { class: 'w-3.5 h-3.5' }) }}
+                                        <span>Abgelehnt</span>
+                                    </span>
+                                    {% if absence.adminComment %}
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 max-w-xs">{{ absence.adminComment }}</p>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+
+                            {# Aktionen (nur bei pending) #}
+                            {% if activeStatus.value == 'pending' %}
+                                <td class="px-6 py-4 align-top text-right">
+                                    <button data-action="click->absence#toggleComment"
+                                            data-absence-id-param="{{ absence.id }}"
+                                            class="text-xs px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                        Bearbeiten
+                                    </button>
+
+                                    {# Inline-Aktionsbereich (anfangs versteckt) #}
+                                    <div id="action-area-{{ absence.id }}" class="hidden mt-3 text-left space-y-2">
+                                        <textarea id="comment-{{ absence.id }}"
+                                                  rows="2"
+                                                  placeholder="Admin-Kommentar (optional)"
+                                                  class="w-full text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-500/50 resize-none"></textarea>
+                                        <div class="flex space-x-2 justify-end">
+                                            <button data-action="click->absence#approve"
+                                                    data-absence-id-param="{{ absence.id }}"
+                                                    class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-green-600 hover:bg-green-700 text-white transition-colors">
+                                                {{ ux_icon('lucide:check', { class: 'w-3.5 h-3.5' }) }}
+                                                <span>Genehmigen</span>
+                                            </button>
+                                            <button data-action="click->absence#reject"
+                                                    data-absence-id-param="{{ absence.id }}"
+                                                    class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-600 hover:bg-red-700 text-white transition-colors">
+                                                {{ ux_icon('lucide:x', { class: 'w-3.5 h-3.5' }) }}
+                                                <span>Ablehnen</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            {% endif %}
+
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-16 text-center">
+                                <div class="flex flex-col items-center space-y-3 text-gray-400 dark:text-gray-500">
+                                    {{ ux_icon('lucide:calendar-off', { class: 'w-10 h-10' }) }}
+                                    <p class="text-sm">Keine Abwesenheiten gefunden.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

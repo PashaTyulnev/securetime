@@ -67,22 +67,34 @@
 
                 <!-- Tage für diesen Mitarbeiter -->
                 {% for day in datesRange %}
+                    {% set empId = employee['@id']|split('/')|last %}
+                    {% set absenceKey = empId ~ '-' ~ day.date|date('Y-m-d') %}
+                    {% set absence = absenceMap[absenceKey] is defined ? absenceMap[absenceKey] : null %}
                     <div
                         data-action="dragover->schedule-month#onDragOver dragleave->schedule-month#onDragLeave drop->schedule-month#onDrop"
                         data-employee-uri="{{ employee['@id'] }}"
                         data-date="{{ day.date|date('Y-m-d') }}"
-                        class="drop-zone relative border-b border-r border-gray-200/50 dark:border-gray-700/50 min-h-[40px] hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 group/cell">
+                        class="drop-zone relative flex flex-col border-b border-r border-gray-200/50 dark:border-gray-700/50 min-h-[40px] hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 group/cell">
 
                         {% for shift in shifts %}
                             {% if shift.date|date('Y-m-d') == day.date|date('d.m.Y')|date('Y-m-d') and shift.employee == employee['@id'] %}
                                 <div style="background: {{ shift.demandShift.color }};font-size: 10px"
-                                     class="w-full h-full text-white p-1 text-center font-bold"
+                                     class="w-full text-white p-1 text-center font-bold"
                                      title="{{ shift.demandShift.timeFrom|date('H:i') }} – {{ shift.demandShift.timeTo|date('H:i') }}">
                                     {{ shift.demandShift.timeFrom|date('H') }}-{{ shift.demandShift.timeTo|date('H') }}
                                     {{ shift.demandShift.facility.shortTitle }}
                                 </div>
                             {% endif %}
                         {% endfor %}
+
+                        {% if absence %}
+                            <div title="{% if absence.status == 'approved' %}Genehmigt{% else %}Offen{% endif %}: {% if absence.type == 'vacation' %}Urlaub{% elseif absence.type == 'sick' %}Krank{% else %}Nicht verfügbar{% endif %}"
+                                 class="flex items-center justify-center w-full text-[8px] font-medium pointer-events-none py-0.5
+                                        {% if absence.status == 'approved' %}bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400
+                                        {% else %}bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400{% endif %}">
+                                {{ ux_icon('lucide:calendar-off', { class: 'w-2 h-2' }) }}
+                            </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>

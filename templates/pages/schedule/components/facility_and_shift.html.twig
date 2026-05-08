@@ -6,6 +6,7 @@
            flex flex-col gap-4
            shadow-sm">
 
+
     {# ========= Objektauswahl ========= #}
     <div class="flex items-center gap-2">
         <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -22,15 +23,10 @@
                    text-blue-900 dark:text-blue-200
                    focus:ring-2 focus:ring-blue-500">
 
-            {% if is_granted("ROLE_ADMIN") %}
                 <option value="null">
                     {{ 'schedule.select_for_planning'|trans }}
                 </option>
-            {% else %}
-                <option value="null">
-                    {{ 'schedule.show_all_facilities'|trans }}
-                </option>
-            {% endif %}
+
 
             {% for facility in facilities %}
                 <option value="{{ facility.id }}"
