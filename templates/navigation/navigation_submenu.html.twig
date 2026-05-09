@@ -1,12 +1,12 @@
 {# Untermenü-Element #}
 {% set target_route = route %}
 
-<li>
+<li data-sidebar-title="{{ title }}">
     <a href="{{ path(route) }}"
-       class="{% if current_route == target_route %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %} pl-8">
-        <span class="relative z-10 flex items-center space-x-3">
-            {{ ux_icon(icon, { class: 'w-5 h-5 transition-colors duration-200' }) }}
-            <span>{{ title }}</span>
+       class="sidebar-nav-link {% if current_route == target_route %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %} pl-8">
+        <span class="sidebar-nav-inner relative z-10 flex items-center space-x-3">
+            {{ ux_icon(icon, { class: 'w-5 h-5 flex-shrink-0 transition-colors duration-200' }) }}
+            <span class="sidebar-text">{{ title }}</span>
         </span>
         {% if current_route == target_route %}
             <div

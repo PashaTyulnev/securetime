@@ -29,15 +29,14 @@ class ShiftCustomRulesValidator extends ConstraintValidator
         $demandShift = $shift->getDemandShift();
         $date = $shift->getDate();
 
-        // Prüfung ob an diesem Tag überhaupt eine Schicht sein muss
-        if (!$this->isDemandShiftActiveOnDate($demandShift, $date)) {
-            $this->addDemandShiftNotActiveViolation($demandShift, $date);
-            return;
-        }
-
-        // Maximale Anzahl an Mitarbeitern für diese Schicht prüfen
-        if ($this->maxEmployeesExceeded($demandShift, $date, $shift)) {
-            $this->addMaxEmployeesViolation($demandShift);
+        if ($demandShift !== null) {
+            if (!$this->isDemandShiftActiveOnDate($demandShift, $date)) {
+                $this->addDemandShiftNotActiveViolation($demandShift, $date);
+                return;
+            }
+            if ($this->maxEmployeesExceeded($demandShift, $date, $shift)) {
+                $this->addMaxEmployeesViolation($demandShift);
+            }
         }
 
         $this->maxHoursInMonthExceeded($shift);
@@ -168,9 +167,12 @@ class ShiftCustomRulesValidator extends ConstraintValidator
 
     private function calculateShiftDuration(Shift $shift): float
     {
-        $demandShift = $shift->getDemandShift();
-        $timeFrom = $demandShift->getTimeFrom();
-        $timeTo = $demandShift->getTimeTo();
+        $timeFrom = $shift->getEffectiveTimeFrom();
+        $timeTo   = $shift->getEffectiveTimeTo();
+
+        if ($timeFrom === null || $timeTo === null) {
+            return 0;
+        }
 
         if ($timeTo <= $timeFrom) {
             return $this->calculateOvernightDuration($timeFrom, $timeTo);
@@ -285,7 +287,9 @@ class ShiftCustomRulesValidator extends ConstraintValidator
 
                 // berechne Ende dieser Schicht (Datum + timeTo; falls Overnight -> +1 day)
                 $psDate = $ps->getDate()->format('Y-m-d');
-                $psEnd = new \DateTime($psDate . ' ' . $ps->getDemandShift()->getTimeTo()->format('H:i'));
+                $psTimeTo = $ps->getEffectiveTimeTo();
+                if ($psTimeTo === null) continue;
+                $psEnd = new \DateTime($psDate . ' ' . $psTimeTo->format('H:i'));
 
                 if ($this->isOvernightShift($ps)) {
                     $psEnd->modify('+1 day');
@@ -300,15 +304,19 @@ class ShiftCustomRulesValidator extends ConstraintValidator
 
             if ($lastShift && $lastShiftEnd) {
                 // Start des neuen Shifts (Datum + timeFrom)
+                $newShiftTimeFrom = $shift->getEffectiveTimeFrom();
+                if ($newShiftTimeFrom === null) return;
                 $newShiftStart = new \DateTime(
-                    $date->format('Y-m-d') . ' ' . $shift->getDemandShift()->getTimeFrom()->format('H:i')
+                    $date->format('Y-m-d') . ' ' . $newShiftTimeFrom->format('H:i')
                 );
 
                 // Prüfe ob genau am MAX. Tag -> dann muss Ende der aktuellen Schicht + 24h vor nächstem Start liegen
                 if ($consecutiveDays === $maxWorkingDaysInRow) {
                     // Berechne Ende der AKTUELLEN Schicht
+                    $currentShiftTimeTo = $shift->getEffectiveTimeTo();
+                    if ($currentShiftTimeTo === null) return;
                     $currentShiftEnd = new \DateTime(
-                        $date->format('Y-m-d') . ' ' . $shift->getDemandShift()->getTimeTo()->format('H:i')
+                        $date->format('Y-m-d') . ' ' . $currentShiftTimeTo->format('H:i')
                     );
                     if ($this->isOvernightShift($shift)) {
                         $currentShiftEnd->modify('+1 day');
@@ -386,9 +394,12 @@ class ShiftCustomRulesValidator extends ConstraintValidator
 
     private function isOvernightShift(Shift $shift): bool
     {
-        $demandShift = $shift->getDemandShift();
-        $timeFrom = $demandShift->getTimeFrom();
-        $timeTo = $demandShift->getTimeTo();
+        $timeFrom = $shift->getEffectiveTimeFrom();
+        $timeTo   = $shift->getEffectiveTimeTo();
+
+        if ($timeFrom === null || $timeTo === null) {
+            return false;
+        }
 
         return $timeTo <= $timeFrom;
     }

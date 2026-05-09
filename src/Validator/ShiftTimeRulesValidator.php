@@ -86,14 +86,21 @@ class ShiftTimeRulesValidator extends ConstraintValidator
 
     private function createShiftTimeframe(Shift $shift): array
     {
-        $date = $shift->getDate();
-        $demandShift = $shift->getDemandShift();
+        $date     = $shift->getDate();
+        $timeFrom = $shift->getEffectiveTimeFrom();
+        $timeTo   = $shift->getEffectiveTimeTo();
 
-        return $this->normalizeShiftTimes(
-            $date,
-            $demandShift->getTimeFrom(),
-            $demandShift->getTimeTo()
-        );
+        if ($timeFrom === null) {
+            return ['start' => clone $date, 'end' => clone $date];
+        }
+        if ($timeTo === null) {
+            return [
+                'start' => $this->createDateTimeFromTime($date, $timeFrom),
+                'end'   => (clone $date)->setTime(23, 59, 0),
+            ];
+        }
+
+        return $this->normalizeShiftTimes($date, $timeFrom, $timeTo);
     }
 
     private function normalizeShiftTimes(\DateTime $date, \DateTime $from, \DateTime $to): array
@@ -174,6 +181,10 @@ class ShiftTimeRulesValidator extends ConstraintValidator
 
     private function demandShiftIsOvernight($getDemandShift): bool
     {
+        if ($getDemandShift === null) {
+            return false;
+        }
+
         return $getDemandShift->getTimeTo() < $getDemandShift->getTimeFrom();
     }
 }

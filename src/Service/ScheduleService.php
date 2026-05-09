@@ -122,12 +122,17 @@ class ScheduleService
             $employee = $shift->getEmployee();
             $employeeId = $employee->getId();
 
-            $demandShift = $shift->getDemandShift();
-            $timeFrom = $demandShift->getTimeFrom();
-            $timeTo = $demandShift->getTimeTo();
+            $timeFrom = $shift->getEffectiveTimeFrom();
+            $timeTo   = $shift->getEffectiveTimeTo();
 
-            // Stundenberechnung
-            $hours = (int)$timeTo->format('H') - (int)$timeFrom->format('H');
+            if ($timeFrom === null) {
+                continue;
+            }
+
+            // Stundenberechnung (offenes Ende = 0 Stunden gezählt)
+            $hours = $timeTo !== null
+                ? (int)$timeTo->format('H') - (int)$timeFrom->format('H')
+                : 0;
             if ($hours < 0) {
                 $hours += 24;
             }

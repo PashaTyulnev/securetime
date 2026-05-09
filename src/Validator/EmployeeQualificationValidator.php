@@ -18,6 +18,10 @@ class EmployeeQualificationValidator extends ConstraintValidator
         $employee = $shift->getEmployee();
         $demandShift = $shift->getDemandShift();
 
+        if ($demandShift === null) {
+            return;
+        }
+
         $employeeQualificationRank = $employee->getQualification()->getRank();
         $demandQualificationRank = $demandShift->getRequiredQualification()->getRank();
 

@@ -668,6 +668,123 @@ export default class extends Controller {
         );
     }
 
+    // ===== Außerordentliche Schicht =====
+
+    openCustomShiftModal(event) {
+        event.stopPropagation();
+        const btn = event.currentTarget;
+        this._customShiftEmployeeUri = btn.dataset.employeeUri;
+        this._customShiftDate        = btn.dataset.date;
+        this._customShiftZone        = btn.closest('.drop-zone');
+
+        document.getElementById('cs-name').value      = '';
+        document.getElementById('cs-time-from').value = '';
+        document.getElementById('cs-time-to').value   = '';
+        document.getElementById('cs-color').value     = '#6366f1';
+
+        // Facility-Select aus dem Haupt-Select befüllen und vorauswählen
+        this._populateFacilitySelect();
+
+        const modal = document.getElementById('custom-shift-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.getElementById('cs-name').focus();
+
+        // Schließen bei Klick auf Backdrop
+        this._modalBackdropHandler = (e) => {
+            if (e.target === modal) this.closeCustomShiftModal();
+        };
+        modal.addEventListener('click', this._modalBackdropHandler);
+
+        // Schließen bei Escape
+        this._modalEscHandler = (e) => {
+            if (e.key === 'Escape') this.closeCustomShiftModal();
+        };
+        document.addEventListener('keydown', this._modalEscHandler);
+    }
+
+    closeCustomShiftModal() {
+        const modal = document.getElementById('custom-shift-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        if (this._modalBackdropHandler) modal.removeEventListener('click', this._modalBackdropHandler);
+        if (this._modalEscHandler) document.removeEventListener('keydown', this._modalEscHandler);
+    }
+
+    _populateFacilitySelect() {
+        const modalSelect = document.getElementById('cs-facility');
+        const mainSelect  = this.facilitySelectTarget;
+
+        // Optionen kopieren (ohne die Platzhalter-Option die bereits im HTML ist)
+        modalSelect.length = 1; // nur Platzhalter behalten
+        Array.from(mainSelect.options).forEach(opt => {
+            if (opt.value && opt.value !== 'null') {
+                const clone = opt.cloneNode(true);
+                modalSelect.appendChild(clone);
+            }
+        });
+
+        // Aktives Objekt vorauswählen, wenn eines gewählt ist
+        const currentVal = mainSelect.value;
+        if (currentVal && currentVal !== 'null') {
+            modalSelect.value = currentVal;
+        }
+    }
+
+    setCustomShiftColor(event) {
+        document.getElementById('cs-color').value = event.currentTarget.dataset.color;
+    }
+
+    saveCustomShift() {
+        const name       = document.getElementById('cs-name').value.trim();
+        const timeFrom   = document.getElementById('cs-time-from').value;
+        const timeTo     = document.getElementById('cs-time-to').value;
+        const color      = document.getElementById('cs-color').value;
+        const facilityId = document.getElementById('cs-facility').value;
+
+        const facilitySelect = document.getElementById('cs-facility');
+        if (!facilityId) {
+            facilitySelect.focus();
+            facilitySelect.classList.add('ring-2', 'ring-red-500');
+            setTimeout(() => facilitySelect.classList.remove('ring-2', 'ring-red-500'), 2000);
+            return;
+        }
+        if (!name) {
+            document.getElementById('cs-name').focus();
+            return;
+        }
+
+        const payload = {
+            employee:       this._customShiftEmployeeUri,
+            date:           this._customShiftDate,
+            customFacility: `/api/facilities/${facilityId}`,
+            customName:     name,
+            customColor:    color,
+            customTimeFrom: timeFrom ? timeFrom + ':00' : null,
+            customTimeTo:   timeTo   ? timeTo   + ':00' : null,
+        };
+
+        ApiDataHandler.createNewEntity('shifts', payload, true).then(res => {
+            if (res.status === 201) {
+                ScheduleComponentApi.getMiniShiftComponent(res.data).then(html => {
+                    if (this._customShiftZone) {
+                        // Den + Button ist das erste Element - einfügen vor ihm
+                        const plusBtn = this._customShiftZone.querySelector('button[data-action*="openCustomShiftModal"]');
+                        if (plusBtn) {
+                            plusBtn.insertAdjacentHTML('beforebegin', html);
+                        } else {
+                            this._customShiftZone.insertAdjacentHTML('beforeend', html);
+                        }
+                    }
+                    this.closeCustomShiftModal();
+                    this.displayToast('success', 'Außerordentliche Schicht gespeichert.');
+                });
+            } else {
+                this.displayToast('error', res.data?.detail ?? 'Fehler beim Speichern.');
+            }
+        });
+    }
+
     convertOnCallShift(event) {
         let shiftId = event.params.shiftId;
         const button = event.currentTarget;

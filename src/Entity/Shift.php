@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Entity\Facility;
 use App\Enum\ShiftStatus;
 use App\Processor\ShiftProcessor;
 use App\Processor\ShiftUpdateProcessor;
@@ -58,9 +59,28 @@ class Shift
     private ?string $note = null;
 
     #[ORM\ManyToOne(inversedBy: 'shifts')]
-    #[ORM\JoinColumn(nullable: false)]
     #[Groups(['shift:write', 'shift:read'])]
     private ?DemandShift $demandShift = null;
+
+    #[ORM\ManyToOne]
+    #[Groups(['shift:write', 'shift:read'])]
+    private ?Facility $customFacility = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['shift:write', 'shift:read'])]
+    private ?string $customName = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    #[Groups(['shift:write', 'shift:read'])]
+    private ?\DateTime $customTimeFrom = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    #[Groups(['shift:write', 'shift:read'])]
+    private ?\DateTime $customTimeTo = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['shift:write', 'shift:read'])]
+    private ?string $customColor = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Groups(['shift:write', 'shift:read'])]
@@ -118,6 +138,48 @@ class Shift
         $this->updateShiftBeginnAndEnd();
 
         return $this;
+    }
+
+    public function getCustomFacility(): ?Facility { return $this->customFacility; }
+    public function setCustomFacility(?Facility $customFacility): static { $this->customFacility = $customFacility; return $this; }
+
+    public function getCustomName(): ?string { return $this->customName; }
+    public function setCustomName(?string $customName): static { $this->customName = $customName; return $this; }
+
+    public function getCustomTimeFrom(): ?\DateTime { return $this->customTimeFrom; }
+    public function setCustomTimeFrom(?\DateTime $customTimeFrom): static
+    {
+        $this->customTimeFrom = $customTimeFrom;
+        $this->updateShiftBeginnAndEnd();
+        return $this;
+    }
+
+    public function getCustomTimeTo(): ?\DateTime { return $this->customTimeTo; }
+    public function setCustomTimeTo(?\DateTime $customTimeTo): static
+    {
+        $this->customTimeTo = $customTimeTo;
+        $this->updateShiftBeginnAndEnd();
+        return $this;
+    }
+
+    public function getCustomColor(): ?string { return $this->customColor; }
+    public function setCustomColor(?string $customColor): static { $this->customColor = $customColor; return $this; }
+
+    /** Gibt die effektive Startzeit zurück (custom oder von DemandShift). */
+    public function getEffectiveTimeFrom(): ?\DateTime
+    {
+        return $this->demandShift?->getTimeFrom() ?? $this->customTimeFrom;
+    }
+
+    /** Gibt die effektive Endzeit zurück (custom oder von DemandShift). */
+    public function getEffectiveTimeTo(): ?\DateTime
+    {
+        return $this->demandShift?->getTimeTo() ?? $this->customTimeTo;
+    }
+
+    public function isCustomShift(): bool
+    {
+        return $this->demandShift === null;
     }
 
     public function getNote(): ?string
@@ -197,8 +259,8 @@ class Shift
 
             return;
         }
-        $timeFrom = $this->demandShift?->getTimeFrom();
-        $timeTo = $this->demandShift?->getTimeTo();
+        $timeFrom = $this->getEffectiveTimeFrom();
+        $timeTo   = $this->getEffectiveTimeTo();
 
         if ($timeFrom === null) {
             $this->shiftBeginn = null;

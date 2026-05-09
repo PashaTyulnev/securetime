@@ -25,7 +25,7 @@
             <div
                 class="p-4 border-b-2 border-r border-gray-200/50 dark:border-gray-700/50 text-center backdrop-blur-xl {% if day.isToday %}bg-blue-50/80 dark:bg-blue-900/20{% else %}bg-gray-50/80 dark:bg-gray-800/80{% endif %}">
                 <div
-                    class="text-sm font-semibold {% if day.isToday %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-white{% endif %}">{{ day.name }}</div>
+                    class="text-sm font-semibold {% if day.isToday %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-white{% endif %}">{{ day.name|slice(0, 2) }}</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ day.shortName|slice(0, 7) }}</div>
             </div>
         {% endfor %}
@@ -78,12 +78,26 @@
 
                         {% for shift in shifts %}
                             {% if shift.date|date('Y-m-d') == day.date|date('d.m.Y')|date('Y-m-d') and shift.employee == employee['@id'] %}
-                                <div style="background: {{ shift.demandShift.color }};font-size: 10px"
-                                     class="w-full text-white p-1 text-center font-bold"
-                                     title="{{ shift.demandShift.timeFrom|date('H:i') }} – {{ shift.demandShift.timeTo|date('H:i') }}">
-                                    {{ shift.demandShift.timeFrom|date('H') }}-{{ shift.demandShift.timeTo|date('H') }}
-                                    {{ shift.demandShift.facility.shortTitle }}
-                                </div>
+                                {% set ds = shift['demandShift'] is defined ? shift['demandShift'] : null %}
+                                {% if ds %}
+                                    <div style="background: {{ ds.color }};font-size: 10px"
+                                         class="w-full text-white p-1 text-center font-bold"
+                                         title="{{ ds.timeFrom|date('H:i') }} – {{ ds.timeTo|date('H:i') }}">
+                                        {{ ds.timeFrom|date('H') }}-{{ ds.timeTo|date('H') }}
+                                        {{ ds.facility.shortTitle }}
+                                    </div>
+                                {% else %}
+                                    {% set cf = shift['customFacility'] is defined ? shift['customFacility'] : null %}
+                                    {% set ctf = shift['customTimeFrom'] is defined ? shift['customTimeFrom'] : null %}
+                                    {% set ctt = shift['customTimeTo']   is defined ? shift['customTimeTo']   : null %}
+                                    <div style="background: {{ shift['customColor'] ?? '#6366f1' }};font-size: 10px"
+                                         class="w-full text-white p-1 text-center font-bold"
+                                         title="{{ shift['customName'] is defined ? shift['customName'] : '' }}">
+                                        {% if ctf %}{{ ctf|date('H') }}{% endif %}
+                                        {%- if ctt %}-{{ ctt|date('H') }}{% else %}–∞{% endif %}
+                                        {% if cf %} {{ cf.shortTitle }}{% endif %}
+                                    </div>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
 
