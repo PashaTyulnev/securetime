@@ -1,27 +1,9 @@
-{# ================================
-   Mobile Toggle Button (Header)
-   ================================ #}
-
-<button data-drawer-target="separator-sidebar"
-        data-drawer-toggle="separator-sidebar"
-        aria-controls="separator-sidebar"
-        type="button"
-        class="bg-white/70 dark:bg-gray-900 inline-flex items-center p-4 text-sm text-gray-500 sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
-    <span class="sr-only">Open sidebar</span>
-    <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-        <path clip-rule="evenodd" fill-rule="evenodd"
-              d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
-    </svg>
-</button>
-
-{# ================================
-   Sidebar (Flowbite Drawer)
-   ================================ #}
-
-{# aktuelle Route #}
 {% set current_route = app.request.attributes.get('_route') %}
 
-{# Klassen #}
+{# ================================================
+   Desktop Sidebar (lg+)
+   ================================================ #}
+
 {% set default_classes =
     'group flex items-center space-x-3 px-3 py-1.5 rounded-xl
      text-gray-600 dark:text-gray-400
@@ -37,17 +19,11 @@
 
 <aside
     id="separator-sidebar"
-    class="fixed top-0 left-0 z-40 w-60 h-screen
-           transition-transform -translate-x-full sm:translate-x-0
+    class="hidden lg:flex fixed top-0 left-0 z-40 w-60 h-screen flex-col
            bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
-           border-r border-gray-200/50 dark:border-gray-700/50
-           flex flex-col"
+           border-r border-gray-200/50 dark:border-gray-700/50"
     aria-label="Sidebar"
 >
-
-    {# ================================
-       Header / Logo
-       ================================ #}
     <div id="sidebar-header" class="flex items-center justify-between pl-5 pr-3 py-3">
         <div class="sidebar-logo-area flex items-center space-x-3 min-w-0">
             <div class="relative flex-shrink-0">
@@ -68,76 +44,47 @@
                 </p>
             </div>
         </div>
-        <button id="sidebar-toggle"
-                type="button"
+        <button id="sidebar-toggle" type="button"
                 title="{{ 'navigation.toggle_sidebar'|trans|default('Menü ein-/ausklappen') }}"
-                class="flex-shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors sm:flex hidden">
+                class="flex-shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors flex">
             <span id="sidebar-toggle-close">{{ ux_icon('lucide:panel-left-close', { class: 'w-5 h-5' }) }}</span>
             <span id="sidebar-toggle-open">{{ ux_icon('lucide:panel-left-open', { class: 'w-5 h-5' }) }}</span>
         </button>
     </div>
 
-    {# ================================
-       Navigation
-       ================================ #}
     <nav class="flex-1 overflow-y-auto px-3 pb-3 scrollbar-thin">
-
         <ul class="space-y-1">
-
             {% include 'navigation/navigation_element.html.twig'
                 with { route:'app_dashboard', icon:'lucide:layout-dashboard', title:('navigation.dashboard'|trans) } %}
-
             {% if is_granted('ROLE_ADMIN') %}
                 {% include 'navigation/navigation_element.html.twig'
                     with { route:'app_facility_shift', icon:'lucide:calendar-cog', title:('navigation.facility_shifts'|trans) } %}
             {% endif %}
-
             {% include 'navigation/navigation_element.html.twig'
                 with { route:'app_time_tracking_index', icon:'lucide:clock', title:('navigation.working_hours'|trans) } %}
-
             {% include 'navigation/navigation_element.html.twig'
                 with { route:'app_my_absences', icon:'lucide:calendar-off', title:('navigation.absences'|trans) } %}
-
             {% if is_granted('ROLE_ADMIN') %}
                 {% include 'navigation/navigation_element.html.twig'
                     with { route:'app_absences', icon:'lucide:shield-check', title:('navigation.absences_admin'|trans) } %}
-            {% endif %}
-
-            {% if is_granted('ROLE_ADMIN') %}
                 {% include 'navigation/navigation_element.html.twig'
                     with { route:'app_schedule', icon:'lucide:calendar-clock', title:('navigation.schedule'|trans) } %}
-            {% endif %}
-
-            {% if is_granted('ROLE_ADMIN') %}
-            {% include 'navigation/navigation_element.html.twig'
-                with { route:'app_company', icon:'lucide:lock', title:('navigation.client'|trans) } %}
-            {% endif %}
-
-            {% if is_granted('ROLE_ADMIN') %}
+                {% include 'navigation/navigation_element.html.twig'
+                    with { route:'app_company', icon:'lucide:lock', title:('navigation.client'|trans) } %}
                 {% include 'navigation/navigation_element.html.twig'
                     with { route:'app_facility', icon:'lucide:building-2', title:('navigation.facilities'|trans) } %}
             {% endif %}
-
             {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_PARTNER_ADMIN') %}
                 {% include 'navigation/navigation_element.html.twig'
                     with { route:'app_employees', icon:'lucide:users', title:('navigation.employees'|trans) } %}
             {% endif %}
-
             {% if is_granted('ROLE_ADMIN') %}
                 {% include 'navigation/navigation_element.html.twig'
                     with { route:'app_contacts', icon:'lucide:contact', title:('navigation.contacts'|trans) } %}
-            {% endif %}
-
-            {% if is_granted('ROLE_ADMIN') %}
                 {% include 'navigation/navigation_element.html.twig'
                     with { route:'app_partner_company', icon:'lucide:handshake', title:('navigation.partners'|trans) } %}
-            {% endif %}
-
-            {# Archiv-Menü mit Unterpunkten - nur für Admins #}
-            {% if is_granted('ROLE_ADMIN') %}
                 <li class="mt-2 sidebar-text">
-                    <div
-                        class="px-3 py-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    <div class="px-3 py-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                         {{ 'navigation.archive'|trans }}
                     </div>
                 </li>
@@ -146,53 +93,194 @@
                 {% include 'navigation/navigation_submenu.html.twig'
                     with { route:'app_archive_facilities', icon:'lucide:building-2', title:('navigation.facilities'|trans) } %}
             {% endif %}
-
             {% include 'navigation/navigation_element.html.twig'
                 with { route:'app_settings', icon:'lucide:settings', title:('navigation.settings'|trans) } %}
-
             {% if is_granted('ROLE_ADMIN') %}
                 <li class="mt-2 sidebar-text">
-                    <div
-                        class="px-3 py-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    <div class="px-3 py-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                         {{ 'navigation.admin'|trans|default('Admin') }}
                     </div>
                 </li>
                 {% include 'navigation/navigation_element.html.twig'
                     with { route:'app_switch_user', icon:'lucide:user-cog', title:('switch_user.title'|trans) } %}
             {% endif %}
-
         </ul>
-
         <div class="my-2 border-t border-gray-200/50 dark:border-gray-700/50"></div>
-
     </nav>
 
-    {# ================================
-       User Profile
-       ================================ #}
     <div id="sidebar-user-profile" class="p-3 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/30">
         <div class="sidebar-user-area flex items-center space-x-2">
             <a href="{{ path('app_logout') }}"
                title="{{ 'navigation.logout'|trans|default('Abmelden') }}"
                class="sidebar-user-icon flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors">
-                {{ ux_icon('lucide:user', { class:'w-5 h-5' }) }}
+                {{ ux_icon('lucide:user', { class:'w-4 h-4' }) }}
             </a>
             <div class="sidebar-text flex-1 min-w-0">
                 <p class="text-xs font-medium truncate">{{ app.user.username }}</p>
                 <p class="text-xs text-gray-500 truncate opacity-70">{{ app.user.email }}</p>
             </div>
             <a href="{{ path('app_logout') }}" class="sidebar-text p-2 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700">
-                {{ ux_icon('lucide:log-out', { class:'w-5 h-5' }) }}
+                {{ ux_icon('lucide:log-out', { class:'w-4 h-4' }) }}
             </a>
         </div>
     </div>
-
 </aside>
 
-{# ================================
-   Flowbite Backdrop (optional)
-   ================================ #}
-<div data-drawer-backdrop class="fixed inset-0 z-30 bg-black/50 hidden"></div>
+
+{# ================================================
+   Mobile / Tablet Top Bar (< lg)
+   ================================================ #}
+<div id="mobile-topbar"
+     class="lg:hidden fixed top-0 left-0 right-0 z-40 h-14
+            flex items-center justify-between px-4
+            bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl
+            border-b border-gray-200/50 dark:border-gray-700/50">
+
+    <div class="flex items-center gap-2.5">
+        <img src="{{ asset('logo_mini.svg') }}" alt="Logo" class="w-7 h-7 object-contain dark:hidden">
+        <img src="{{ asset('logo_mini_white.svg') }}" alt="Logo" class="w-7 h-7 object-contain hidden dark:block">
+        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ 'app.name'|trans }}</span>
+    </div>
+
+    <button id="mobile-menu-open"
+            type="button"
+            class="p-2.5 rounded-xl text-gray-600 dark:text-gray-300
+                   hover:bg-gray-100 dark:hover:bg-gray-800
+                   active:bg-gray-200 dark:active:bg-gray-700
+                   transition-colors touch-manipulation"
+            aria-label="Menü öffnen">
+        {{ ux_icon('lucide:menu', { class: 'w-5 h-5' }) }}
+    </button>
+</div>
+
+
+{# ================================================
+   Mobile / Tablet Drawer + Backdrop (< lg)
+   ================================================ #}
+<div id="mobile-overlay" class="lg:hidden fixed inset-0 z-50 hidden" aria-hidden="true">
+
+    {# Backdrop #}
+    <div id="mobile-backdrop"
+         class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+
+    {# Drawer #}
+    <nav id="mobile-drawer"
+         class="absolute top-0 left-0 h-full w-72 flex flex-col
+                bg-white dark:bg-gray-900
+                shadow-2xl
+                -translate-x-full transition-transform duration-300 ease-out
+                border-r border-gray-200/50 dark:border-gray-700/50">
+
+        {# Drawer Header #}
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <img src="{{ asset('logo_mini.svg') }}" alt="Logo" class="w-7 h-7 object-contain dark:hidden">
+                    <img src="{{ asset('logo_mini_white.svg') }}" alt="Logo" class="w-7 h-7 object-contain hidden dark:block">
+                    <div class="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ 'app.name'|trans }}</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ 'app.subtitle'|trans }}</p>
+                </div>
+            </div>
+            <button id="mobile-menu-close"
+                    type="button"
+                    class="p-2 rounded-xl text-gray-500 dark:text-gray-400
+                           hover:bg-gray-100 dark:hover:bg-gray-800
+                           active:bg-gray-200 dark:active:bg-gray-700
+                           transition-colors touch-manipulation">
+                {{ ux_icon('lucide:x', { class: 'w-5 h-5' }) }}
+            </button>
+        </div>
+
+        {# Drawer Nav Items #}
+        <div class="flex-1 overflow-y-auto py-3 px-3">
+
+            {% macro mobile_item(route, icon, label, current_route) %}
+                <a href="{{ path(route) }}"
+                   class="flex items-center gap-3.5 px-4 py-3 rounded-xl mb-0.5
+                          text-sm font-medium transition-all duration-150 touch-manipulation
+                          {% if current_route == route %}
+                              bg-slate-100 dark:bg-gray-800 text-slate-900 dark:text-white
+                          {% else %}
+                              text-gray-600 dark:text-gray-400
+                              hover:bg-gray-100 dark:hover:bg-gray-800/80
+                              active:bg-gray-200 dark:active:bg-gray-700
+                          {% endif %}">
+                    {{ ux_icon(icon, { class: 'w-5 h-5 flex-shrink-0' }) }}
+                    <span>{{ label }}</span>
+                    {% if current_route == route %}
+                        <div class="ml-auto w-1.5 h-1.5 rounded-full bg-slate-600 dark:bg-white"></div>
+                    {% endif %}
+                </a>
+            {% endmacro %}
+
+            {% from _self import mobile_item %}
+
+            {{ mobile_item('app_dashboard', 'lucide:layout-dashboard', 'navigation.dashboard'|trans, current_route) }}
+
+            {% if is_granted('ROLE_ADMIN') %}
+                {{ mobile_item('app_facility_shift', 'lucide:calendar-cog', 'navigation.facility_shifts'|trans, current_route) }}
+            {% endif %}
+
+            {{ mobile_item('app_time_tracking_index', 'lucide:clock', 'navigation.working_hours'|trans, current_route) }}
+            {{ mobile_item('app_my_absences', 'lucide:calendar-off', 'navigation.absences'|trans, current_route) }}
+
+            {% if is_granted('ROLE_ADMIN') %}
+                {{ mobile_item('app_absences', 'lucide:shield-check', 'navigation.absences_admin'|trans, current_route) }}
+                {{ mobile_item('app_schedule', 'lucide:calendar-clock', 'navigation.schedule'|trans, current_route) }}
+                {{ mobile_item('app_company', 'lucide:lock', 'navigation.client'|trans, current_route) }}
+                {{ mobile_item('app_facility', 'lucide:building-2', 'navigation.facilities'|trans, current_route) }}
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_PARTNER_ADMIN') %}
+                {{ mobile_item('app_employees', 'lucide:users', 'navigation.employees'|trans, current_route) }}
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') %}
+                {{ mobile_item('app_contacts', 'lucide:contact', 'navigation.contacts'|trans, current_route) }}
+                {{ mobile_item('app_partner_company', 'lucide:handshake', 'navigation.partners'|trans, current_route) }}
+
+                <div class="px-4 pt-4 pb-1">
+                    <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-600">
+                        {{ 'navigation.archive'|trans }}
+                    </p>
+                </div>
+                {{ mobile_item('app_archive_employees', 'lucide:users', 'navigation.employees'|trans, current_route) }}
+                {{ mobile_item('app_archive_facilities', 'lucide:building-2', 'navigation.facilities'|trans, current_route) }}
+            {% endif %}
+
+            <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
+
+            {{ mobile_item('app_settings', 'lucide:settings', 'navigation.settings'|trans, current_route) }}
+
+            {% if is_granted('ROLE_ADMIN') %}
+                {{ mobile_item('app_switch_user', 'lucide:user-cog', 'switch_user.title'|trans, current_route) }}
+            {% endif %}
+        </div>
+
+        {# Drawer User Footer #}
+        <div class="p-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/40">
+            <div class="flex items-center gap-3 px-2 py-1">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 dark:from-slate-600 dark:to-slate-800 flex items-center justify-center flex-shrink-0">
+                    <span class="text-sm font-bold text-white">{{ app.user.username|slice(0,1)|upper }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ app.user.username }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ app.user.email }}</p>
+                </div>
+                <a href="{{ path('app_logout') }}"
+                   title="{{ 'navigation.logout'|trans|default('Abmelden') }}"
+                   class="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors touch-manipulation">
+                    {{ ux_icon('lucide:log-out', { class: 'w-4 h-4' }) }}
+                </a>
+            </div>
+        </div>
+
+    </nav>
+</div>
+
 
 {# ================================
    Styles
@@ -202,63 +290,41 @@
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(156,163,175,.5); border-radius: 3px; }
     .dark .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(75,85,99,.5); }
 
-    /* ===== Sidebar collapse ===== */
+    /* Desktop: Sidebar-Breite + Main-Margin */
     #separator-sidebar {
         transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
         width: 15rem;
     }
-    @media (min-width: 640px) {
-        #main-content { margin-left: 15rem; transition: margin-left 0.25s cubic-bezier(0.4,0,0.2,1); }
+    @media (min-width: 1024px) {
+        #main-content {
+            margin-left: 15rem;
+            transition: margin-left 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
         html.sidebar-collapsed #main-content { margin-left: 3.5rem; }
     }
+
+    /* Mobile/Tablet: Top-Bar Abstand */
+    @media (max-width: 1023px) {
+        #main-content { padding-top: 3.5rem; }
+    }
+
     html.sidebar-collapsed #separator-sidebar { width: 3.5rem; }
 
-    /* Text ausblenden */
+    /* Text ausblenden im collapsed-Zustand */
     html.sidebar-collapsed .sidebar-text { display: none; }
-
-    /* Header im eingeklappten Zustand */
-    html.sidebar-collapsed #sidebar-header {
-        justify-content: center;
-        padding: 0.75rem 0.5rem;
-    }
+    html.sidebar-collapsed #sidebar-header { justify-content: center; padding: 0.75rem 0.5rem; }
     html.sidebar-collapsed .sidebar-logo-area { display: none; }
-
-    /* Toggle-Button: Icon wechseln */
     html:not(.sidebar-collapsed) #sidebar-toggle-open { display: none; }
     html.sidebar-collapsed #sidebar-toggle-close { display: none; }
-
-    /* Nav-Links zentrieren */
-    html.sidebar-collapsed .sidebar-nav-link {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        justify-content: center !important;
-    }
-    html.sidebar-collapsed .sidebar-nav-inner {
-        justify-content: center !important;
-    }
+    html.sidebar-collapsed .sidebar-nav-link { padding-left: 0 !important; padding-right: 0 !important; justify-content: center !important; }
+    html.sidebar-collapsed .sidebar-nav-inner { justify-content: center !important; }
     html.sidebar-collapsed .sidebar-nav-inner > * + * { margin-left: 0 !important; }
-
-    /* User-Bereich zentrieren */
     html.sidebar-collapsed .sidebar-user-area { justify-content: center; }
-    html.sidebar-collapsed .sidebar-user-icon {
-        width: 2.25rem; height: 2.25rem;
-    }
+    html.sidebar-collapsed #separator-sidebar nav { padding-left: 0.25rem; padding-right: 0.25rem; }
+    html.sidebar-collapsed #sidebar-user-profile { padding: 0.5rem; }
+    html.sidebar-collapsed #separator-sidebar .my-2 { display: none; }
 
-    /* Nav-Padding im eingeklappten Zustand */
-    html.sidebar-collapsed #separator-sidebar nav {
-        padding-left: 0.25rem;
-        padding-right: 0.25rem;
-    }
-
-    /* User-Bereich Padding */
-    html.sidebar-collapsed #sidebar-user-profile {
-        padding: 0.5rem;
-    }
-
-    /* Trennlinie ausblenden */
-    html.sidebar-collapsed #separator-sidebar .my-6 { display: none; }
-
-    /* Tooltips im eingeklappten Zustand */
+    /* Tooltips im collapsed-Zustand */
     html.sidebar-collapsed #separator-sidebar li[data-sidebar-title] { position: relative; }
     html.sidebar-collapsed #separator-sidebar li[data-sidebar-title]:hover::after {
         content: attr(data-sidebar-title);
@@ -276,21 +342,61 @@
         pointer-events: none;
         box-shadow: 0 4px 6px -1px rgba(0,0,0,0.15);
     }
-    .dark html.sidebar-collapsed #separator-sidebar li[data-sidebar-title]:hover::after {
-        background: rgba(31,41,55,0.98);
-    }
 </style>
 
+
 {# ================================
-   Sidebar Toggle JS
+   JavaScript
    ================================ #}
 <script>
-    (function () {
-        var btn = document.getElementById('sidebar-toggle');
-        if (!btn) return;
-        btn.addEventListener('click', function () {
+(function () {
+    /* ---- Desktop Sidebar Collapse ---- */
+    var toggleBtn = document.getElementById('sidebar-toggle');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
             var collapsed = document.documentElement.classList.toggle('sidebar-collapsed');
             localStorage.setItem('sidebarCollapsed', collapsed ? 'true' : 'false');
         });
-    })();
+    }
+
+    /* ---- Mobile Drawer ---- */
+    var overlay  = document.getElementById('mobile-overlay');
+    var drawer   = document.getElementById('mobile-drawer');
+    var backdrop = document.getElementById('mobile-backdrop');
+    var openBtn  = document.getElementById('mobile-menu-open');
+    var closeBtn = document.getElementById('mobile-menu-close');
+
+    function openDrawer() {
+        overlay.classList.remove('hidden');
+        overlay.setAttribute('aria-hidden', 'false');
+        // Trigger reflow so transitions fire
+        overlay.offsetHeight;
+        drawer.classList.remove('-translate-x-full');
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+        drawer.classList.add('-translate-x-full');
+        backdrop.classList.remove('opacity-100');
+        backdrop.classList.add('opacity-0');
+        document.body.style.overflow = '';
+        setTimeout(function () {
+            overlay.classList.add('hidden');
+            overlay.setAttribute('aria-hidden', 'true');
+        }, 300);
+    }
+
+    if (openBtn)  openBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+    // Schließen wenn ein Nav-Link angeklickt wird
+    if (drawer) {
+        drawer.querySelectorAll('a[href]').forEach(function (link) {
+            link.addEventListener('click', closeDrawer);
+        });
+    }
+})();
 </script>
