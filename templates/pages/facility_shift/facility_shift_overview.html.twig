@@ -1,18 +1,18 @@
-<main class="w-full mx-auto px-6 py-8" data-controller="facility-shift">
+<main class="w-full mx-auto px-2 py-3 widescreen:px-6 widescreen:py-8" data-controller="facility-shift">
 
     {# Split View Container #}
-    <div class="grid grid-cols-12 gap-6 h-[calc(100vh-160px)]">
+    <div class="flex flex-col widescreen:grid widescreen:grid-cols-12 gap-3 widescreen:gap-6 h-[calc(100vh-110px)] widescreen:h-[calc(100vh-160px)]">
 
         {# Left Panel - Facilities List #}
         <div
-            class="col-span-3 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-800/50 overflow-hidden flex flex-col"
+            class="widescreen:col-span-3 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-2xl widescreen:rounded-3xl border border-gray-200/50 dark:border-gray-800/50 overflow-hidden flex-shrink-0 widescreen:flex-shrink widescreen:flex-col"
             data-facility-shift-target="facilityList">
 
         </div>
 
         {# Right Panel - Shifts Configuration #}
         <div
-            class="col-span-9 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-800/50 overflow-hidden flex flex-col"
+            class="widescreen:col-span-9 flex-1 min-h-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-2xl widescreen:rounded-3xl border border-gray-200/50 dark:border-gray-800/50 overflow-hidden flex flex-col"
             data-facility-shift-target="demandShiftsContainer">
 
         </div>

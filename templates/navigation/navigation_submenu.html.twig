@@ -3,10 +3,10 @@
 
 <li data-sidebar-title="{{ title }}">
     <a href="{{ path(route) }}"
-       class="sidebar-nav-link {% if current_route == target_route %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %} pl-8">
+       class="sidebar-nav-link {% if current_route == target_route %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %} pl-6">
         <span class="sidebar-nav-inner relative z-10 flex items-center space-x-3">
-            {{ ux_icon(icon, { class: 'w-5 h-5 flex-shrink-0 transition-colors duration-200' }) }}
-            <span class="sidebar-text">{{ title }}</span>
+            {{ ux_icon(icon, { class: 'w-4 h-4 flex-shrink-0 transition-colors duration-200' }) }}
+            <span class="sidebar-text text-sm">{{ title }}</span>
         </span>
         {% if current_route == target_route %}
             <div

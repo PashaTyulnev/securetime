@@ -1,15 +1,15 @@
 <div class="facility-panel flex flex-col h-full">
-    <div class="p-6 border-b border-gray-200/50 dark:border-gray-700/50">
+    <div class="p-3 widescreen:p-6 border-b border-gray-200/50 dark:border-gray-700/50">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-2">{{ facility.title }}</h2>
+                <h2 class="text-base widescreen:text-2xl font-light text-gray-900 dark:text-white mb-1 widescreen:mb-2">{{ facility.title }}</h2>
                 <div class="flex items-center gap-4">
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
+    <div class="px-3 widescreen:px-6 py-2 widescreen:py-4 border-b border-gray-200/50 dark:border-gray-700/50">
         <div class="flex items-center gap-4">
             <button
                 data-action="click->facility-shift#previousWeek"
@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-6">
+    <div class="flex-1 overflow-y-auto p-3 widescreen:p-6">
         <div class="space-y-4">
 
             <div class="bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl">

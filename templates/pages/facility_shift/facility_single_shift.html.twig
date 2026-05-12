@@ -12,11 +12,11 @@
         <input type="hidden" name="facility" value="{{ facility['@id'] }}">
 
         {# Hauptbereich mit Schicht-Informationen #}
-        <div class="p-3">
-            <div class="grid grid-cols-12 gap-3 items-start">
+        <div class="p-2 widescreen:p-3">
+            <div class="grid grid-cols-6 widescreen:grid-cols-12 gap-2 widescreen:gap-3 items-start">
 
                 {# Schichtname mit Farbe - 3 Spalten #}
-                <div class="col-span-3">
+                <div class="col-span-2 widescreen:col-span-3">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'facility_shift.shift'|trans }}
@@ -55,7 +55,7 @@
                 </div>
 
                 {# Qualifikation - 2 Spalten #}
-                <div class="col-span-2">
+                <div class="col-span-2 widescreen:col-span-2">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'facility_shift.qualification'|trans }}
@@ -77,7 +77,7 @@
                 </div>
 
                 {# Zeit - 2 Spalten #}
-                <div class="col-span-2">
+                <div class="col-span-2 widescreen:col-span-2">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'common.time'|trans }}
@@ -102,7 +102,7 @@
                 </div>
 
                 {# Personal - 1 Spalte #}
-                <div class="col-span-1">
+                <div class="col-span-1 widescreen:col-span-1">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'facility_shift.personnel'|trans }}
@@ -117,7 +117,7 @@
                 </div>
 
                 {# Wochentage - 3 Spalten (mehr Platz!) #}
-                <div class="col-span-3">
+                <div class="col-span-4 widescreen:col-span-3">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         {{ 'schedule.weekdays'|trans }}
@@ -144,7 +144,7 @@
                 </div>
 
                 {# Aktionen - 1 Spalte #}
-                <div class="col-span-1">
+<div class="col-span-1 widescreen:col-span-1">
                     <label
                         class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1 block">
                         &nbsp;
@@ -176,10 +176,10 @@
             </div>
         </div>
 
-        <div class="flex">
+        <div class="flex flex-wrap">
 
         {% if facility.positions | length > 0 %}
-            <div class="px-3 pb-2 pt-1.5 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
+            <div class="px-2 widescreen:px-3 pb-2 pt-1.5 border-t border-gray-200/30 dark:border-gray-700/30 w-1/2 widescreen:w-1/4">
                 {% include 'elements/multi_select.html.twig' with {
                     'systemName': 'requiredPositions',
                     'title': ('facility_shift.required_positions'|trans),
@@ -197,7 +197,7 @@
             </div>
         {% endif %}
 
-        <div class="px-3 pb-2 pt-1.5 border-t border-gray-200/30 dark:border-gray-700/30 w-1/4">
+        <div class="px-2 widescreen:px-3 pb-2 pt-1.5 border-t border-gray-200/30 dark:border-gray-700/30 w-1/2 widescreen:w-1/4">
             {% include 'elements/multi_select.html.twig' with {
                 'systemName': 'partnerVisibility',
                 'title': ('facility_shift.partner_visibility'|trans),

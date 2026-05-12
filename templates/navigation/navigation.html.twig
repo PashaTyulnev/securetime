@@ -23,13 +23,13 @@
 
 {# Klassen #}
 {% set default_classes =
-    'group flex items-center space-x-3 px-5 py-2 rounded-2xl
+    'group flex items-center space-x-3 px-3 py-1.5 rounded-xl
      text-gray-600 dark:text-gray-400
      hover:bg-gray-100/80 dark:hover:bg-gray-700/50
      transition-all duration-200 relative overflow-hidden' %}
 
 {% set active_classes =
-    'group flex items-center space-x-3 px-5 py-2 rounded-2xl
+    'group flex items-center space-x-3 px-3 py-1.5 rounded-xl
      bg-gradient-to-r from-slate-100 to-gray-100
      dark:from-gray-700/50 dark:to-gray-700/30
      text-slate-900 dark:text-white
@@ -37,7 +37,7 @@
 
 <aside
     id="separator-sidebar"
-    class="fixed top-0 left-0 z-40 w-72 h-screen
+    class="fixed top-0 left-0 z-40 w-60 h-screen
            transition-transform -translate-x-full sm:translate-x-0
            bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
            border-r border-gray-200/50 dark:border-gray-700/50
@@ -48,10 +48,10 @@
     {# ================================
        Header / Logo
        ================================ #}
-    <div id="sidebar-header" class="flex items-center justify-between pl-10 pr-3 py-5">
+    <div id="sidebar-header" class="flex items-center justify-between pl-5 pr-3 py-3">
         <div class="sidebar-logo-area flex items-center space-x-3 min-w-0">
             <div class="relative flex-shrink-0">
-                <div class="w-9 h-9">
+                <div class="w-7 h-7">
                     <img src="{{ asset('logo_mini.svg') }}" alt="SecureTime Logo"
                          class="w-full h-full object-contain dark:hidden">
                     <img src="{{ asset('logo_mini_white.svg') }}" alt="SecureTime Logo"
@@ -60,7 +60,7 @@
                 <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
             </div>
             <div class="sidebar-text min-w-0">
-                <h2 class="text-lg font-light text-gray-900 dark:text-white tracking-tight whitespace-nowrap">
+                <h2 class="text-sm font-medium text-gray-900 dark:text-white tracking-tight whitespace-nowrap">
                     {{ 'app.name'|trans }}
                 </h2>
                 <p class="text-xs font-light text-gray-500 dark:text-gray-400 whitespace-nowrap">
@@ -80,7 +80,7 @@
     {# ================================
        Navigation
        ================================ #}
-    <nav class="flex-1 overflow-y-auto px-5 pb-5 scrollbar-thin">
+    <nav class="flex-1 overflow-y-auto px-3 pb-3 scrollbar-thin">
 
         <ul class="space-y-1">
 
@@ -137,7 +137,7 @@
             {% if is_granted('ROLE_ADMIN') %}
                 <li class="mt-2 sidebar-text">
                     <div
-                        class="px-5 py-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                        class="px-3 py-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                         {{ 'navigation.archive'|trans }}
                     </div>
                 </li>
@@ -153,7 +153,7 @@
             {% if is_granted('ROLE_ADMIN') %}
                 <li class="mt-2 sidebar-text">
                     <div
-                        class="px-5 py-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                        class="px-3 py-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                         {{ 'navigation.admin'|trans|default('Admin') }}
                     </div>
                 </li>
@@ -163,23 +163,23 @@
 
         </ul>
 
-        <div class="my-6 border-t border-gray-200/50 dark:border-gray-700/50"></div>
+        <div class="my-2 border-t border-gray-200/50 dark:border-gray-700/50"></div>
 
     </nav>
 
     {# ================================
        User Profile
        ================================ #}
-    <div id="sidebar-user-profile" class="p-5 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/30">
-        <div class="sidebar-user-area flex items-center space-x-3">
+    <div id="sidebar-user-profile" class="p-3 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/30">
+        <div class="sidebar-user-area flex items-center space-x-2">
             <a href="{{ path('app_logout') }}"
                title="{{ 'navigation.logout'|trans|default('Abmelden') }}"
-               class="sidebar-user-icon flex-shrink-0 w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors">
+               class="sidebar-user-icon flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors">
                 {{ ux_icon('lucide:user', { class:'w-5 h-5' }) }}
             </a>
             <div class="sidebar-text flex-1 min-w-0">
-                <p class="text-sm font-medium truncate">{{ app.user.username }}</p>
-                <p class="text-xs text-gray-500 truncate">{{ app.user.email }}</p>
+                <p class="text-xs font-medium truncate">{{ app.user.username }}</p>
+                <p class="text-xs text-gray-500 truncate opacity-70">{{ app.user.email }}</p>
             </div>
             <a href="{{ path('app_logout') }}" class="sidebar-text p-2 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700">
                 {{ ux_icon('lucide:log-out', { class:'w-5 h-5' }) }}
@@ -205,13 +205,13 @@
     /* ===== Sidebar collapse ===== */
     #separator-sidebar {
         transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
-        width: 18rem;
+        width: 15rem;
     }
     @media (min-width: 640px) {
-        #main-content { margin-left: 18rem; transition: margin-left 0.25s cubic-bezier(0.4,0,0.2,1); }
-        html.sidebar-collapsed #main-content { margin-left: 4rem; }
+        #main-content { margin-left: 15rem; transition: margin-left 0.25s cubic-bezier(0.4,0,0.2,1); }
+        html.sidebar-collapsed #main-content { margin-left: 3.5rem; }
     }
-    html.sidebar-collapsed #separator-sidebar { width: 4rem; }
+    html.sidebar-collapsed #separator-sidebar { width: 3.5rem; }
 
     /* Text ausblenden */
     html.sidebar-collapsed .sidebar-text { display: none; }

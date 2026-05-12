@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --breakpoint-widescreen: 1500px;
+}
 html {
     color-scheme: dark;
 }

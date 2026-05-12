@@ -10,14 +10,14 @@
 
         {# Header #}
         <header class="sticky top-0 backdrop-blur-2xl bg-white/70 dark:bg-gray-900/70 border-b border-gray-200/50 dark:border-gray-800/50">
-            <div class="w-full mx-auto px-6 py-4">
+            <div class="w-full mx-auto px-3 widescreen:px-6 py-2 widescreen:py-4">
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-6">
-                        <h1 class="text-3xl font-extralight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+                    <div class="flex items-center gap-3 widescreen:gap-6">
+                        <h1 class="text-lg widescreen:text-3xl font-extralight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
                             {{ 'facility_shift.templates'|trans }}
                         </h1>
-                        <div class="h-8 w-px bg-gray-200 dark:bg-gray-800"></div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400 font-light">{{ 'facility_shift.description'|trans }}</span>
+                        <div class="hidden md:block h-6 w-px bg-gray-200 dark:bg-gray-800"></div>
+                        <span class="hidden md:block text-xs text-gray-500 dark:text-gray-400 font-light">{{ 'facility_shift.description'|trans }}</span>
                     </div>
 
                 </div>
