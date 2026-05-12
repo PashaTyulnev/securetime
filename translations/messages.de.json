@@ -256,5 +256,7 @@
   "pwa.install_title": "App installieren",
   "pwa.install_description": "Installieren Sie diese App für schnelleren Zugriff und Offline-Nutzung.",
   "pwa.install": "Installieren",
-  "pwa.dismiss": "Später"
+  "pwa.dismiss": "Später",
+  "schedule.screen_too_small_title": "Bildschirm zu klein",
+  "schedule.screen_too_small_message": "Die Einsatzplanung erfordert einen Desktop-Computer oder einen großen Monitor für optimale Nutzung."
 }

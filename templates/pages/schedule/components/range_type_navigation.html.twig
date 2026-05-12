@@ -1,17 +1,17 @@
-<div class="px-6">
-    <nav class="flex gap-1">
+<div class="px-3 schedule:px-6">
+    <nav class="flex gap-0.5">
         <a href="{{ path('app_schedule') }}"
-           class="px-5 py-3 text-sm font-medium {{ app.request.attributes.get('_route') == 'app_schedule' ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600' }} transition-all duration-200">
+           class="px-3 py-2 schedule:px-5 schedule:py-3 text-xs schedule:text-sm font-medium {{ app.request.attributes.get('_route') == 'app_schedule' ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600' }} transition-all duration-200">
             {{ 'schedule.week_view'|trans }}
         </a>
 
         <a href="{{ path('app_schedule_two_week') }}"
-           class="px-5 py-3 text-sm font-medium {{ app.request.attributes.get('_route') == 'app_schedule_two_week' ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600' }} transition-all duration-200">
+           class="px-3 py-2 schedule:px-5 schedule:py-3 text-xs schedule:text-sm font-medium {{ app.request.attributes.get('_route') == 'app_schedule_two_week' ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600' }} transition-all duration-200">
             {{ 'schedule.two_week_view'|trans }}
         </a>
 
         <a href="{{ path('app_schedule_month') }}"
-           class="px-5 py-3 text-sm font-medium {{ app.request.attributes.get('_route') == 'app_schedule_month' ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600' }} transition-all duration-200">
+           class="px-3 py-2 schedule:px-5 schedule:py-3 text-xs schedule:text-sm font-medium {{ app.request.attributes.get('_route') == 'app_schedule_month' ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600' }} transition-all duration-200">
             {{ 'schedule.month_view'|trans }}
         </a>
     </nav>

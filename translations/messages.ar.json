@@ -254,5 +254,7 @@
   "pwa.install_title": "تثبيت التطبيق",
   "pwa.install_description": "قم بتثبيت هذا التطبيق للوصول السريع والاستخدام في وضع عدم الاتصال.",
   "pwa.install": "تثبيت",
-  "pwa.dismiss": "لاحقاً"
+  "pwa.dismiss": "لاحقاً",
+  "schedule.screen_too_small_title": "الشاشة صغيرة جداً",
+  "schedule.screen_too_small_message": "تخطيط المناوبات يتطلب حاسوباً مكتبياً أو شاشة كبيرة للاستخدام الأمثل."
 }

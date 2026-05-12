@@ -4,6 +4,7 @@
 
 @theme {
     --breakpoint-widescreen: 1500px;
+    --breakpoint-schedule: 1200px;
 }
 html {
     color-scheme: dark;

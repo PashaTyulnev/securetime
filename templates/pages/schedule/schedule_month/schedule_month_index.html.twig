@@ -2,8 +2,17 @@
 
 {% block body %}
 
+    {# Hinweis für sehr kleine Bildschirme #}
+    <div class="schedule:hidden flex flex-col items-center justify-center min-h-screen px-6 text-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
+        <div class="p-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl max-w-sm w-full space-y-4">
+            {{ ux_icon('lucide:monitor', { class: 'w-12 h-12 text-slate-400 mx-auto' }) }}
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ 'schedule.screen_too_small_title'|trans|default('Bildschirm zu klein') }}</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ 'schedule.screen_too_small_message'|trans|default('Die Einsatzplanung ist für größere Bildschirme optimiert. Bitte nutze ein Tablet im Querformat oder einen Desktop-Computer.') }}</p>
+        </div>
+    </div>
+
     <div data-controller="schedule-month"
-         class="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-gray-950 dark:via-slate-950 dark:to-gray-900">
+         class="hidden schedule:block min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-gray-950 dark:via-slate-950 dark:to-gray-900">
 
         {# Animated Background Gradients #}
         <div class="fixed inset-0 overflow-hidden pointer-events-none">
