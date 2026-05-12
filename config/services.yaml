@@ -17,6 +17,10 @@ services:
     App\:
         resource: '../src/'
 
+    App\Doctrine\Middleware\TenantConnectionMiddleware:
+        tags:
+            - { name: doctrine.middleware, connection: default }
+
     App\EventSubscriber\TenantSubscriber:
         arguments:
             $adminEntityManager: '@doctrine.orm.admin_entity_manager'
