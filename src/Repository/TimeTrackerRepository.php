@@ -14,6 +14,36 @@ class TimeTrackerRepository extends ServiceEntityRepository
         parent::__construct($registry, TimeTracker::class);
     }
 
+    /**
+     * Loads all reference entries whose timestamp is inside the template window (ordered chronologically).
+     *
+     * @return TimeTracker[]
+     */
+    public function findTemplatesInRange(\DateTimeInterface $start, \DateTimeInterface $end): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.timestamp >= :start')
+            ->andWhere('t.timestamp <= :end')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('t.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Counts all entries on or after the given timestamp.
+     */
+    public function countFromTimestamp(\DateTimeInterface $from): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->andWhere('t.timestamp >= :from')
+            ->setParameter('from', $from)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function findPreviousMainCheckinEntry(User $user, int $currentEntryId): ?TimeTracker
     {
         return $this->createQueryBuilder('t')

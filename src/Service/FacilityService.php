@@ -72,7 +72,7 @@ class FacilityService
 
     public function getFacilityById(int $facility)
     {
-        $facility = $this->facilityRepository->find($facility);
+        $facility = $this->facilityRepository->findByIdWithCompany($facility);
 
         $facility = $this->serializer->serialize(
             $facility,

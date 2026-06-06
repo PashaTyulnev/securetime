@@ -41,6 +41,40 @@ class ShiftRepository extends ServiceEntityRepository
     }
 
 
+    /**
+     * Loads all reference shifts whose date is inside the template window.
+     *
+     * @return Shift[]
+     */
+    public function findTemplatesInRange(\DateTimeInterface $start, \DateTimeInterface $end): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.date >= :start')
+            ->andWhere('s.date <= :end')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('s.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Returns the ids of all shifts on or after the given date.
+     *
+     * @return int[]
+     */
+    public function findIdsFromDate(\DateTimeInterface $from): array
+    {
+        $rows = $this->createQueryBuilder('s')
+            ->select('s.id')
+            ->andWhere('s.date >= :from')
+            ->setParameter('from', $from)
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_map(static fn (array $row): int => (int) $row['id'], $rows);
+    }
+
     public function findByEmployeeAndDate(?Employee $employee, ?\DateTime $getDate)
     {
         return $this->createQueryBuilder('s')

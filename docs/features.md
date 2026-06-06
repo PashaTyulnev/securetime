@@ -139,3 +139,36 @@ Unterstützte Sprachen:
 
 Weitere Sprachen später möglich.
 
+---
+
+# Demo-Modus
+
+## Demand-Shifts generieren (`app:demo:generate-demand-shifts`)
+
+- Repliziert das 2-Wochen-Template (27.04.–10.05.2026) zyklisch als Wochenregeln in die Zukunft
+- Wochenmuster wird beibehalten (Wochentag-Flags werden 1:1 kopiert, keine Auflösung in Einzeltage)
+- Löscht vor der Generierung alle `demand_shift` ab `--from` FK-sicher (inkl. abhängiger Shifts), Referenzdaten bleiben unverändert
+- Idempotent: mehrfaches Ausführen erzeugt denselben Endzustand
+- Optionen: `--from=2026-05-11`, `--months=6`, `--dry-run`
+
+## Shifts generieren (`app:demo:generate-shifts`)
+
+- Repliziert echte Shifts (27.04.–10.05.2026) als 2-Wochen-Muster zyklisch in die Zukunft
+- Mappt `demand_shift_id` automatisch auf die neu erzeugten DemandShifts (Match über Facility, Name, Zeiten, On-Call, Wochentag, Gültigkeitszeitraum)
+- Nutzt die bestehenden Shift-Validatoren (Qualifikation, Zeit-/Ruhezeit-Regeln, Custom-Regeln, Abwesenheiten) plus harte Prüfung „1 Schicht pro Mitarbeiter und Tag"
+- Bei fehlendem DemandShift-Match oder Regelverstoß: Fehler + Rollback (keine kaputten Demo-Daten)
+- Löscht vor der Generierung alle Shifts ab `--from`, Referenzdaten bleiben unverändert
+- Voraussetzung: `app:demo:generate-demand-shifts` muss vorher laufen
+- Optionen: `--from=2026-05-11`, `--months=6`, `--dry-run`
+
+## Zeiterfassung generieren (`app:demo:generate-time-tracking`)
+
+- Repliziert echte Zeiterfassung (27.04.–10.05.2026) als 2-Wochen-Muster zyklisch, nur bis heute (keine Zukunft)
+- Erhält Checkin/Pause/Checkout-Gruppen: `parent_id` wird auf die neue Parent-ID der Kopie gemappt (Parent zuerst, dann Kinder chronologisch)
+- Verschiebt `timestamp` und `created_at` um die gleiche Tagesdifferenz, respektiert den Chronologie-Listener
+- Erzeugt nur Einträge an Tagen, an denen der User eine Shift hat; Tage ohne Shift werden übersprungen
+- Löscht vor der Generierung alle Einträge ab `--from` (FK-sicher Kinder zuerst), Referenzdaten bleiben unverändert
+- Voraussetzung: `app:demo:generate-shifts` muss vorher laufen
+- Optionen: `--from=2026-05-11`, `--until=today` (oder Datum), `--dry-run`
+
+Empfohlene Ausführungsreihenfolge: `generate-demand-shifts` → `generate-shifts` → `generate-time-tracking`.

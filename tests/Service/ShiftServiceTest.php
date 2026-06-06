@@ -297,11 +297,11 @@ class ShiftServiceTest extends TestCase
     {
         return new ShiftService(
             $this->createStub(\App\Repository\ShiftPresetRepository::class),
+            $this->createStub(\App\Repository\DemandShiftRepository::class),
             $this->createStub(\Symfony\Component\Serializer\SerializerInterface::class),
             $shiftRepository,
             $this->createStub(\Symfony\Bundle\SecurityBundle\Security::class),
             $employeeService,
-            $this->createStub(\App\Repository\DemandShiftRepository::class),
             $this->createStub(\Symfony\Contracts\HttpClient\HttpClientInterface::class)
         );
     }

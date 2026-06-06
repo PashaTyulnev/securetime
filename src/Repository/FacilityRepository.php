@@ -29,6 +29,17 @@ class FacilityRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findByIdWithCompany(int $id): ?Facility
+    {
+        return $this->createQueryBuilder('f')
+            ->leftJoin('f.company', 'c')
+            ->addSelect('c')
+            ->where('f.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function findAllWithActiveFilter(?bool $active = true): array
     {
         $qb = $this->createQueryBuilder('f')
